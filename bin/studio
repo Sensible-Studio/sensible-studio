@@ -21,11 +21,23 @@ fi
 JAVA_BIN="${JAVA_HOME:+$JAVA_HOME/bin/}java"
 
 JAR_PATH="$DIR/studio-quickstart/target/studio-quickstart-1.0.0-SNAPSHOT.jar"
+# A release (made by "bin/studio dist", downloaded from the project's releases) has everything built
+# already, in lib/: the launcher, the install folder and the two services. Its RELEASE file holds the
+# version. There is nothing to compile, so Maven, Node.js and Rust are not needed.
+RELEASE=""
+if [ -f "$DIR/RELEASE" ]; then
+    RELEASE="$(cat "$DIR/RELEASE")"
+    JAR_PATH="$DIR/lib/studio-quickstart.jar"
+fi
 # The author instance lives in instances/author (the publish one in instances/publish, see bin/studio-publish)
 AUTHOR_HOME="${AUTHOR_HOME:-$DIR/instances/author}"
 PID_FILE="$AUTHOR_HOME/author.pid"
 
 build_if_needed() {
+    if [ -n "$RELEASE" ]; then
+        [ -f "$JAR_PATH" ] || { echo "❌ $JAR_PATH is missing: this release is incomplete, download it again."; exit 1; }
+        return 0
+    fi
     if [ ! -f "$JAR_PATH" ]; then
         echo "⚙️  Building Sensible Studio Engine..."
         mvn package -DskipTests
@@ -36,6 +48,17 @@ build_if_needed() {
 # instances/author/dam/bin/studio-dam. Without Rust, Sensible Studio still starts; assets just are not processed.
 install_dam_service() {
     local src="$DIR/dam-service" bin="$DIR/dam-service/target/release/studio-dam" dest="$AUTHOR_HOME/dam/bin/studio-dam"
+    if [ -n "$RELEASE" ]; then
+        bin="$DIR/lib/bin/studio-dam"
+        if [ ! -x "$bin" ]; then
+            [ -x "$dest" ] || echo "⚠️  This release has no media service for this system: media is not processed"
+            return 0
+        fi
+        if [ ! -x "$dest" ] || ! cmp -s "$bin" "$dest"; then
+            mkdir -p "$(dirname "$dest")" && cp "$bin" "$dest" && chmod +x "$dest"
+        fi
+        return 0
+    fi
     [ -f "$src/Cargo.toml" ] || return 0
     if ! command -v cargo >/dev/null 2>&1; then
         [ -x "$dest" ] || echo "⚠️  Rust not installed: DAM processing disabled (install from https://rustup.rs)"
@@ -74,7 +97,8 @@ check_office() {
 # kept in git: instances/ is the machine's own. Run again after pulling new code; an instance that already
 # ran picks up what changed (a content package only when its version did).
 #   bin/studio setup           the product
-#   bin/studio setup --wknd    and the WKND reference site (Apache 2.0, downloaded from its GitHub releases)
+#   bin/studio setup --wknd    and the WKND reference site (Adobe's sample project, downloaded from its
+#                              GitHub releases; not part of this repository or of a release)
 THIRD_PARTY="
 org.apache.commons:commons-imaging:1.0-alpha3:jar
 org.apache.commons:commons-lang3:3.17.0:jar
@@ -116,6 +140,16 @@ setup() {
             *) echo "Usage: bin/studio setup [--wknd]"; exit 1 ;;
         esac
     done
+    if [ -n "$RELEASE" ]; then
+        # a release: the install folder is in lib/, as "bin/studio dist" built it
+        [ -d "$DIR/lib/install" ] || { echo "❌ $DIR/lib/install is missing: this release is incomplete, download it again."; exit 1; }
+        mkdir -p "$install"
+        cp -f "$DIR/lib/install"/* "$install/"
+        [ "$wknd" = 1 ] && add_wknd "$install"
+        install_dam_service
+        echo "✅ $AUTHOR_HOME is ready (Sensible Studio $RELEASE, $(ls "$install" | wc -l | tr -d ' ') files in install/). Start it: bin/studio start"
+        return 0
+    fi
     need mvn "Apache Maven 3.9 or newer, https://maven.apache.org"
     need node "Node.js 20 or newer, https://nodejs.org"
     need npm "it comes with Node.js"
@@ -177,18 +211,89 @@ setup() {
     echo "⚙️  Configurations..."
     cp -f "$DIR/studio-uberjar/studio-compat-config"/*.cfg.json "$install/"
 
-    if [ "$wknd" = 1 ]; then
-        echo "🏔  The WKND reference site $WKND_VERSION..."
-        need curl "to download WKND"
-        local pack="$install/aem-guides-wknd.all-$WKND_VERSION.zip"
-        [ -s "$pack" ] || curl -fL --progress-bar -o "$pack" "$WKND_URL"
-        for inner in ui.content ui.content.sample; do
-            unzip -p "$pack" "jcr_root/apps/wknd-packages/content/install/aem-guides-wknd.$inner-$WKND_VERSION.zip" > "$install/aem-guides-wknd.$inner-$WKND_VERSION.zip"
-        done
-    fi
+    [ "$wknd" = 1 ] && add_wknd "$install"
 
     install_dam_service
     echo "✅ $AUTHOR_HOME is ready ($(ls "$install" | wc -l | tr -d ' ') files in install/). Start it: bin/studio start"
+}
+
+# The WKND reference site, downloaded into an install folder: the "all" package, and its two content
+# packages put beside it (the installer does not unpack a package from inside another).
+add_wknd() {
+    local install="$1" inner
+    echo "🏔  The WKND reference site $WKND_VERSION..."
+    need curl "to download WKND"
+    need unzip "the unzip command"
+    local pack="$install/aem-guides-wknd.all-$WKND_VERSION.zip"
+    [ -s "$pack" ] || curl -fL --progress-bar -o "$pack" "$WKND_URL"
+    for inner in ui.content ui.content.sample; do
+        unzip -p "$pack" "jcr_root/apps/wknd-packages/content/install/aem-guides-wknd.$inner-$WKND_VERSION.zip" > "$install/aem-guides-wknd.$inner-$WKND_VERSION.zip"
+    done
+}
+
+# A release: one archive with everything built, for people who want to run Sensible Studio and not
+# build it. dist/sensible-studio-<version>-<system>-<processor>.tar.gz holds the launcher, a clean
+# install folder (no sample site), the media service and the Live cache compiled for this machine's
+# system, the scripts, the configuration of the Live cache and of Apache, and the documentation.
+# Unpacked, "bin/studio start" is enough: it needs Java 21 and nothing else.
+dist() {
+    local version="$1"
+    [ -n "$version" ] || { echo "Usage: bin/studio dist <version>   (for example: bin/studio dist 0.1.0)"; exit 1; }
+    [ -z "$RELEASE" ] || { echo "This folder is a release already ($RELEASE): run dist from a clone of the repository."; exit 1; }
+    need tar "the tar command"
+    local os arch name out stage
+    os=$(uname -s | tr '[:upper:]' '[:lower:]'); [ "$os" = "darwin" ] && os="macos"
+    arch=$(uname -m)
+    case "$arch" in
+        x86_64|amd64) arch="x64" ;;
+        aarch64|arm64) arch="arm64" ;;
+    esac
+    name="sensible-studio-$version-$os-$arch"
+    out="$DIR/dist"
+    stage="$out/$name"
+    rm -rf "$stage" "$out/$name.tar.gz"
+    mkdir -p "$stage/lib/bin"
+
+    # a clean install folder, in a home of its own: the one of this machine's author has every earlier
+    # build of the authoring interface in it, and maybe a sample site
+    AUTHOR_HOME="$stage/.home"
+    setup
+    mv "$stage/.home/install" "$stage/lib/install"
+    if [ -x "$stage/.home/dam/bin/studio-dam" ]; then
+        mv "$stage/.home/dam/bin/studio-dam" "$stage/lib/bin/studio-dam"
+    else
+        echo "⚠️  No media service in this release (Rust is not installed)"
+    fi
+    rm -rf "$stage/.home"
+    cp "$JAR_PATH" "$stage/lib/studio-quickstart.jar"
+
+    if command -v cargo >/dev/null 2>&1; then
+        echo "🦀 Building the Live cache..."
+        (cd "$DIR/live-service" && cargo build --release --quiet)
+        cp "$DIR/live-service/target/release/studio-live" "$stage/lib/bin/studio-live"
+    else
+        echo "⚠️  No Live cache in this release (Rust is not installed)"
+    fi
+
+    echo "📚 Scripts, configuration and documentation..."
+    mkdir -p "$stage/bin" "$stage/studio-uberjar" "$stage/live-service" "$stage/docs"
+    cp "$DIR/bin/studio" "$DIR/bin/studio-publish" "$DIR/bin/studio-live" "$stage/bin/"
+    cp -R "$DIR/studio-uberjar/studio-compat-config" "$stage/studio-uberjar/"
+    cp -R "$DIR/live-service/conf" "$DIR/live-service/apache" "$DIR/live-service/deploy" "$stage/live-service/"
+    cp "$DIR/live-service/README.md" "$stage/live-service/"
+    cp -R "$DIR/docs/content" "$stage/docs/"
+    cp "$DIR/LICENSE" "$DIR/README.md" "$stage/"
+    find "$stage" -name .DS_Store -delete
+    echo "$version" > "$stage/RELEASE"
+
+    (cd "$out" && tar -czf "$name.tar.gz" "$name")
+    if command -v shasum >/dev/null 2>&1; then
+        (cd "$out" && shasum -a 256 "$name.tar.gz" > "$name.tar.gz.sha256")
+    elif command -v sha256sum >/dev/null 2>&1; then
+        (cd "$out" && sha256sum "$name.tar.gz" > "$name.tar.gz.sha256")
+    fi
+    rm -rf "$stage"
+    echo "✅ $out/$name.tar.gz ($(du -h "$out/$name.tar.gz" | cut -f1 | tr -d ' '))"
 }
 
 case "$1" in
@@ -198,7 +303,11 @@ case "$1" in
         ;;
     start)
         if [ ! -d "$AUTHOR_HOME/install" ]; then
-            echo "⚠️  $AUTHOR_HOME/install does not exist: run 'bin/studio setup' first, or this instance is only Apache Sling."
+            if [ -n "$RELEASE" ]; then
+                setup
+            else
+                echo "⚠️  $AUTHOR_HOME/install does not exist: run 'bin/studio setup' first, or this instance is only Apache Sling."
+            fi
         fi
         build_if_needed
         install_dam_service
@@ -209,6 +318,10 @@ case "$1" in
         mkdir -p "$AUTHOR_HOME"
         echo $$ > "$PID_FILE"
         exec "$JAVA_BIN" -jar "$JAR_PATH" -c "$AUTHOR_HOME" "$@"
+        ;;
+    dist)
+        shift
+        dist "$@"
         ;;
     stop)
         if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
@@ -237,6 +350,7 @@ case "$1" in
         echo "  start [-p <port>] [-r <mode>]                Start the author instance (home: instances/author, AUTHOR_HOME overrides)"
         echo "  stop                                         Stop the author instance started with 'start'"
         echo "  build                                        Compile and package all modules"
+        echo "  dist <version>                               Make a release archive in dist/: everything built, for this system"
         echo "  test                                         Run full unit and compatibility tests"
         echo "  help                                         Show this help message"
         echo ""

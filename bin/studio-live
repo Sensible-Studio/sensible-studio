@@ -30,6 +30,12 @@ cd "$DIR"
 LIVE_HOME="${LIVE_HOME:-$DIR/instances/live}"
 CONFIG="${LIVE_CONFIG:-$DIR/live-service/conf/live.toml}"
 BIN="$DIR/live-service/target/release/studio-live"
+# a release (see bin/studio) has the service compiled already, in lib/bin
+RELEASE=""
+if [ -f "$DIR/RELEASE" ]; then
+    RELEASE="$(cat "$DIR/RELEASE")"
+    BIN="$DIR/lib/bin/studio-live"
+fi
 PID_FILE="$LIVE_HOME/live.pid"
 LOG_FILE="$LIVE_HOME/logs/live.log"
 
@@ -49,6 +55,10 @@ running() {
 }
 
 build() {
+    if [ -n "$RELEASE" ]; then
+        [ -x "$BIN" ] && { echo "✅ Nothing to build: this release has the Live cache in $BIN"; return 0; }
+        echo "This release has no Live cache for this system."; exit 1
+    fi
     command -v cargo >/dev/null || { echo "cargo is needed to build the Live cache: https://rustup.rs"; exit 1; }
     ( cd "$DIR/live-service" && cargo build --release )
     echo "✅ Built $BIN"

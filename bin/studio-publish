@@ -16,6 +16,12 @@ AUTHOR_HOME="${AUTHOR_HOME:-$DIR/instances/author}"
 PUBLISH_HOME="${PUBLISH_HOME:-$DIR/instances/publish}"
 PORT="${PUBLISH_PORT:-4503}"
 JAR_PATH="$DIR/studio-quickstart/target/studio-quickstart-1.0.0-SNAPSHOT.jar"
+# a release (see bin/studio): the launcher, the install folder and the media service are in lib/
+RELEASE=""
+if [ -f "$DIR/RELEASE" ]; then
+    RELEASE="$(cat "$DIR/RELEASE")"
+    JAR_PATH="$DIR/lib/studio-quickstart.jar"
+fi
 PID_FILE="$PUBLISH_HOME/publish.pid"
 # The sign-in key of the farm (studio-auth signs the studio-login cookie with it): one file, and every
 # publish instance gets a copy, so that a visitor signed in on one is signed in on all of them. Not in
@@ -76,7 +82,12 @@ setup() {
     mkdir -p "$PUBLISH_HOME/install" "$PUBLISH_HOME/logs"
     farm_key
     # the same bundles, content and configurations as the author, apart from what is author-only
-    for f in "$AUTHOR_HOME"/install/*; do
+    # from the author's install folder (what was deployed to it belongs here too); in a release whose
+    # author was never set up, from the release's own
+    seed="$AUTHOR_HOME/install"
+    if [ ! -d "$seed" ] && [ -n "$RELEASE" ]; then seed="$DIR/lib/install"; fi
+    [ -d "$seed" ] || { echo "❌ $seed does not exist: run 'bin/studio setup' first."; exit 1; }
+    for f in "$seed"/*; do
         name="$(basename "$f")"
         case "$name" in
             *RepositoryInitializer~studio-start*) continue ;;   # /content → author start screen
@@ -107,9 +118,11 @@ setup() {
     fi
     # the image service (studio-dam): the publish runs its own, on its own port (see the publish configuration
     # of DamServiceManager); without the binary /is/image/... answers 503 there
-    if [ -x "$AUTHOR_HOME/dam/bin/studio-dam" ]; then
+    dam="$AUTHOR_HOME/dam/bin/studio-dam"
+    if [ ! -x "$dam" ] && [ -n "$RELEASE" ]; then dam="$DIR/lib/bin/studio-dam"; fi
+    if [ -x "$dam" ]; then
         mkdir -p "$PUBLISH_HOME/dam/bin"
-        cp -f "$AUTHOR_HOME/dam/bin/studio-dam" "$PUBLISH_HOME/dam/bin/studio-dam"
+        cp -f "$dam" "$PUBLISH_HOME/dam/bin/studio-dam"
         chmod 755 "$PUBLISH_HOME/dam/bin/studio-dam"
     fi
     # the Sling feature launcher's artifact cache: share the author's download
@@ -120,7 +133,7 @@ setup() {
 }
 
 start() {
-    [ -f "$JAR_PATH" ] || { echo "Build first: ./bin/studio build"; exit 1; }
+    [ -f "$JAR_PATH" ] || { echo "Build first: ./bin/studio setup"; exit 1; }
     [ -d "$PUBLISH_HOME/install" ] || setup
     farm_key
     check_ffmpeg

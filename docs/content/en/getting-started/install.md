@@ -1,12 +1,37 @@
 ---
 title: Install and run
-description: From a clone of the Sensible Studio repository to a running author instance, a publish instance and the Live cache, on your own machine.
+description: Install Sensible Studio from a release or build it from source, then start the author instance, a publish instance and the Live cache on your own machine.
 order: 10
 ---
 
-This page takes you from a clone of the repository to an author instance you can sign in to. Allow twenty minutes, most of it waiting for the first build.
+There are two ways to get a running instance. A **release** is everything built already: unpack it and start. Building **from source** is for people who want to change the product, or run the latest code.
 
-## What you need
+Either way you end with the same folder layout and the same commands, so everything after "Start the author instance" applies to both.
+
+## From a release
+
+You need **Java 21** or newer, and nothing else.
+
+1. Download the archive for your system from the project's [releases](https://github.com/Sensible-Studio/sensible-studio/releases): `sensible-studio-<version>-linux-x64.tar.gz` or `sensible-studio-<version>-macos-arm64.tar.gz`.
+2. Unpack it and start:
+
+```
+tar -xzf sensible-studio-<version>-linux-x64.tar.gz
+cd sensible-studio-<version>-linux-x64
+bin/studio start
+```
+
+The first start sets the instance up from the release's own files, and downloads Apache Sling itself from Maven Central (about 100 MB, once). For the WKND sample site, which the examples in this documentation use, run `bin/studio setup --wknd` before the first start.
+
+The archive holds the launcher, the install folder, the media service and the Live cache compiled for that system, the scripts, the Apache configuration and this documentation. `ffmpeg` and LibreOffice are still optional extras of the machine; see the table below.
+
+Continue at [Start the author instance](#start-the-author-instance).
+
+## From source
+
+This takes you from a clone of the repository to an author instance you can sign in to. Allow twenty minutes, most of it waiting for the first build.
+
+### What you need
 
 | | Version | What for |
 |---|---|---|
@@ -20,7 +45,7 @@ This page takes you from a clone of the repository to an author instance you can
 
 It runs on macOS and Linux. About 4 GB of free memory and 5 GB of disk are enough for an author, a publish instance and the sample site.
 
-## Build and set up
+### Build and set up
 
 ```
 git clone <the repository address> sensible-studio
@@ -80,7 +105,7 @@ A second publish instance, or a preview, is the same script with another home an
 Optional on a developer's machine. The Live cache is what stands in front of the publish instances on a real site; see [The Live cache](../developer/live-cache.md).
 
 ```
-bin/studio-live build
+bin/studio-live build      # from source only; a release has it built
 bin/studio-live start
 ```
 
@@ -99,6 +124,7 @@ It answers on [http://localhost:4520/](http://localhost:4520/). `bin/studio-live
 ## If something goes wrong
 
 - **The page shows the Apache Sling welcome page.** `instances/author/install` is missing or empty. Run `bin/studio setup`.
+- **The first start stops with a download error.** The launcher fetches Apache Sling from Maven Central the first time. The machine needs to reach `repo1.maven.org` once.
 - **A sample page fails with "cannot be resolved to a type".** The instance runs on a Java older than 21. Check `java.version` under **Home › System › Web Console › System Status**.
 - **Images have no thumbnails.** The media service is not running: Rust was not installed when you ran `setup`. Install it and run `bin/studio setup` again.
 - **Anything else.** The log is `instances/author/logs/error.log`. **Home › System › Developer › Health** shows what the instance thinks of itself.

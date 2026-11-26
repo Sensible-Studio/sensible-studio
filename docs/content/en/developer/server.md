@@ -25,24 +25,28 @@ A new instance is set up for a developer's machine. Do these before it is reacha
 
 ## The instances
 
-Build on a build machine, not on the server:
+Do not build on the server. Put a **release** on it: the archive from the project's releases, or one you made yourself with `bin/studio dist <version>` on a machine with the same system as the server. Unpacked, it has everything the commands below need, and the server needs only Java 21.
 
 ```
-bin/studio setup
+tar -xzf sensible-studio-<version>-linux-x64.tar.gz -C /opt
+ln -sfn /opt/sensible-studio-<version>-linux-x64 /opt/sensible-studio
 ```
 
-Copy to each server:
-
-- `studio-quickstart/target/studio-quickstart-*.jar`, the launcher;
-- the install folder: `instances/author/install` for the author; for a publish instance, the one `bin/studio-publish setup` makes in `instances/publish/install`;
-- the media service binary, `dam-service/target/release/studio-dam`, built for the server's system, in `<home>/dam/bin/`.
-
-Start an instance with its home folder and port; a publish instance also gets its run mode:
+The scripts are the quickest way to run from it. Each instance keeps its repository in a home folder of your choice, outside the release, so a new release replaces the code and leaves the content alone:
 
 ```
-java -Xmx4g -jar studio-quickstart.jar -c /var/lib/studio/author  -p 4502
-java -Xmx4g -jar studio-quickstart.jar -c /var/lib/studio/publish -p 4503 -r publish
+AUTHOR_HOME=/var/lib/studio/author   /opt/sensible-studio/bin/studio start
+PUBLISH_HOME=/var/lib/studio/publish /opt/sensible-studio/bin/studio-publish start
 ```
+
+Under systemd, start the launcher itself. A publish instance also gets its run mode:
+
+```
+java -Xmx4g -jar /opt/sensible-studio/lib/studio-quickstart.jar -c /var/lib/studio/author  -p 4502
+java -Xmx4g -jar /opt/sensible-studio/lib/studio-quickstart.jar -c /var/lib/studio/publish -p 4503 -r publish
+```
+
+Run `bin/studio setup` and `bin/studio-publish setup` once with the same home folders first: they fill each home's `install` folder and put the media service in place. An instance's first start downloads Apache Sling from Maven Central, so the server needs to reach `repo1.maven.org` that once.
 
 Run each as its own system user, from a systemd unit, with `Restart=on-failure`. Install **ffmpeg** and **LibreOffice** on the machines if you want video and document previews.
 
@@ -52,7 +56,7 @@ Run each as its own system user, from a systemd unit, with `Restart=on-failure`.
 | Disk | The repository, and every version of every file | The published content |
 | Java | 21 | 21 |
 
-**Deploying a new version**: put the new bundles and packages in the instance's `install` folder. The installer picks them up while the instance runs. Every build needs a new version number.
+**Deploying a new version**: unpack the new release, point `/opt/sensible-studio` at it, run the two `setup` commands again and restart the instances. Your own project's bundles and packages go in each instance's `install` folder; the installer picks them up while the instance runs. Every build needs a new version number.
 
 ## The Live cache
 
@@ -62,10 +66,10 @@ Run each as its own system user, from a systemd unit, with `Restart=on-failure`.
 useradd --system --home /var/cache/studio-live --shell /usr/sbin/nologin studio-live
 install -d -o studio-live -g studio-live -m 711  /var/cache/studio-live
 install -d -o studio-live -g www-data    -m 2750 /var/cache/studio-live/docroot
-install -D -m 755 target/release/studio-live /usr/local/bin/studio-live
-install -D -m 644 conf/live.toml /etc/studio-live/live.toml
+install -D -m 755 lib/bin/studio-live /usr/local/bin/studio-live           # from the release
+install -D -m 644 live-service/conf/live.toml /etc/studio-live/live.toml
 install -m 640 -g studio-live /dev/null /etc/studio-live/env
-install -m 644 deploy/studio-live.service /etc/systemd/system/
+install -m 644 live-service/deploy/studio-live.service /etc/systemd/system/
 systemctl enable --now studio-live
 ```
 

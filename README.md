@@ -12,18 +12,20 @@ Authors create and publish pages, media and structured content. Developers build
 
 ## Quick start
 
-You need Java 21, Maven and Node.js 20. Rust is optional (media processing and the Live cache).
+**From a release** (you need Java 21, nothing else): download the archive for your system from [Releases](https://github.com/Sensible-Studio/sensible-studio/releases), unpack it, and
 
 ```
-bin/studio setup --wknd     # build everything, with the WKND sample site
+bin/studio setup --wknd     # optional: the WKND sample site
 bin/studio start            # the author instance: http://localhost:4502
 ```
+
+**From source** you also need Maven and Node.js 20; Rust is optional (media processing and the Live cache). The commands are the same: `setup` builds everything first.
 
 Sign in as `admin` / `admin`, and change that password before anyone else can reach the instance.
 
 ```
 bin/studio-publish start    # a publish instance: http://localhost:4503
-bin/studio-live build && bin/studio-live start    # the Live cache: http://localhost:4520
+bin/studio-live start       # the Live cache: http://localhost:4520
 ```
 
 ## Documentation

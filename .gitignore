@@ -43,6 +43,9 @@ Thumbs.db
 dam-service/target/
 dam-service/**/*.rs.bk
 Cargo.lock
+# ...except those of the two services: a release is built from exactly these versions
+!dam-service/Cargo.lock
+!live-service/Cargo.lock
 
 # Frontend (author-ui)
 author-ui/node_modules/
@@ -70,3 +73,6 @@ _to_delete/
 
 # An instance started from the repository root by mistake (instances live in instances/)
 /crx-quickstart/
+
+# Release archives made by "bin/studio dist"
+/dist/

@@ -14,6 +14,7 @@ order: 120
 | `start [-p <port>]` | Starts the author instance in the foreground. Home `instances/author`; `AUTHOR_HOME` overrides. |
 | `stop` | Stops it. |
 | `build` | Compiles and packages the Java modules. |
+| `dist <version>` | Makes a release archive in `dist/`: everything built, for this machine's system. |
 | `test` | Runs the Java tests. |
 
 ### bin/studio-publish
