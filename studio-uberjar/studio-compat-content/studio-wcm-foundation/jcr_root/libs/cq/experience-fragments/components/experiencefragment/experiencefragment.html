@@ -1,0 +1,34 @@
+<!--/*
+    Sensible Studio: an experience fragment itself only holds its variations. Asked for as a page it lists them, each a
+    link to the variation, instead of Sling's dump of the node. The editor opens the master variation by itself.
+*/-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex">
+    <title>${properties.jcr:title || resource.parent.name}</title>
+    <style>
+        body { margin: 0; padding: 40px; font: 15px/1.5 system-ui, sans-serif; color: #1c2430; background: #f4f5f7; }
+        main { max-width: 34em; }
+        h1 { margin: 0 0 4px; font-size: 22px; font-weight: 600; }
+        p { margin: 0 0 20px; color: #5a6675; }
+        ul { margin: 0; padding: 0; list-style: none; background: #fff; border: 1px solid #d5dae1; border-radius: 6px; }
+        li + li { border-top: 1px solid #e6e9ee; }
+        a { display: block; padding: 10px 14px; color: #3a4fa0; text-decoration: none; }
+        a:hover, a:focus-visible { background: #f0f2f8; }
+        small { color: #5a6675; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>${properties.jcr:title || resource.parent.name}</h1>
+    <p>An experience fragment has no content of its own. Its variations:</p>
+    <ul data-sly-list.variation="${resource.parent.children}">
+        <li data-sly-test="${variation.name != 'jcr:content'}">
+            <a href="${variation.path}.html">${variation.valueMap['jcr:content/jcr:title'] || variation.name} <small>${variation.name}</small></a>
+        </li>
+    </ul>
+</main>
+</body>
+</html>

@@ -6,5 +6,6 @@
     <filter root="/libs/wcm/foundation/components/parsys"/>
     <filter root="/libs/cq/cloudserviceconfigs/components/servicelibs"/>
     <filter root="/libs/cq/experience-fragments/components/xfpage"/>
+    <filter root="/libs/cq/experience-fragments/components/experiencefragment"/>
     <filter root="/libs/cq/experience-fragments/editor/components/buildingblock"/>
 </workspaceFilter>

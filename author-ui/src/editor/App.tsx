@@ -96,6 +96,20 @@ interface Clipboard {
 /** localStorage: whether the notes are shown over the page in Edit mode (`false` hides them). */
 const ANNOTATIONS_SHOWN = 'studio.editor.annotations';
 
+/** The resource type of an experience fragment itself (the page that holds its variations). */
+const XF_HOLDER = 'cq/experience-fragments/components/experiencefragment';
+
+/** The variation the editor opens for an experience fragment: its master, else its first one. `node` is `<fragment>.2.json`. */
+export function xfVariation(path: string, node: unknown): string | null {
+  if (!node || typeof node !== 'object') return null;
+  const pages = Object.entries(node as Record<string, unknown>).filter(
+    (e): e is [string, { 'jcr:content'?: Record<string, unknown> }] => !!e[1] && typeof e[1] === 'object' && (e[1] as Record<string, unknown>)['jcr:primaryType'] === 'cq:Page',
+  );
+  const master = pages.find(([, p]) => p['jcr:content']?.['cq:xfMasterVariation'] === true || p['jcr:content']?.['cq:xfMasterVariation'] === 'true');
+  const pick = master ?? pages[0];
+  return pick ? `${path}/${pick[0]}` : null;
+}
+
 const XF_EDIT_HANDLER = /^CQ\.CoreComponents\.experiencefragment\.v\d+\.actions\.edit$/;
 
 /** The content node at `path` in the page's content tree (`root` is the tree's path), if loaded. */
@@ -317,6 +331,12 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
   const loadData = useCallback(async () => {
     try {
       const [d, c] = await Promise.all([client.getPageData(pagePath), client.getContent(contentRoot).catch(() => null)]);
+      // an experience fragment itself is only the holder of its variations and has nothing to render: the editor
+      // opens its master variation, as AEM does
+      if (d.page.resourceType === XF_HOLDER) {
+        const variation = xfVariation(pagePath, await fetch(`${encodeURI(pagePath)}.2.json`, { credentials: 'same-origin', cache: 'no-store' }).then((r) => (r.ok ? r.json() : null), () => null));
+        if (variation) return go({ kind: 'editor', path: variation }, { replace: true });
+      }
       setData(d);
       setContent(c);
       setLoadError(null);
@@ -324,7 +344,7 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
       setData(null);
       setLoadError(e instanceof Error ? e.message : String(e));
     }
-  }, [client, pagePath, contentRoot]);
+  }, [client, pagePath, contentRoot, go]);
 
   useEffect(() => {
     setSelectionKey(null);
