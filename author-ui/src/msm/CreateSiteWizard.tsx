@@ -190,7 +190,7 @@ export function CreateSiteWizard({ msm, parent, parentTitle, user, onClose, onCr
                 />
                 <TextField label="Site owner" value={owner} onChange={setOwner} />
                 <Checkbox isSelected={liveCopy} onChange={setLiveCopy}>
-                  Live Copy (keep the site synchronized with the blueprint; otherwise plain copies)
+                  Linked copy (the site stays in sync with its source; otherwise plain copies)
                 </Checkbox>
                 <CheckboxGroup
                   label="Sync rules"

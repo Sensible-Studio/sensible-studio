@@ -71,7 +71,7 @@ describe('Create Site', () => {
     fireEvent.click(await screen.findByRole('checkbox', { name: 'French (fr)' }));
     fireEvent.click(screen.getByRole('checkbox', { name: 'FAQs (faqs)' }));
     fireEvent.change(screen.getByRole('textbox', { name: /^Title/ }), { target: { value: 'My Site' } });
-    fireEvent.click(screen.getByRole('checkbox', { name: /^Live Copy/ }));
+    fireEvent.click(screen.getByRole('checkbox', { name: /^Linked copy/ }));
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Create' }));
     });
