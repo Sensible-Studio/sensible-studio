@@ -12,6 +12,27 @@ A production setup is at least three parts, ideally on machines of their own:
 | **Publish** instances, one or more | The Live cache and the author only | No public address. |
 | **Live cache** (Apache httpd and `studio-live`) | Visitors | The only part with a public address. A CDN may stand in front. |
 
+## The smallest setup that works
+
+One machine with 2 GB of memory is enough for a live site: a publish instance, the Live cache and Apache, with the author somewhere else. This documentation is served that way. The author runs on a laptop and delivers to the server's publish instance through an SSH tunnel, so nothing but ports 80 and 443 is open to the internet.
+
+```
+ssh -N -L 14503:127.0.0.1:4503 <server>
+```
+
+With the tunnel up, the author's publishing target is `http://127.0.0.1:14503/bin/receive`, with the transport user of the server's publish instance. While the tunnel is down, the target's queue holds what was published and delivers it later.
+
+`live-service/deploy/single-server/` in the repository has the two scripts that set such a server up, to read and adapt:
+
+| Script | What it does |
+|---|---|
+| `setup.sh` | Installs the Live cache and its configuration for one site, seeds the publish instance, writes the two systemd units and Apache's virtual hosts, with short addresses (`/en/page.html` for `/content/<site>/en/page.html`). |
+| `secure.sh` | Gives the publish instance passwords of its own, removes the sample users, and connects its flush target to the cache with the cache's secret. Prints nothing secret; the new values go in a file only root reads. |
+
+Give the publish instance a heap of about 900 MB (`-Xmx900m`) and the machine 2 GB of swap. Measured with this configuration: the first start takes about a minute, and after serving a few hundred pages and resized images in parallel, about 1 GB is in use.
+
+An author on the same machine needs more: 4 GB at least, 8 GB to be comfortable.
+
 ## Before anything else: secure it
 
 A new instance is set up for a developer's machine. Do these before it is reachable by anyone else.
