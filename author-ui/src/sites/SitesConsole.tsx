@@ -819,9 +819,11 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
                 setSelected([]);
                 if (parentOf(moved.path) !== path) navigate(parentOf(moved.path));
                 ToastQueue.positive(
-                  `${it.title} moved${moved.adjusted ? `, ${moved.adjusted} reference${moved.adjusted === 1 ? '' : 's'} adjusted` : ''}`,
-                  { timeout: 4000 },
+                  `${it.title} moved${moved.adjusted ? `, ${moved.adjusted} reference${moved.adjusted === 1 ? '' : 's'} adjusted` : ''}${moved.republished?.length ? `; published again at its new address${moved.republished.length > 1 ? ` (${moved.republished.length} pages)` : ''}` : ''}`,
+                  { timeout: 5000 },
                 );
+                // the move stands; the live site still has the old address until someone publishes
+                if (moved.republishError) ToastQueue.negative(`${it.title} was live and could not be published at its new address: ${moved.republishError}`, { timeout: 12000 });
               });
             }}
           />

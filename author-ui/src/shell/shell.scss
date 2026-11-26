@@ -508,8 +508,9 @@
     height: 100%;
   }
 
-  // a wizard covered the window; in a tab it covers the content cell
-  > .studio-wizard {
+  // a wizard covered the window; in a tab it covers the content cell, never the shell's bar with the tabs,
+  // also when it is opened from inside a console (Pages › Create › Page)
+  .studio-wizard {
     position: absolute;
   }
 
@@ -1064,7 +1065,7 @@
 
 // Wizard steps: the current number reads on its accent dot; done steps get a quiet tick of colour.
 .studio-wizard__rail li.is-current > span { color: var(--studio-neutral-0); background: var(--studio-accent-700); border-color: var(--studio-accent-700); font-weight: 600; }
-.studio-wizard__rail li.is-done > span { color: var(--studio-accent-700); border-color: var(--studio-accent-700); }
+.studio-wizard__rail li.is-done > span { color: var(--studio-accent-contrast); background: var(--studio-accent-700); border-color: var(--studio-accent-700); }
 .studio-wizard__rail li.is-current { font-weight: 600; color: var(--studio-text-strong); }
 
 // A primary built as a menu button (Media's Create) is the same filled action as any other primary.

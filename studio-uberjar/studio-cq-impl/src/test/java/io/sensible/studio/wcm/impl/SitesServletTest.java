@@ -128,4 +128,18 @@ class SitesServletTest {
         assertEquals(1, ((Map<String, Integer>) r.get("counts")).get("modified"));
         assertNull(servlet.unpublished(context.resourceResolver(), "/content/nope", null, null));
     }
+
+    @Test
+    void aMovedPageTakesItsPublishedPagesAlong() {
+        context.create().resource("/content/zz", "jcr:primaryType", "cq:Page");
+        context.create().resource("/content/zz/jcr:content", "cq:lastReplicationAction", "Activate");
+        context.create().resource("/content/zz/draft", "jcr:primaryType", "cq:Page");
+        context.create().resource("/content/zz/draft/jcr:content", "jcr:title", "Draft");
+        context.create().resource("/content/zz/off", "jcr:primaryType", "cq:Page");
+        context.create().resource("/content/zz/off/jcr:content", "cq:lastReplicationAction", "Deactivate");
+        context.create().resource("/content/zz/draft/live", "jcr:primaryType", "cq:Page");
+        context.create().resource("/content/zz/draft/live/jcr:content", "cq:lastReplicationAction", "Activate");
+        java.util.List<String> live = SitesServlet.published(context.resourceResolver().getResource("/content/zz"), "/content/zz", "/content/site/yy");
+        org.junit.jupiter.api.Assertions.assertEquals(java.util.List.of("/content/site/yy", "/content/site/yy/draft/live"), live);
+    }
 }

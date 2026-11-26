@@ -261,7 +261,8 @@ export interface StudioClient {
    * Moves and/or renames a page or folder; rewrites references to it in `adjustPages` and inside
    * the moved subtree. Returns its new path and how many properties were rewritten.
    */
-  movePage(path: string, destParent: string, name: string, adjustPages?: string[]): Promise<{ path: string; adjusted: number }>;
+  /** `republished`: the pages that were live and were published again at the new path; `republishError`: why they were not */
+  movePage(path: string, destParent: string, name: string, adjustPages?: string[]): Promise<{ path: string; adjusted: number; republished?: string[]; republishError?: string }>;
   /** The signed-in user (`anonymous` when nobody is). */
   currentUser(): Promise<string>;
   /** Creates a component; returns the new resource path. */

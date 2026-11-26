@@ -175,14 +175,14 @@ export function LiveCopyStatus({ msm, path, onChanged }: Props) {
               {busy && <ProgressCircle size="S" isIndeterminate aria-label="Working" />}
             </div>
           )}
-          {!rel.inherited && <p className="studio-msm__muted">This page was created in the live copy; it is not synchronized.</p>}
+          {!rel.inherited && <p className="studio-msm__muted">This page was created in the linked copy; it is not synchronized.</p>}
         </section>
       )}
 
       {status.isSource && status.liveCopies && (
         <section className="studio-msm__section" aria-label="Linked copies">
           <h3>
-            Live Copies ({status.liveCopies.length})
+            Linked copies ({status.liveCopies.length})
           </h3>
           <ul className="studio-msm__copies">
             {status.liveCopies.map((c) => (

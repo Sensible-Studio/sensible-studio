@@ -215,7 +215,8 @@ export function reducer(state: ShellState, action: ShellAction): ShellState {
 /** What is saved: URLs, not places, so a change in the Place type never breaks a saved session. */
 interface Saved {
   v: 1;
-  tabs: Array<{ id: string; urls: string[]; index: number; second?: { urls: string[]; index: number }; focus?: 'first' | 'second' }>;
+  /** `title`: what the view called itself, so a tab not opened again after a reload keeps its name (a page's title, not its node name) */
+  tabs: Array<{ id: string; urls: string[]; index: number; title?: string; second?: { urls: string[]; index: number }; focus?: 'first' | 'second' }>;
   active: string;
 }
 
@@ -228,6 +229,7 @@ export function serialize(state: ShellState): string {
       id: t.id,
       urls: t.entries.map(urlOf),
       index: t.index,
+      ...(t.title ? { title: t.title } : {}),
       ...(t.second ? { second: { urls: t.second.entries.map(urlOf), index: t.second.index }, focus: t.focus } : {}),
     })),
     active: state.active,
@@ -245,6 +247,7 @@ export function deserialize(json: string | null): ShellState | null {
       .map((t) => {
         const entries = t.urls.map((u) => placeOfUrl(String(u)));
         const tab: Tab = { id: t.id, entries, index: Math.max(0, Math.min(Number(t.index) || 0, entries.length - 1)) };
+        if (typeof t.title === 'string' && t.title) tab.title = t.title;
         if (t.second && Array.isArray(t.second.urls) && t.second.urls.length > 0) {
           const e2 = t.second.urls.map((u) => placeOfUrl(String(u)));
           tab.second = { entries: e2, index: Math.max(0, Math.min(Number(t.second.index) || 0, e2.length - 1)) };

@@ -197,9 +197,12 @@ export function PublishDialog({ client, paths, title, action = 'activate', offer
           <Text UNSAFE_className="studio-publish__hint">Everything the page uses is already {tier ? 'on Preview' : 'published'}.</Text>
         ) : null}
         {offerDeep && (
-          <Checkbox isSelected={deep} onChange={setDeep} isDisabled={busy} marginTop="size-150">
-            Also the {below} below it
-          </Checkbox>
+          // on its own line: beside the Now / Later choice the two read as one muddled row
+          <div className="studio-publish__row">
+            <Checkbox isSelected={deep} onChange={setDeep} isDisabled={busy} marginTop="size-150">
+              Also the {below} below it
+            </Checkbox>
+          </div>
         )}
         {!tier && (
           <RadioGroup label={publishing ? 'Publish' : 'Unpublish'} value={when} onChange={(v) => setWhen(v as 'now' | 'later')} orientation="horizontal" marginTop="size-150" isDisabled={busy}>

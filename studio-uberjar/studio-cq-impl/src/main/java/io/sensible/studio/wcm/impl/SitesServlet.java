@@ -27,6 +27,15 @@ import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
+
+import com.day.cq.replication.ReplicationActionType;
+import com.day.cq.replication.ReplicationException;
+import com.day.cq.replication.ReplicationOptions;
+import com.day.cq.replication.Replicator;
 
 import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.Template;
@@ -61,6 +70,11 @@ import io.sensible.studio.wcm.impl.msm.MsmState;
 public class SitesServlet extends SlingAllMethodsServlet {
 
     private static final long serialVersionUID = 1L;
+
+    /** Follows a moved page on the publish side; absent on an instance without replication. */
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    private volatile Replicator replicator;
+
     static final String ROOT = "/content";
     /** Content trees with their own consoles; the Sites console does not show them at the root. */
     static final Set<String> OTHER_CONSOLES = new HashSet<>(Arrays.asList(
@@ -463,7 +477,9 @@ public class SitesServlet extends SlingAllMethodsServlet {
     /**
      * {@code POST op=move&path=&dest=<new parent>&name=<new name>&adjust=<page>...}: moves (and/or
      * renames) a page or folder, then rewrites references to it in the listed pages and inside the
-     * moved subtree itself.
+     * moved subtree itself. Pages of the subtree that were published follow on the publish side, as AEM's
+     * Move does with Republish: the old path is unpublished and those pages are published at the new one
+     * ({@code republish=false} leaves the publish side alone). The move stands if that fails; the answer says why.
      */
     private void move(SlingHttpServletRequest request, SlingHttpServletResponse response) throws IOException {
         ResourceResolver resolver = request.getResourceResolver();
@@ -497,8 +513,10 @@ public class SitesServlet extends SlingAllMethodsServlet {
                     refs.add(r);
                 }
             }
+            javax.jcr.Session session = resolver.adaptTo(javax.jcr.Session.class);
+            List<String> live = target.equals(path) || "false".equals(request.getParameter("republish"))
+                    ? new ArrayList<>() : published(source, path, target);
             if (!target.equals(path)) {
-                javax.jcr.Session session = resolver.adaptTo(javax.jcr.Session.class);
                 if (session == null) {
                     throw new javax.jcr.RepositoryException("Moving needs a JCR session");
                 }
@@ -509,10 +527,42 @@ public class SitesServlet extends SlingAllMethodsServlet {
             Map<String, Object> out = new LinkedHashMap<>();
             out.put("path", target);
             out.put("adjusted", changed);
+            if (!live.isEmpty()) {
+                Replicator r = replicator;
+                try {
+                    if (r == null) {
+                        throw new ReplicationException("Publishing is not available on this instance");
+                    }
+                    r.replicate(session, ReplicationActionType.DEACTIVATE, path);
+                    r.replicate(session, ReplicationActionType.ACTIVATE, live.toArray(new String[0]), new ReplicationOptions());
+                    out.put("republished", live);
+                } catch (ReplicationException e) {
+                    out.put("republishError", e.getMessage());
+                }
+            }
             send(response, HttpServletResponse.SC_OK, out);
         } catch (javax.jcr.RepositoryException | org.apache.sling.api.resource.PersistenceException e) {
             resolver.revert();
             send(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, Collections.singletonMap("error", e.getMessage()));
+        }
+    }
+
+    /** The pages of a subtree that are published now, as the paths they will have after the move; parents first. */
+    static List<String> published(Resource root, String from, String to) {
+        List<String> out = new ArrayList<>();
+        collectPublished(root, from, to, out);
+        return out;
+    }
+
+    private static void collectPublished(Resource r, String from, String to, List<String> out) {
+        Resource content = r.getChild("jcr:content");
+        if (content != null && "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction", String.class))) {
+            out.add(to + r.getPath().substring(from.length()));
+        }
+        for (Resource c : r.getChildren()) {
+            if (!"jcr:content".equals(c.getName()) && !c.getName().startsWith("rep:")) {
+                collectPublished(c, from, to, out);
+            }
         }
     }
 

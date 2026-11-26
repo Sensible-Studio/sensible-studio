@@ -286,7 +286,9 @@ export function Overlay(props: Props) {
       {/* Empty components (Core's `cq-placeholder`, e.g. an Image without an asset): their name, like AEM. */}
       {mode === 'edit' &&
         tree.all.map((e) => {
-          const text = emptyText(e);
+          // while its text is being typed in place the component is not empty any more: no name over the words
+          const typing = inline && selection?.kind === 'editable' && selection.editable.path === e.path;
+          const text = typing ? null : emptyText(e);
           const b = text ? boxOf(e.el) : null;
           return b ? (
             <div key={`${e.path}#empty`} className="studio-ov-placeholder studio-ov-empty" style={place(b)}>

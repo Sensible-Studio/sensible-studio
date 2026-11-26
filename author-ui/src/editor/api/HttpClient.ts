@@ -184,7 +184,7 @@ export class HttpClient implements StudioClient {
     return res.references;
   }
 
-  async movePage(path: string, destParent: string, name: string, adjustPages: string[] = []): Promise<{ path: string; adjusted: number }> {
+  async movePage(path: string, destParent: string, name: string, adjustPages: string[] = []): Promise<{ path: string; adjusted: number; republished?: string[]; republishError?: string }> {
     const body = new URLSearchParams({ op: 'move', path, dest: destParent.replace(/\/$/, ''), name });
     for (const p of adjustPages) body.append('adjust', p);
     const res = await fetch(`${this.base}/bin/studio/sites.json`, {
@@ -193,9 +193,9 @@ export class HttpClient implements StudioClient {
       headers: { 'Content-Type': FORM },
       body,
     });
-    const json = (await res.json().catch(() => ({}))) as { path?: string; adjusted?: number; error?: string };
+    const json = (await res.json().catch(() => ({}))) as { path?: string; adjusted?: number; error?: string; republished?: string[]; republishError?: string };
     if (!res.ok || !json.path) throw new StudioHttpError(res.status, json.error || `Could not move ${path} (HTTP ${res.status})`);
-    return { path: json.path, adjusted: json.adjusted ?? 0 };
+    return { path: json.path, adjusted: json.adjusted ?? 0, republished: json.republished, republishError: json.republishError };
   }
 
   async currentUser(): Promise<string> {
