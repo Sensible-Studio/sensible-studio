@@ -52,6 +52,10 @@ import java.util.Map;
         })
 public class ContentFragmentServlet extends SlingAllMethodsServlet {
 
+    @org.osgi.service.component.annotations.Reference(cardinality = org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL,
+            policyOption = org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY)
+    private transient volatile com.day.cq.replication.Replicator replicator;
+
     private static final long serialVersionUID = 1L;
 
     /** Sensible Studio Translation (studio-translation bundle); fragments translate only when it is there. */
@@ -154,6 +158,28 @@ public class ContentFragmentServlet extends SlingAllMethodsServlet {
         return out;
     }
 
+    /** A published fragment is taken off the live site before it is deleted; false when it was not published. */
+    private boolean unpublish(SlingHttpServletRequest request, String path) {
+        org.apache.sling.api.resource.Resource asset = path == null ? null : request.getResourceResolver().getResource(path);
+        if (!ContentFragmentImpl.isFragment(asset) || !published(asset)) return false;
+        com.day.cq.replication.Replicator r = replicator;
+        javax.jcr.Session session = request.getResourceResolver().adaptTo(javax.jcr.Session.class);
+        if (r == null || session == null) {
+            throw new IllegalArgumentException(path + " is published and publishing is not available here to take it down; nothing was deleted");
+        }
+        try {
+            r.replicate(session, com.day.cq.replication.ReplicationActionType.DEACTIVATE, path);
+        } catch (com.day.cq.replication.ReplicationException e) {
+            throw new IllegalArgumentException(path + " is published and could not be unpublished (" + e.getMessage() + "); nothing was deleted");
+        }
+        return true;
+    }
+
+    static boolean published(org.apache.sling.api.resource.Resource asset) {
+        org.apache.sling.api.resource.Resource content = asset.getChild("jcr:content");
+        return content != null && "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction", String.class));
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     protected void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response) throws IOException {
@@ -181,6 +207,7 @@ public class ContentFragmentServlet extends SlingAllMethodsServlet {
                             str(body, "model"), str(body, "description")));
                     break;
                 case "delete":
+                    out.put("unpublished", unpublish(request, str(body, "path")));
                     store.delete(str(body, "path"));
                     out.put("deleted", str(body, "path"));
                     break;

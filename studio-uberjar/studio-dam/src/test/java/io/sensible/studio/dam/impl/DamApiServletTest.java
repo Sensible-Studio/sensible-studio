@@ -732,6 +732,33 @@ class DamApiServletTest {
     }
 
     @Test
+    void deletingAPublishedFileTakesItOffTheLiveSiteFirst() throws Exception {
+        org.apache.sling.api.resource.ModifiableValueMap m = resolver.getResource("/content/dam/wknd/surf.jpg/jcr:content")
+                .adaptTo(org.apache.sling.api.resource.ModifiableValueMap.class);
+        m.put("cq:lastReplicationAction", "Activate");
+        resolver.commit();
+        assertTrue(DamApiServlet.hasPublished(resolver.getResource("/content/dam/wknd")), "a folder with a published file");
+        assertFalse(DamApiServlet.hasPublished(resolver.getResource("/content/dam/wknd/alps.png")));
+        // without publishing here, a published file stays: it would be left on the live site
+        assertEquals(409L, post("op", "delete", "path", "/content/dam/wknd/alps.png", "path", "/content/dam/wknd/surf.jpg").get("_status"));
+        assertNotNull(resolver.getResource("/content/dam/wknd/alps.png"), "nothing deleted");
+        List<String> calls = new java.util.ArrayList<>();
+        com.day.cq.replication.Replicator rep = (com.day.cq.replication.Replicator) java.lang.reflect.Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class<?>[] {com.day.cq.replication.Replicator.class}, (proxy, method, args) -> {
+                    if ("replicate".equals(method.getName())) {
+                        calls.add(args[1] + " " + args[2]);
+                    }
+                    return null;
+                });
+        Map<String, Object> r = DamApiServlet.delete(resolver,
+                java.util.Arrays.asList("/content/dam/wknd/alps.png", "/content/dam/wknd/surf.jpg"), rep);
+        assertEquals(List.of("/content/dam/wknd/surf.jpg"), r.get("unpublished"));
+        assertEquals(1, calls.size());
+        assertTrue(calls.get(0).toUpperCase().contains("DEACTIVATE") && calls.get(0).endsWith("/content/dam/wknd/surf.jpg"), calls.get(0));
+        assertNull(resolver.getResource("/content/dam/wknd/surf.jpg"));
+    }
+
+    @Test
     void editsBasicMetadataOnly() throws Exception {
         MockSlingHttpServletRequest req = new MockSlingHttpServletRequest(resolver, context.bundleContext());
         req.setMethod("POST");

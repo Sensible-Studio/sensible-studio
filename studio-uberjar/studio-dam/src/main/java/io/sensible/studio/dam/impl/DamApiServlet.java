@@ -695,7 +695,7 @@ public class DamApiServlet extends SlingAllMethodsServlet {
                     result = createFolder(resolver, normalize(param(request, "parent")), param(request, "title"), param(request, "name"));
                     break;
                 case "delete":
-                    result = delete(resolver, paths(request));
+                    result = delete(resolver, paths(request), replicator);
                     break;
                 case "move":
                     result = move(resolver, paths(request), normalize(param(request, "dest")), param(request, "name"),
@@ -1421,17 +1421,60 @@ public class DamApiServlet extends SlingAllMethodsServlet {
         return out;
     }
 
-    private static Map<String, Object> delete(ResourceResolver resolver, List<String> paths)
-            throws ApiException, PersistenceException {
+    /** Deletes; what is published is taken off the live site first, or nothing is deleted. */
+    static Map<String, Object> delete(ResourceResolver resolver, List<String> paths,
+            com.day.cq.replication.Replicator replicatorNow) throws ApiException, PersistenceException {
         List<String> done = new ArrayList<>();
+        List<String> live = new ArrayList<>();
         for (String p : paths) {
             writable(resolver, p); // all checked before the first delete
+            if (hasPublished(existing(resolver, p))) {
+                live.add(p);
+            }
+        }
+        if (!live.isEmpty()) {
+            Session session = resolver.adaptTo(Session.class);
+            if (replicatorNow == null || session == null) {
+                throw new ApiException(409, live.get(0)
+                        + " is published and publishing is not available here to take it down; nothing was deleted");
+            }
+            try {
+                for (String p : live) {
+                    replicatorNow.replicate(session, com.day.cq.replication.ReplicationActionType.DEACTIVATE, p);
+                }
+            } catch (com.day.cq.replication.ReplicationException e) {
+                throw new ApiException(409, live.get(0) + " is published and could not be unpublished (" + e.getMessage()
+                        + "); nothing was deleted");
+            }
         }
         for (String p : paths) {
-            resolver.delete(existing(resolver, p));
+            Resource r = resolver.getResource(p);
+            if (r != null) { // unpublishing may be set up to change the item
+                resolver.delete(r);
+            }
             done.add(p);
         }
-        return Collections.singletonMap("deleted", done);
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("deleted", done);
+        out.put("unpublished", live);
+        return out;
+    }
+
+    /** Whether the file, or any file below the folder, is published now. */
+    static boolean hasPublished(Resource r) {
+        Resource content = r.getChild("jcr:content");
+        if (content != null && "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction", String.class))) {
+            return true;
+        }
+        if (r.isResourceType("dam:Asset") || "dam:Asset".equals(r.getValueMap().get("jcr:primaryType", String.class))) {
+            return false;
+        }
+        for (Resource c : r.getChildren()) {
+            if (!"jcr:content".equals(c.getName()) && !c.getName().startsWith("rep:") && hasPublished(c)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Map<String, Object> move(ResourceResolver resolver, List<String> paths, String dest, String rename,
