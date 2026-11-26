@@ -32,10 +32,13 @@ export function toolOf(url: string): { group: ToolCategory; tool: Tool } | null 
 export function ToolCrumbs({ url, title, extra = [], onGo, standaloneControls = true }: { url: string; title?: string; extra?: Crumb[]; onGo?(path: string): void; standaloneControls?: boolean }) {
   const navigate = useNavigate();
   const found = toolOf(url);
+  const name = title ?? found?.tool.title ?? url;
   const crumbs: Crumb[] = [
-    { path: SYSTEM, title: VOCAB.system },
-    ...(found ? [{ path: `${SYSTEM}/${found.group.id}`, title: found.group.title }] : []),
-    { path: url, title: title ?? found?.tool.title ?? url },
+    // a screen that is not one of System's tools (Generate Variations is a Content card) hangs under Home alone
+    ...(found ? [{ path: SYSTEM, title: VOCAB.system }] : []),
+    // a group named like its main tool (Publishing › Publishing, Users › Users) is said once
+    ...(found && found.group.title !== name ? [{ path: `${SYSTEM}/${found.group.id}`, title: found.group.title }] : []),
+    { path: url, title: name },
     ...extra,
   ];
   const go = (path: string) => {

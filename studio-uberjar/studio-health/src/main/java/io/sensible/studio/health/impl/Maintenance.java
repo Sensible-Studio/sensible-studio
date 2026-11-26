@@ -119,13 +119,12 @@ public class Maintenance implements Runnable {
             if (!s.enabled || progress.running) {
                 return;
             }
-            LocalDateTime now = LocalDateTime.now();
-            if (now.getHour() != s.hour) {
-                return;
-            }
-            String today = LocalDate.now().toString();
             Map<String, Object> last = lastRun();
-            if (last != null && String.valueOf(last.get("started")).startsWith(today)) {
+            Object started = last == null ? null : last.get("started");
+            Instant lastStarted = started == null ? null : Instant.parse(String.valueOf(started));
+            // a machine asleep at the hour (a laptop at night) makes the run up when it is back, once it has settled
+            long up = java.lang.management.ManagementFactory.getRuntimeMXBean().getUptime();
+            if (!due(LocalDateTime.now(), s.hour, lastStarted, ZoneId.systemDefault(), up >= CATCH_UP_AFTER_MILLIS)) {
                 return;
             }
             start("all", "scheduled");
@@ -478,6 +477,26 @@ public class Maintenance implements Runnable {
 
     RevisionGc gc() {
         return gc;
+    }
+
+    /** A missed run is made up only when the instance has been up this long: not in the middle of a start. */
+    static final long CATCH_UP_AFTER_MILLIS = 10 * 60 * 1000L;
+
+    /**
+     * Whether the nightly run should start now: in its hour when it has not run today, or later (when
+     * {@code catchUp}) when the last run is older than the most recent time it was due, because nothing
+     * was awake at that hour.
+     */
+    static boolean due(LocalDateTime now, int hour, Instant lastStarted, ZoneId zone, boolean catchUp) {
+        LocalDateTime at = now.withHour(hour).withMinute(0).withSecond(0).withNano(0);
+        if (at.isAfter(now)) {
+            at = at.minusDays(1);
+        }
+        boolean ranSince = lastStarted != null && !lastStarted.isBefore(at.atZone(zone).toInstant());
+        if (ranSince) {
+            return false;
+        }
+        return now.getHour() == hour || catchUp;
     }
 
     /** When the next scheduled run would start, from the settings. */

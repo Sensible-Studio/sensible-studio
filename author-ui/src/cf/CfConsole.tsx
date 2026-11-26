@@ -340,10 +340,10 @@ export function CfConsole({ client, initialPath, studio = STUB_STUDIO, dam: damP
       <ScreenFrame
         identity={<PathCrumbs crumbs={trail} onGo={navigate} />}
         tools={<Flex gap="size-100" alignItems="center" wrap>
-          <SearchField aria-label="Search content fragments" placeholder="Search in this folder" value={query} onChange={setQuery} width="size-3000" />
+          <SearchField aria-label="Search content fragments" placeholder="Search in this folder" value={query} onChange={setQuery} width="size-2400" />
           <Picker
             aria-label="Model"
-            width="size-2400"
+            width="size-2000"
             selectedKey={modelFilter}
             onSelectionChange={(k) => setModelFilter(String(k))}
             items={[{ path: ALL, title: 'All models' }, ...models]}
