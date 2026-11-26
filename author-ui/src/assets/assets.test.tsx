@@ -110,7 +110,7 @@ describe('browser', () => {
     vi.stubGlobal('location', { ...window.location, assign, pathname: window.location.pathname, hash: '' });
     try {
       mount(dam);
-      const cf = await screen.findByRole('gridcell', { name: /Yosemite, record/ });
+      const cf = await screen.findByRole('gridcell', { name: /Yosemite, content fragment/ });
       expect(within(cf).getByText('Granite cliffs')).toBeTruthy();
       fireEvent.click(cf);
       expect(assign).toHaveBeenCalledWith('/editor.html/content/dam/wknd/yosemite');

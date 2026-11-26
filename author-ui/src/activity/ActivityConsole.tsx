@@ -160,7 +160,7 @@ export function ActivityConsole({ fetcher = fetch }: { fetcher?: typeof fetch })
                     </button>
                   </td>
                   <td>
-                    <span className={`studio-activity__type studio-activity__type--${e.type}`}>{VERB[e.type]}</span> a {e.kind === 'media' ? 'media item' : e.kind}
+                    <span className={`studio-activity__type studio-activity__type--${e.type}`}>{VERB[e.type]}</span> {e.kind === 'media' ? 'a media item' : e.kind === 'block' ? 'an experience fragment' : `a ${e.kind}`}
                   </td>
                   <td>
                     {e.exists ? <Link to={openUrl(e)}>{e.title}</Link> : <span>{e.title}</span>}

@@ -35,7 +35,7 @@ export function kindOf(item: DamItem): Kind {
 /** IMAGE, VIDEO, ... (the type line on a card). */
 export function typeLabel(item: DamItem): string {
   const k = kindOf(item);
-  return k === 'pdf' ? 'DOCUMENT' : k === 'fragment' ? 'RECORD' : k === 'set' ? (item.type === 'asset' && item.setKind === 'spin' ? 'SPIN SET' : 'IMAGE SET') : k.toUpperCase();
+  return k === 'pdf' ? 'DOCUMENT' : k === 'fragment' ? 'CONTENT FRAGMENT' : k === 'set' ? (item.type === 'asset' && item.setKind === 'spin' ? 'SPIN SET' : 'IMAGE SET') : k.toUpperCase();
 }
 
 export function dimensions(item: AssetItem): string {
