@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Step Properties"
+    sling:resourceType="cq/gui/components/authoring/dialog">
+    <content jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/container">
+        <items jcr:primaryType="nt:unstructured">
+            <tabs jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/tabs" maximized="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+            <common jcr:primaryType="nt:unstructured" jcr:title="Common" sling:resourceType="granite/ui/components/coral/foundation/container" margin="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <title jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Title" name="./jcr:title"/>
+                    <description jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textarea" fieldLabel="Description" name="./jcr:description"/>
+                    <stage jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/select" fieldLabel="Workflow Stage" name="./metaData/workflowStage" emptyOption="{Boolean}true" emptyText="None" fieldDescription="The stage of the model this step belongs to (Model Properties lists the stages)."><datasource jcr:primaryType="nt:unstructured" sling:resourceType="studio/workflow/datasources/stages"/></stage>
+                </items>
+            </common>
+<process jcr:primaryType="nt:unstructured" jcr:title="Process" sling:resourceType="granite/ui/components/coral/foundation/container" margin="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <target jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/select" fieldLabel="The step to go to" name="./metaData/TARGET_NODE_PATH" required="{Boolean}true" emptyOption="{Boolean}true" emptyText="Select"><datasource jcr:primaryType="nt:unstructured" sling:resourceType="studio/workflow/datasources/steps"/></target><rule jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Rule" name="./metaData/rule" fieldDescription="true, false or empty (always jumps). Script rules are not evaluated by Sensible Studio and count as false."/>
+                </items>
+            </process>
+                </items>
+            </tabs>
+        </items>
+    </content>
+</jcr:root>

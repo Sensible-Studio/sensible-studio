@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sensible Studio clean-room Style System tab for design dialogs (component policies). Apache License 2.0.
+  Edits cq:styleDefaultClasses, cq:styleDefaultElement and the style groups (cq:styleGroups/itemN with
+  cq:styleGroupLabel, cq:styleGroupMultiple and cq:styles/itemN with cq:styleId, cq:styleLabel,
+  cq:styleClasses, cq:styleElement), the structure AEM policies use.
+-->
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Styles"
+    sling:resourceType="granite/ui/components/coral/foundation/container"
+    margin="{Boolean}true">
+    <items jcr:primaryType="nt:unstructured">
+        <defaults
+            jcr:primaryType="nt:unstructured"
+            jcr:title="Defaults"
+            sling:resourceType="granite/ui/components/coral/foundation/form/fieldset">
+            <items jcr:primaryType="nt:unstructured">
+                <classes
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                    fieldLabel="Default CSS classes"
+                    fieldDescription="Always added to the component, separated by spaces."
+                    name="./cq:styleDefaultClasses"/>
+                <element
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="granite/ui/components/coral/foundation/form/select"
+                    emptyOption="{Boolean}true"
+                    fieldLabel="Default element"
+                    name="./cq:styleDefaultElement">
+                    <items jcr:primaryType="nt:unstructured">
+                        <div jcr:primaryType="nt:unstructured" text="div" value="div"/>
+                        <section jcr:primaryType="nt:unstructured" text="section" value="section"/>
+                        <article jcr:primaryType="nt:unstructured" text="article" value="article"/>
+                        <aside jcr:primaryType="nt:unstructured" text="aside" value="aside"/>
+                        <main jcr:primaryType="nt:unstructured" text="main" value="main"/>
+                        <header jcr:primaryType="nt:unstructured" text="header" value="header"/>
+                        <footer jcr:primaryType="nt:unstructured" text="footer" value="footer"/>
+                        <nav jcr:primaryType="nt:unstructured" text="nav" value="nav"/>
+                    </items>
+                </element>
+            </items>
+        </defaults>
+        <groups
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="granite/ui/components/coral/foundation/form/multifield"
+            composite="{Boolean}true"
+            fieldLabel="Style groups">
+            <field
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/container"
+                name="./cq:styleGroups">
+                <items jcr:primaryType="nt:unstructured">
+                    <label
+                        jcr:primaryType="nt:unstructured"
+                        sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                        fieldLabel="Group name"
+                        name="./cq:styleGroupLabel"
+                        required="{Boolean}true"/>
+                    <multiple
+                        jcr:primaryType="nt:unstructured"
+                        sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
+                        name="./cq:styleGroupMultiple"
+                        text="Styles of this group can be combined"
+                        value="{Boolean}true"/>
+                    <styles
+                        jcr:primaryType="nt:unstructured"
+                        sling:resourceType="granite/ui/components/coral/foundation/form/multifield"
+                        composite="{Boolean}true"
+                        fieldLabel="Styles">
+                        <field
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/container"
+                            name="./cq:styles">
+                            <items jcr:primaryType="nt:unstructured">
+                                <id
+                                    jcr:primaryType="nt:unstructured"
+                                    sling:resourceType="studio/granite/components/stylesystem/styleid"
+                                    name="./cq:styleId"/>
+                                <label
+                                    jcr:primaryType="nt:unstructured"
+                                    sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                                    fieldLabel="Style name"
+                                    name="./cq:styleLabel"
+                                    required="{Boolean}true"/>
+                                <classes
+                                    jcr:primaryType="nt:unstructured"
+                                    sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                                    fieldLabel="CSS classes"
+                                    name="./cq:styleClasses"/>
+                                <element
+                                    jcr:primaryType="nt:unstructured"
+                                    sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                                    fieldLabel="Element"
+                                    emptyText="Default element"
+                                    name="./cq:styleElement"/>
+                            </items>
+                        </field>
+                    </styles>
+                </items>
+            </field>
+        </groups>
+    </items>
+</jcr:root>

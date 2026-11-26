@@ -1,0 +1,111 @@
+{
+  "jcr:primaryType": "sling:Folder",
+  "wknd": {
+    "jcr:primaryType": "cq:Page",
+    "jcr:content": {
+      "jcr:primaryType": "cq:PageContent",
+      "jcr:title": "WKND Site"
+    },
+    "us": {
+      "jcr:primaryType": "cq:Page",
+      "jcr:content": {
+        "jcr:primaryType": "cq:PageContent",
+        "jcr:title": "WKND US"
+      },
+      "en": {
+        "jcr:primaryType": "cq:Page",
+        "jcr:content": {
+          "jcr:primaryType": "cq:PageContent",
+          "jcr:title": "WKND Adventures and Travel",
+          "cq:template": "/conf/wknd/settings/wcm/templates/page-content",
+          "sling:resourceType": "wknd/components/page",
+          "root": {
+            "sling:resourceType": "wknd/components/container",
+            "container": {
+              "sling:resourceType": "wknd/components/container",
+              "title": {
+                "sling:resourceType": "wknd/components/title",
+                "jcr:title": "Welcome"
+              },
+              "container": {
+                "sling:resourceType": "wknd/components/container",
+                "text": {
+                  "sling:resourceType": "wknd/components/text",
+                  "text": "<p>Hi</p>"
+                }
+              }
+            }
+          }
+        },
+        "adventures": {
+          "jcr:primaryType": "cq:Page",
+          "jcr:content": {
+            "jcr:primaryType": "cq:PageContent",
+            "jcr:title": "Adventures",
+            "navTitle": "All Adventures",
+            "pageTitle": "WKND Adventures",
+            "jcr:description": "Find your next trip",
+            "cq:template": "/conf/wknd/settings/wcm/templates/page-content",
+            "cq:tags": [
+              "wknd:activity/surfing",
+              "wknd:does/not/exist"
+            ],
+            "sling:vanityPath": [
+              "/adventures"
+            ],
+            "cq:lastModifiedBy": "editor"
+          },
+          "bali-surf-camp": {
+            "jcr:primaryType": "cq:Page",
+            "jcr:content": {
+              "jcr:primaryType": "cq:PageContent",
+              "jcr:title": "Bali Surf Camp"
+            }
+          },
+          "riverside-camping": {
+            "jcr:primaryType": "cq:Page",
+            "jcr:content": {
+              "jcr:primaryType": "cq:PageContent",
+              "jcr:title": "Riverside Camping"
+            }
+          }
+        },
+        "faqs": {
+          "jcr:primaryType": "cq:Page",
+          "jcr:content": {
+            "jcr:primaryType": "cq:PageContent",
+            "jcr:title": "FAQs",
+            "hideInNav": true
+          }
+        },
+        "magazine": {
+          "jcr:primaryType": "cq:Page",
+          "jcr:content": {
+            "jcr:primaryType": "cq:PageContent",
+            "jcr:title": "Magazine",
+            "jcr:language": "de_CH"
+          }
+        },
+        "assets-folder": {
+          "jcr:primaryType": "sling:Folder"
+        }
+      }
+    }
+  },
+  "cq:tags": {
+    "jcr:primaryType": "sling:Folder",
+    "wknd": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "WKND",
+      "activity": {
+        "jcr:primaryType": "cq:Tag",
+        "jcr:title": "Activity",
+        "surfing": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "Surfing",
+          "jcr:title.de": "Surfen"
+        }
+      }
+    }
+  }
+}

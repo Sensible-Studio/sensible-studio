@@ -1,0 +1,1 @@
+<%@page session="false" %><%-- No servlet session: a JSP opens one for every visitor unless told not to, and this hook is in the head of every page. --%><%-- Sensible Studio: hook for cloud service scripts (analytics, tag managers) in the page head. No services are configured yet, so nothing is written. --%>

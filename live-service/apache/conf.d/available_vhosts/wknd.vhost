@@ -1,0 +1,43 @@
+#
+# A published site: WKND. Copy this file (and sites/wknd.site) per site; link or copy the ones in
+# use into enabled_vhosts/ and Include that directory from httpd.conf:
+#   IncludeOptional conf.d/enabled_vhosts/*.vhost
+#
+# Without STUDIO_LIVE_TLS (a developer's machine) the site answers over HTTP. With it (a server)
+# HTTP only sends visitors to HTTPS, and the site answers on STUDIO_LIVE_TLS_PORT with the
+# certificate ${STUDIO_LIVE_TLS_DIR}/wknd.crt and its key wknd.key.
+#
+
+<VirtualHost *:${STUDIO_LIVE_PORT}>
+    ServerName  wknd.localhost
+    # The site's domains. localhost and 127.0.0.1 are for a developer's machine, as in live.toml:
+    # take them out on a server.
+    ServerAlias www.wknd.example wknd.example localhost 127.0.0.1
+
+    <IfDefine !STUDIO_LIVE_TLS>
+        Include conf.d/sites/wknd.site
+    </IfDefine>
+    <IfDefine STUDIO_LIVE_TLS>
+        RewriteEngine On
+        RewriteCond %{HTTP_HOST} ^([^:]+)
+        RewriteRule ^ https://%1%{REQUEST_URI} [R=301,NE,L]
+    </IfDefine>
+</VirtualHost>
+
+<IfDefine STUDIO_LIVE_TLS>
+<VirtualHost *:${STUDIO_LIVE_TLS_PORT}>
+    ServerName  wknd.localhost
+    ServerAlias www.wknd.example wknd.example localhost 127.0.0.1
+
+    SSLEngine on
+    SSLCertificateFile    "${STUDIO_LIVE_TLS_DIR}/wknd.crt"
+    SSLCertificateKeyFile "${STUDIO_LIVE_TLS_DIR}/wknd.key"
+    <IfModule mod_headers.c>
+        Header always set Strict-Transport-Security "max-age=31536000"
+        # The cache and the publish mark their cookies Secure behind HTTPS.
+        RequestHeader set X-Forwarded-Proto https
+    </IfModule>
+
+    Include conf.d/sites/wknd.site
+</VirtualHost>
+</IfDefine>

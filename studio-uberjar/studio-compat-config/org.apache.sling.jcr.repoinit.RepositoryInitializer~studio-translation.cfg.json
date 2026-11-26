@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "create path (sling:OrderedFolder) /content\ncreate path (sling:Folder) /conf\ncreate path (sling:Folder) /var/studio/translation/pages\ncreate service user studio-translation-service\nset ACL for studio-translation-service\n    allow jcr:read,rep:write on /var/studio/translation\nend\ncreate service user studio-translation-worker\nset ACL for studio-translation-worker\n    allow jcr:read,rep:write,jcr:versionManagement,jcr:lockManagement on /content\n    allow jcr:read on /conf\n    allow jcr:read,rep:write on /var/studio/translation\nend\ncreate group translation-reviewers\nadd admin to group translation-reviewers"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "queue.name": "Sensible Studio workflow engine",
+  "queue.topics": [
+    "studio/workflow/event"
+  ],
+  "queue.type": "ORDERED",
+  "queue.retries": 3,
+  "queue.retrydelay": 5000,
+  "queue.priority": "NORM"
+}

@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "create path (sling:OrderedFolder) /content\ncreate path (sling:Folder) /apps\ncreate path (sling:Folder) /libs\ncreate path (sling:Folder) /var/workflow/models\ncreate path (sling:Folder) /var/workflow/instances\ncreate path (sling:Folder) /conf/global/settings/workflow/models\ncreate service user studio-workflow-service\nset ACL for studio-workflow-service\n    allow jcr:all on /var/workflow\n    allow jcr:read,rep:write,jcr:versionManagement,jcr:lockManagement on /content\n    allow jcr:read,rep:write on /conf\n    allow jcr:read on /libs\n    allow jcr:read on /apps\n    allow jcr:read on /home\nend"
+  ]
+}

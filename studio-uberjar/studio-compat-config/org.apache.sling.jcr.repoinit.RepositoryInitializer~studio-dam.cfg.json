@@ -1,0 +1,31 @@
+{
+  "scripts": [
+    "register namespace (studio) http://sensible.io/jcr/studio/1.0",
+    "register namespace (dc) http://purl.org/dc/elements/1.1/",
+    "register namespace (xmp) http://ns.adobe.com/xap/1.0/",
+    "register namespace (xmpMM) http://ns.adobe.com/xap/1.0/mm/",
+    "register namespace (xmpRights) http://ns.adobe.com/xap/1.0/rights/",
+    "register namespace (tiff) http://ns.adobe.com/tiff/1.0/",
+    "register namespace (exif) http://ns.adobe.com/exif/1.0/",
+    "register namespace (exifEX) http://cipa.jp/exif/1.0/",
+    "register namespace (psAux) http://ns.adobe.com/exif/1.0/aux/",
+    "register namespace (photoshop) http://ns.adobe.com/photoshop/1.0/",
+    "register namespace (Iptc4xmpCore) http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/",
+    "register namespace (Iptc4xmpExt) http://iptc.org/std/Iptc4xmpExt/2008-02-29/",
+    "register namespace (prismusagerights) http://prismstandard.org/namespaces/prismusagerights/2.1/",
+    "register namespace (pdf) http://ns.adobe.com/pdf/1.3/",
+    "register namespace (xmpDM) http://ns.adobe.com/xmp/1.0/DynamicMedia/",
+    "register namespace (prism) http://prismstandard.org/namespaces/basic/2.1/",
+    "create path /content(sling:Folder)/dam(sling:OrderedFolder)",
+    "create service user studio-dam-processor\nset ACL for studio-dam-processor\n    allow jcr:read,rep:write on /content/dam\nend",
+    "create path /conf(sling:Folder)/global(sling:Folder)/settings(sling:Folder)/dam(sling:Folder)/processing(sling:Folder)\nset ACL for studio-dam-processor\n    allow jcr:read on /conf/global/settings/dam\nend",
+    "create path /var(sling:Folder)/studio(sling:Folder)/dam(sling:Folder)/linkshare(sling:Folder)\ncreate service user studio-dam-linkshare\nset ACL for studio-dam-linkshare\n    allow jcr:read on /content/dam\n    allow jcr:read,rep:write on /var/studio/dam/linkshare\nend",
+    "create path /var(sling:Folder)/studio(sling:Folder)/dam(sling:Folder)/index(nt:unstructured)\ncreate service user studio-dam-indexer\nset ACL for studio-dam-indexer\n    allow jcr:read,rep:write,rep:indexDefinitionManagement on /oak:index\n    allow jcr:read,rep:write on /var/studio/dam/index\nend\nset ACL for everyone\n    allow jcr:read on /var/studio/dam/index\nend\nset ACL for studio-dam-processor\n    allow jcr:read on /var/studio/dam/index\nend",
+    "create path /var(sling:Folder)/studio(sling:Folder)/dam(sling:Folder)/reports(sling:Folder)\ncreate service user studio-dam-reports\nset ACL for studio-dam-reports\n    allow jcr:read,rep:write on /var/studio/dam/reports\n    allow jcr:read on /var/studio/dam/linkshare\nend\nset ACL for everyone\n    deny jcr:read on /var/studio/dam/reports\nend",
+    "create path /content/cq:tags\nset ACL for studio-dam-processor\n    allow jcr:read on /content/cq:tags\nend",
+    "create path /var(sling:Folder)/studio(sling:Folder)/dam(sling:Folder)/downloads(sling:Folder)\ncreate service user studio-dam-downloads\nset ACL for studio-dam-downloads\n    allow jcr:read on /content/dam\n    allow jcr:read,rep:write on /var/studio/dam/downloads\nend\nset ACL for everyone\n    deny jcr:read on /var/studio/dam/downloads\nend",
+    "create service user studio-dam-livecopy\nset ACL for studio-dam-livecopy\n    allow jcr:read,rep:write,jcr:readAccessControl on /content/dam\n    allow jcr:read on /home\nend",
+    "create path /conf(sling:Folder)/global(sling:Folder)/settings(sling:Folder)/dam(sling:Folder)/gallerypresets(sling:Folder)\nset ACL for everyone\n    allow jcr:read on /conf/global/settings/dam/gallerypresets\nend",
+    "create path /var(sling:Folder)/studio(sling:Folder)/dam(sling:Folder)/notifications(sling:Folder)\ncreate service user studio-dam-notifications\nset ACL for studio-dam-notifications\n    allow jcr:read,rep:write on /var/studio/dam/notifications\n    allow jcr:read on /home\nend\nset ACL for everyone\n    deny jcr:read on /var/studio/dam/notifications\nend"
+  ]
+}

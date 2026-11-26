@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/libs/wcm/foundation/components/basicpage"/>
+    <filter root="/libs/granite/sightly/templates"/>
+    <filter root="/libs/wcm/foundation/components/responsivegrid"/>
+    <filter root="/libs/wcm/foundation/components/parsys"/>
+    <filter root="/libs/cq/cloudserviceconfigs/components/servicelibs"/>
+    <filter root="/libs/cq/experience-fragments/components/xfpage"/>
+    <filter root="/libs/cq/experience-fragments/editor/components/buildingblock"/>
+</workspaceFilter>

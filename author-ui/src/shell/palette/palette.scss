@@ -1,0 +1,150 @@
+// ⌘K — the command palette: a field over everything, the matches below it
+
+.studio-palette__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  background: rgb(0 0 0 / 28%);
+}
+
+.studio-palette {
+  display: flex;
+  flex-direction: column;
+  width: min(640px, calc(100vw - 32px));
+  max-height: min(70vh, 560px);
+  overflow: hidden;
+  font-size: 14px;
+  color: var(--spectrum-global-color-gray-800);
+  background: var(--spectrum-global-color-gray-50, var(--studio-neutral-0));
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgb(0 0 0 / 28%);
+
+  &__field {
+    display: flex;
+    flex: none;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 16px;
+    color: var(--spectrum-global-color-gray-600);
+    border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 0;
+      font: inherit;
+      font-size: 16px;
+      color: var(--spectrum-global-color-gray-900);
+      background: none;
+      border: 0;
+      outline: none;
+
+      &::placeholder {
+        color: var(--spectrum-global-color-gray-500);
+      }
+    }
+  }
+
+  &__busy {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--spectrum-global-color-gray-300);
+    border-top-color: var(--spectrum-global-color-gray-700);
+    border-radius: 50%;
+    animation: studio-palette-spin 0.8s linear infinite;
+  }
+
+  &__list {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 6px 0;
+    overflow-y: auto;
+  }
+
+  &__heading {
+    padding: 8px 16px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--spectrum-global-color-gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 7px 16px;
+    cursor: pointer;
+
+    &.is-current {
+      background: var(--spectrum-global-color-gray-200);
+    }
+  }
+
+  &__icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__title {
+    flex: none;
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__hint {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-600);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__empty {
+    padding: 24px 16px;
+    color: var(--spectrum-global-color-gray-600);
+    text-align: center;
+  }
+
+  &__foot {
+    display: flex;
+    flex: none;
+    gap: 16px;
+    padding: 8px 16px;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-600);
+    border-top: 1px solid var(--spectrum-global-color-gray-200);
+
+    kbd {
+      display: inline-block;
+      min-width: 16px;
+      padding: 0 4px;
+      margin-right: 3px;
+      font: inherit;
+      line-height: 16px;
+      text-align: center;
+      background: var(--spectrum-global-color-gray-200);
+      border-radius: 3px;
+    }
+  }
+}
+
+@keyframes studio-palette-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

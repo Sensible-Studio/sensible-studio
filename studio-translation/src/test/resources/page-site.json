@@ -1,0 +1,73 @@
+{
+  "jcr:primaryType": "sling:Folder",
+  "language-masters": {
+    "jcr:primaryType": "cq:Page",
+    "jcr:content": {"jcr:primaryType": "cq:PageContent", "jcr:title": "Language Masters"},
+    "en": {
+      "jcr:primaryType": "cq:Page",
+      "jcr:content": {"jcr:primaryType": "cq:PageContent", "jcr:title": "English", "sling:resourceType": "site/components/page"},
+      "about": {
+        "jcr:primaryType": "cq:Page",
+        "jcr:content": {
+          "jcr:primaryType": "cq:PageContent",
+          "jcr:mixinTypes": ["mix:versionable", "cq:LiveRelationship"],
+          "jcr:uuid": "11111111-2222-3333-4444-555555555555",
+          "jcr:title": "About us",
+          "jcr:description": "Who we are and what we do",
+          "sling:resourceType": "site/components/page",
+          "cq:template": "/conf/site/settings/wcm/templates/page",
+          "cq:lastReplicated": "2019-10-22T13:34:50.000-07:00",
+          "cq:lastReplicationAction": "Activate",
+          "cq:tags": ["site:topic/team"],
+          "cq:LiveSyncConfig": {"jcr:primaryType": "cq:LiveCopy", "cq:master": "/content/elsewhere"},
+          "root": {
+            "jcr:primaryType": "nt:unstructured",
+            "sling:resourceType": "site/components/container",
+            "layout": "responsiveGrid",
+            "title": {"jcr:primaryType": "nt:unstructured", "sling:resourceType": "site/components/title", "jcr:title": "Our story", "type": "h1"},
+            "text": {"jcr:primaryType": "nt:unstructured", "sling:resourceType": "site/components/text", "textIsRich": "true",
+                     "text": "<p>We ride <b>waves</b>. See <a href=\"/content/site/language-masters/en/contact.html\">contact</a> and <a href=\"/content/site/language-masters/en/jobs.html\">jobs</a>.</p>"},
+            "image": {"jcr:primaryType": "nt:unstructured", "sling:resourceType": "site/components/image", "alt": "Surfers at dawn",
+                      "fileReference": "/content/dam/site/en/surf.jpg", "displayPopupTitle": "true"},
+            "teaser": {"jcr:primaryType": "nt:unstructured", "sling:resourceType": "site/components/teaser", "jcr:title": "Join us",
+                       "actions": {"jcr:primaryType": "nt:unstructured",
+                         "item0": {"jcr:primaryType": "nt:unstructured", "text": "Contact", "link": "/content/site/language-masters/en/contact"}}},
+            "embed": {"jcr:primaryType": "nt:unstructured", "sling:resourceType": "core/wcm/components/embed/v1/embed", "text": "Not to be translated"},
+            "list": {"jcr:primaryType": "nt:unstructured", "sling:resourceType": "site/components/list", "parentPage": "/content/site/language-masters/en", "maxItems": "4"}
+          },
+          "cq:responsive": {"jcr:primaryType": "nt:unstructured", "default": {"jcr:primaryType": "nt:unstructured", "width": "12"}}
+        },
+        "team": {
+          "jcr:primaryType": "cq:Page",
+          "jcr:content": {"jcr:primaryType": "cq:PageContent", "jcr:title": "The team", "sling:resourceType": "site/components/page"}
+        }
+      },
+      "contact": {
+        "jcr:primaryType": "cq:Page",
+        "jcr:content": {"jcr:primaryType": "cq:PageContent", "jcr:title": "Contact", "sling:resourceType": "site/components/page"}
+      }
+    },
+    "fr": {
+      "jcr:primaryType": "cq:Page",
+      "jcr:content": {"jcr:primaryType": "cq:PageContent", "jcr:title": "Français", "sling:resourceType": "site/components/page"},
+      "contact": {
+        "jcr:primaryType": "cq:Page",
+        "jcr:content": {"jcr:primaryType": "cq:PageContent", "jcr:title": "Contactez-nous", "sling:resourceType": "site/components/page"}
+      }
+    }
+  },
+  "us": {
+    "jcr:primaryType": "cq:Page",
+    "jcr:content": {"jcr:primaryType": "cq:PageContent", "jcr:title": "US"},
+    "en": {
+      "jcr:primaryType": "cq:Page",
+      "jcr:content": {"jcr:primaryType": "cq:PageContent", "jcr:title": "English",
+        "cq:LiveSyncConfig": {"jcr:primaryType": "cq:LiveCopy", "cq:master": "/content/site/language-masters/en", "cq:isDeep": true}}
+    },
+    "es": {
+      "jcr:primaryType": "cq:Page",
+      "jcr:content": {"jcr:primaryType": "cq:PageContent", "jcr:title": "Español",
+        "cq:LiveSyncConfig": {"jcr:primaryType": "cq:LiveCopy", "cq:master": "/content/site/language-masters/es", "cq:isDeep": true}}
+    }
+  }
+}

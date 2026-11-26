@@ -1,0 +1,10 @@
+<div class="studio-form__field studio-form__field--email" data-studio-field="${properties.name}">
+    <label class="studio-form__label" for="${resource.name}-${properties.name}">${properties.label || 'Email'}<span class="studio-form__required" data-sly-test="${properties.required}" aria-hidden="true"> *</span></label>
+    <input class="studio-form__input" id="${resource.name}-${properties.name}" type="email" name="${properties.name}"
+           placeholder="${properties.placeholder}" value="${properties.value}" autocomplete="email"
+           data-sly-attribute.required="${properties.required ? 'required' : ''}"
+           data-studio-messages="${properties.requiredMessage}|${properties.typeMessage}"/>
+    <p class="studio-form__help" data-sly-test="${properties.help}">${properties.help}</p>
+    <p class="studio-form__error" data-studio-error aria-live="polite"></p>
+    <sly data-sly-resource="${'rules' @ resourceType='studio/forms/components/rules'}"></sly>
+</div>

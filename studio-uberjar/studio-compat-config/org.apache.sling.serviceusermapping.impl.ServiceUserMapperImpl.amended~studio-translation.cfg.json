@@ -1,0 +1,6 @@
+{
+  "user.mapping": [
+    "io.sensible.studio.translation:translation=[studio-translation-service]",
+    "io.sensible.studio.translation:worker=[studio-translation-worker]"
+  ]
+}

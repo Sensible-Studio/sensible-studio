@@ -1,0 +1,13 @@
+<!--/* Sensible Studio Target component. Authoring (wcmmode=edit): the experience the editor selected (default otherwise).
+       Otherwise every experience is rendered and the ContextHub client script shows the first one whose
+       audience matches the visitor (the default when none does); in an A/B test (data-studio-mode=abtest) the one the
+       visitor was dealt by the experiences' shares, the same one on every visit. */-->
+<sly data-sly-use.t="io.sensible.studio.personalization.htl.TargetUse"/>
+<sly data-sly-test="${t.authoring && t.selected}" data-sly-resource="${t.selected.path}"/>
+<div data-sly-test="${!t.authoring}" class="studio-target" data-studio-target="${t.path}" data-studio-goal-type="${t.goalType}" data-studio-goal-value="${t.goalValue}" data-studio-track="${t.track ? 'true' : 'false'}" data-studio-mode="${t.mode}">
+    <div data-sly-repeat.e="${t.experiences}" class="studio-target__experience" data-studio-experience="${e.name}"
+         data-studio-segment="${e.segmentPath}" data-studio-expression="${e.expression}" data-studio-boost="${e.boost}" data-studio-share="${e.share}" hidden="${!e.isDefault}">
+        <sly data-sly-resource="${e.path}"/>
+    </div>
+    <script data-sly-test="${t.includeScript}" src="/libs/studio/contexthub/contexthub.js" data-studio-contexthub="${t.contexthub}" defer></script>
+</div>

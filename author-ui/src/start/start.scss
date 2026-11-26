@@ -1,0 +1,679 @@
+// Sensible Studio Start screen.
+
+.studio-start {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  color: var(--spectrum-global-color-gray-800);
+  background: var(--spectrum-global-color-gray-100);
+
+  &__body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  &__rail {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    width: 48px;
+    padding-top: 8px;
+    background: var(--spectrum-global-color-gray-75);
+    border-right: 1px solid var(--spectrum-global-color-gray-300);
+  }
+
+  &__main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__titlebar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    height: 48px;
+    background: var(--spectrum-global-color-gray-50);
+    border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+
+    h1 {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+  }
+
+  &__crumb {
+    padding: 0;
+    font: inherit;
+    font-weight: 400;
+    color: var(--spectrum-global-color-gray-700);
+    cursor: pointer;
+    background: none;
+    border: 0;
+
+    &:hover {
+      color: var(--spectrum-global-color-gray-900);
+      text-decoration: underline;
+    }
+  }
+
+  &__crumb-sep {
+    color: var(--spectrum-global-color-gray-600);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ product bar
+
+.studio-shell {
+  flex: none;
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
+    padding: 0 8px 0 16px;
+    background: #1e1e1e;
+  }
+
+  &__brand {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 14px;
+    color: var(--studio-neutral-200);
+    text-decoration: none;
+  }
+
+  &__mark {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--studio-neutral-0);
+    background: var(--spectrum-blue-900);
+    border-radius: 6px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  &__avatar {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e1e1e;
+    background: #ccc;
+    border-radius: 50%;
+  }
+}
+
+// ------------------------------------------------------------------------------------------ tiles
+
+.studio-tilesections {
+  flex: 1;
+  min-height: 0;
+  padding: 40px 48px 64px;
+  overflow: auto;
+}
+
+// the rows sit in the middle of the window, however wide it is
+.studio-tilesections__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  // five tiles of 150px and their gaps: the block is as wide as its fullest row, so it reads centred
+  width: 100%;
+  max-width: 782px;
+  margin: 0 auto;
+}
+
+.studio-tilesection__heading {
+  margin: 0 0 8px 2px;
+  font-size: var(--studio-type-xs);
+  font-weight: 600;
+  color: var(--studio-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.studio-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 150px);
+  gap: 8px;
+  align-content: start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.studio-tile {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 18px 8px 14px;
+  font: inherit;
+  color: var(--studio-text);
+  text-decoration: none;
+  cursor: pointer;
+  background: var(--studio-surface-raised);
+  border: 1px solid var(--studio-border-subtle);
+  border-radius: var(--studio-radius-md);
+
+  &:hover:not(.is-disabled) {
+    border-color: var(--studio-border-strong);
+    box-shadow: var(--studio-shadow-1);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--studio-focus-ring);
+  }
+
+  &.is-disabled {
+    cursor: default;
+    opacity: 0.45;
+  }
+
+  &__icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__more {
+    position: absolute;
+    left: 100%;
+    margin-left: 2px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__title {
+    font-size: var(--studio-type-md);
+    font-weight: 500;
+    // a name of two words can take two lines (Experience Fragments): centred like the one-line ones
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  &__soon {
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ page list (group tiles)
+
+.studio-pagelist {
+  flex: 1;
+  min-height: 0;
+  padding: 24px 32px;
+  overflow: auto;
+
+  &__tools {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  &__count {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__empty {
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__table {
+    width: 100%;
+    font-size: 13px;
+    background: var(--spectrum-global-color-gray-50);
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-collapse: collapse;
+
+    th {
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: left;
+      color: var(--spectrum-global-color-gray-700);
+      border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+    }
+
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+    }
+
+    tr:hover td {
+      background: var(--spectrum-global-color-gray-100);
+    }
+  }
+
+  &__title {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    color: var(--spectrum-global-color-gray-900);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--spectrum-global-color-blue-700);
+      text-decoration: underline;
+    }
+
+    &.is-group,
+    &.is-group:hover {
+      font-weight: 700;
+      color: var(--spectrum-global-color-gray-800);
+      text-decoration: none;
+    }
+  }
+
+  &__path {
+    font-family: var(--studio-mono, monospace);
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__date {
+    white-space: nowrap;
+    color: var(--spectrum-global-color-gray-700);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ tools
+
+.studio-tools {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+
+  // the categories, like AEM's Tools rail: anchors into the accordion
+  &__rail {
+    flex: none;
+    width: 220px;
+    padding: 12px 0 24px;
+    overflow: auto;
+    background: var(--spectrum-global-color-gray-75);
+    border-right: 1px solid var(--spectrum-global-color-gray-300);
+
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 36px;
+      padding: 0 20px;
+      font: inherit;
+      font-size: 14px;
+      color: var(--spectrum-global-color-gray-800);
+      text-align: left;
+      cursor: pointer;
+      background: none;
+      border: 0;
+      border-left: 3px solid transparent;
+
+      &:hover {
+        background: var(--spectrum-global-color-gray-200);
+      }
+
+      &.is-current {
+        font-weight: 700;
+        color: var(--spectrum-global-color-gray-900);
+        background: var(--spectrum-global-color-gray-200);
+        border-left-color: var(--spectrum-blue-900);
+      }
+    }
+  }
+
+  &__railtitle {
+    margin: 4px 20px 10px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+    overflow: auto;
+    scroll-padding-top: 8px;
+  }
+
+  // the same categories, each one foldable; open by default
+  &__accordion {
+    max-width: 1040px;
+    padding: 16px 40px 0;
+    margin: 0 auto;
+  }
+
+  &__section {
+    scroll-margin-top: 8px;
+    border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+
+    &:first-child {
+      border-top: 1px solid var(--spectrum-global-color-gray-300);
+    }
+  }
+
+  &__heading {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+
+    button {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      padding: 14px 8px;
+      font: inherit;
+      color: var(--spectrum-global-color-gray-900);
+      text-align: left;
+      cursor: pointer;
+      background: none;
+      border: 0;
+
+      &:hover {
+        background: var(--spectrum-global-color-gray-200);
+      }
+    }
+  }
+
+  &__chevron {
+    flex: none;
+    color: var(--spectrum-global-color-gray-700);
+    transition: transform 0.15s;
+  }
+
+  &__section.is-open &__chevron {
+    transform: rotate(90deg);
+  }
+
+  &__count {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--spectrum-global-color-gray-600);
+  }
+
+  &__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 220px));
+    gap: 20px;
+    padding: 4px 8px 24px 32px;
+    margin: 0;
+    list-style: none;
+  }
+
+  // room under the last section, so the last anchor can reach the top
+  &__tail {
+    height: 60vh;
+  }
+}
+
+.studio-toolcard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  padding: 20px 12px;
+  text-align: center;
+  color: var(--spectrum-global-color-gray-800);
+  text-decoration: none;
+  border-radius: 6px;
+
+  &:hover {
+    background: var(--spectrum-global-color-gray-200);
+  }
+
+  &__icon {
+    margin-bottom: 4px;
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  &__desc {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--spectrum-global-color-gray-700);
+  }
+}
+
+// an icon with a small second icon on its top-right corner (Media settings: the media icon and a gear)
+.studio-navicon {
+  position: relative;
+  display: inline-flex;
+
+  &__badge {
+    position: absolute;
+    top: -6px;
+    right: -9px;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    color: var(--spectrum-global-color-gray-800);
+    background: var(--spectrum-global-color-gray-100);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--spectrum-global-color-gray-100);
+  }
+
+  &--L &__badge,
+  &--M &__badge {
+    top: -5px;
+    right: -7px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// on hover the tile's background changes; the badge follows it so it still looks cut out of the icon
+.studio-tile:hover .studio-navicon__badge,
+.studio-toolcard:hover .studio-navicon__badge {
+  background: var(--spectrum-global-color-gray-200);
+  box-shadow: 0 0 0 2px var(--spectrum-global-color-gray-200);
+}
+
+// ------------------------------------------------------------------------------------------ your work
+
+// Recent · Pinned: a rail at the left of Home; hidden, a strip with the button that brings it back
+.studio-work {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 260px;
+  min-height: 0;
+  overflow: auto;
+  background: var(--spectrum-global-color-gray-75);
+  border-right: 1px solid var(--spectrum-global-color-gray-300);
+
+  &--hidden {
+    width: 40px;
+    padding-top: 6px;
+    align-items: center;
+    overflow: visible;
+  }
+
+  &__railhead {
+    display: flex;
+    flex: none;
+    justify-content: flex-end;
+    padding: 6px 6px 0;
+  }
+
+  &__card {
+    padding: 2px 8px 10px;
+  }
+
+  &__head {
+    margin: 0;
+  }
+
+  &__fold {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
+    padding: 6px 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--spectrum-global-color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-radius: 6px;
+
+    &:hover {
+      background: var(--spectrum-global-color-gray-200);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--spectrum-global-color-blue-500);
+      outline-offset: -2px;
+    }
+  }
+
+  &__count {
+    min-width: 18px;
+    padding: 0 6px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    color: var(--studio-neutral-0);
+    text-align: center;
+    letter-spacing: 0;
+    background: var(--spectrum-global-color-blue-600);
+    border-radius: 9px;
+  }
+
+  &__row.is-dragging {
+    opacity: 0.4;
+  }
+
+  &__row.is-over {
+    box-shadow: inset 0 2px 0 var(--spectrum-global-color-blue-500);
+  }
+
+  &__empty a {
+    color: var(--spectrum-global-color-blue-700);
+  }
+
+  &__list {
+    margin: 2px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+    border-radius: 6px;
+
+    &:hover {
+      background: var(--spectrum-global-color-gray-200);
+    }
+
+    // the row's buttons show on hover and focus, so the list stays quiet
+    .studio-work__actions {
+      display: flex;
+      flex: none;
+      opacity: 0;
+      transition: opacity 120ms;
+    }
+
+    &:hover .studio-work__actions,
+    &:focus-within .studio-work__actions,
+    .studio-work__actions .is-on {
+      opacity: 1;
+    }
+  }
+
+  &__link {
+    display: flex;
+    flex: 1;
+    gap: 8px;
+    align-items: center;
+    min-width: 0;
+    padding: 5px 6px;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 6px;
+
+    &:focus-visible {
+      outline: 2px solid var(--spectrum-global-color-blue-500);
+      outline-offset: -2px;
+    }
+  }
+
+  &__icon {
+    display: flex;
+    flex: none;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__texts {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__title,
+  &__hint {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__title {
+    font-size: 13px;
+    line-height: 17px;
+  }
+
+  &__hint {
+    font-size: 11px;
+    line-height: 14px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__empty {
+    margin: 4px 6px 4px;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+}

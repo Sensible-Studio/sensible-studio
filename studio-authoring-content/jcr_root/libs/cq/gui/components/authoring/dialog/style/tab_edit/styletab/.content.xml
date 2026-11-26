@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sensible Studio clean-room Style System tab for component (edit) dialogs. Apache License 2.0.
+  Lets authors pick styles defined in the component's policy (cq:styleGroups/*/cq:styles/*) and stores the
+  chosen style IDs in cq:styleIds, the property AEM content uses. Hidden when the policy defines no styles.
+-->
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Styles"
+    sling:resourceType="granite/ui/components/coral/foundation/container"
+    margin="{Boolean}true">
+    <granite:rendercondition
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="studio/granite/renderconditions/hasstyles"/>
+    <items jcr:primaryType="nt:unstructured">
+        <styles
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="studio/granite/components/stylesystem/styleselector"
+            fieldDescription="Styles come from the component's policy in the page template."
+            name="./cq:styleIds"/>
+    </items>
+</jcr:root>

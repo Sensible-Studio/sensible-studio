@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="sling:Folder">
+    <weekend-hiker jcr:primaryType="nt:unstructured" jcr:title="Weekend Hiker" jcr:description="Mara, 34, outdoors on every free day; reads on her phone.">
+        <profile jcr:primaryType="nt:unstructured" givenName="Mara" familyName="Ionescu" gender="female" age="{Long}34" interests="[hiking,camping,photography]" loyalty="member"/>
+        <geolocation jcr:primaryType="nt:unstructured" country="RO" city="Cluj-Napoca" latitude="{Double}46.77" longitude="{Double}23.6"/>
+        <surferinfo jcr:primaryType="nt:unstructured" device="mobile" os="Android" browser="Chrome" isMobile="{Boolean}true" isTablet="{Boolean}false" isDesktop="{Boolean}false"/>
+    </weekend-hiker>
+    <city-explorer jcr:primaryType="nt:unstructured" jcr:title="City Explorer" jcr:description="Tomás, 27, short city breaks and food; plans trips on his laptop.">
+        <profile jcr:primaryType="nt:unstructured" givenName="Tomás" familyName="Álvarez" gender="male" age="{Long}27" interests="[food,architecture,nightlife]" loyalty="none"/>
+        <geolocation jcr:primaryType="nt:unstructured" country="ES" city="Madrid" latitude="{Double}40.42" longitude="{Double}-3.7"/>
+        <surferinfo jcr:primaryType="nt:unstructured" device="desktop" os="macOS" browser="Safari" isMobile="{Boolean}false" isTablet="{Boolean}false" isDesktop="{Boolean}true"/>
+    </city-explorer>
+    <family-planner jcr:primaryType="nt:unstructured" jcr:title="Family Planner" jcr:description="Anneke, 45, travels with two children; books early, compares on a tablet.">
+        <profile jcr:primaryType="nt:unstructured" givenName="Anneke" familyName="de Vries" gender="female" age="{Long}45" interests="[family,beach,museums]" loyalty="gold" children="{Long}2"/>
+        <geolocation jcr:primaryType="nt:unstructured" country="NL" city="Utrecht" latitude="{Double}52.09" longitude="{Double}5.12"/>
+        <surferinfo jcr:primaryType="nt:unstructured" device="tablet" os="iOS" browser="Safari" isMobile="{Boolean}false" isTablet="{Boolean}true" isDesktop="{Boolean}false"/>
+    </family-planner>
+    <retired-traveller jcr:primaryType="nt:unstructured" jcr:title="Retired Traveller" jcr:description="George, 68, long trips off season; prefers a big screen.">
+        <profile jcr:primaryType="nt:unstructured" givenName="George" familyName="Whitfield" gender="male" age="{Long}68" interests="[cruises,history,gardens]" loyalty="platinum"/>
+        <geolocation jcr:primaryType="nt:unstructured" country="GB" city="Bath" latitude="{Double}51.38" longitude="{Double}-2.36"/>
+        <surferinfo jcr:primaryType="nt:unstructured" device="desktop" os="Windows" browser="Edge" isMobile="{Boolean}false" isTablet="{Boolean}false" isDesktop="{Boolean}true"/>
+    </retired-traveller>
+</jcr:root>

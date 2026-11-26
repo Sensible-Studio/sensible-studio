@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="cq:Page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Translation Review"
+        jcr:description="A member of translation-reviewers reviews a translated page, experience fragment or content fragment (Tools → Translation Review) and approves it, which puts its texts into the translation memory, or asks for changes with a comment."
+        cq:template="/libs/cq/workflow/templates/model"
+        cq:workflowStages="[Review,Decision]"
+        sling:resourceType="cq/workflow/components/pages/model">
+        <flow
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="foundation/components/parsys">
+            <participant
+                jcr:primaryType="nt:unstructured"
+                jcr:title="Review the translation"
+                jcr:description="Open Tools → Translation Review, correct what needs it, then complete this step: Approve, or Request changes with a comment."
+                sling:resourceType="cq/workflow/components/model/participant">
+                <metaData
+                    jcr:primaryType="nt:unstructured"
+                    PARTICIPANT="translation-reviewers"
+                    workflowStage="Review"/>
+            </participant>
+            <or
+                jcr:primaryType="nt:unstructured"
+                jcr:title="Decision"
+                sling:resourceType="cq/workflow/components/model/or"
+                branches="2"
+                orSplit="true">
+                <metaData
+                    jcr:primaryType="nt:unstructured"
+                    default1="true"
+                    default2="false"/>
+                <_x0031_
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="cq/flow/components/parsys">
+                    <process
+                        jcr:primaryType="nt:unstructured"
+                        jcr:title="Approve"
+                        sling:resourceType="cq/workflow/components/model/process">
+                        <metaData
+                            jcr:primaryType="nt:unstructured"
+                            PROCESS="io.sensible.studio.translation.impl.TranslationReviewProcesses$Approve"
+                            PROCESS_AUTO_ADVANCE="true"
+                            workflowStage="Decision"/>
+                    </process>
+                </_x0031_>
+                <_x0032_
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="cq/flow/components/parsys">
+                    <process
+                        jcr:primaryType="nt:unstructured"
+                        jcr:title="Request changes"
+                        sling:resourceType="cq/workflow/components/model/process">
+                        <metaData
+                            jcr:primaryType="nt:unstructured"
+                            PROCESS="io.sensible.studio.translation.impl.TranslationReviewProcesses$RequestChanges"
+                            PROCESS_AUTO_ADVANCE="true"
+                            workflowStage="Decision"/>
+                    </process>
+                </_x0032_>
+            </or>
+        </flow>
+    </jcr:content>
+</jcr:root>

@@ -1,0 +1,679 @@
+// The page editor in Studio's design language (theme/theme.scss; rules in the project's design-language
+// note). editor.scss lays the editor out and was written against Spectrum's look with a fixed selection
+// blue; this file loads after it and restates only what the design language changes, so the two can be
+// worked on independently. Everything is scoped under `.studio-theme`, which also puts it ahead of
+// editor.scss whatever the bundling order.
+
+.studio-theme {
+  // what is selected, hovered or about to receive a drop on the page: the scheme's accent, its "current"
+  --studio-ed-mark: var(--studio-accent-600);
+  --studio-ed-mark-strong: var(--studio-accent-700);
+  --studio-ed-mark-soft: color-mix(in srgb, var(--studio-accent-600) 9%, transparent);
+  --studio-ed-mark-line: color-mix(in srgb, var(--studio-accent-600) 55%, transparent);
+}
+
+.studio-theme {
+  // ---------------------------------------------------------------------------------------- top bar
+  // a console tool bar: 48px on the panel surface, a border under it, no colour of its own
+  .studio-topbar {
+    background: var(--studio-surface-panel);
+    border-bottom: 1px solid var(--studio-border);
+
+    &__title {
+      font-size: var(--studio-type-xs);
+      font-weight: 600;
+      color: var(--studio-text-strong);
+      letter-spacing: 0.08em;
+    }
+
+    &__subtitle {
+      color: var(--studio-text-muted);
+    }
+
+    // the mode you are in and a pressed toggle: a sunken neutral, edged — never accent
+    .is-current,
+    .studio-mode.is-current .studio-mode__current,
+    .studio-topbar__icon-button.is-pressed {
+      color: var(--studio-text-strong);
+      background: var(--studio-surface-sunken);
+    }
+
+    .studio-mode.is-current {
+      background: var(--studio-surface-sunken);
+      border-radius: var(--studio-radius-sm);
+      box-shadow: inset 0 0 0 1px var(--studio-border);
+    }
+
+    &__badge {
+      font-weight: 600;
+      color: var(--studio-neutral-0);
+      background: var(--studio-accent-700);
+      border-radius: var(--studio-radius-pill);
+    }
+  }
+
+  .studio-statusbar {
+    color: var(--studio-info-strong);
+    background: var(--studio-info-surface);
+    border-bottom-color: color-mix(in srgb, var(--studio-info) 30%, transparent);
+
+    &--warning {
+      color: var(--studio-warning-strong);
+      background: var(--studio-warning-surface);
+      border-bottom-color: color-mix(in srgb, var(--studio-warning) 30%, transparent);
+    }
+
+    &__icon {
+      color: inherit;
+    }
+  }
+
+  // ------------------------------------------------------------------------------------- side panel
+  .studio-sidepanel {
+    background: var(--studio-surface-panel);
+    border-right-color: var(--studio-border);
+
+    &__rail {
+      background: var(--studio-surface-canvas);
+      border-right-color: var(--studio-border);
+    }
+
+    // a category label, as on Home and in the inspector
+    &__title {
+      font-size: var(--studio-type-xs);
+      font-weight: 600;
+      color: var(--studio-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    &__resizer:hover,
+    &.is-resizing .studio-sidepanel__resizer {
+      background: var(--studio-ed-mark);
+    }
+  }
+
+  .studio-complist {
+    &__item {
+      border-radius: var(--studio-radius-sm);
+
+      &:hover {
+        background: var(--studio-surface-hover);
+      }
+    }
+
+    &__icon {
+      color: var(--studio-text-muted);
+      background: var(--studio-surface-sunken);
+      border: 1px solid var(--studio-border);
+      border-radius: var(--studio-radius-sm);
+    }
+
+    &__title {
+      font-size: var(--studio-type-md);
+      font-weight: 500;
+      color: var(--studio-text-strong);
+    }
+
+    &__group {
+      font-size: var(--studio-type-xs);
+      color: var(--studio-text-muted);
+    }
+  }
+
+  .studio-panel__empty {
+    color: var(--studio-text-muted);
+  }
+
+  // ------------------------------------------------------------------------- the overlay on the page
+  .studio-ov-hover {
+    background: var(--studio-ed-mark-soft);
+    border: 1px solid var(--studio-ed-mark-line);
+  }
+
+  .studio-ov-selected {
+    border: 2px solid var(--studio-ed-mark);
+
+    &.is-placeholder {
+      background: var(--studio-ed-mark-soft);
+    }
+
+    &.is-grouped {
+      border-color: var(--studio-ed-mark-line);
+    }
+  }
+
+  .studio-ov-label {
+    font-size: var(--studio-type-xs);
+    font-weight: 500;
+    color: var(--studio-neutral-0);
+    background: var(--studio-ed-mark);
+
+    &--hover {
+      background: var(--studio-ed-mark-line);
+    }
+  }
+
+  .studio-overlay .studio-ov-label,
+  .studio-overlay .studio-ov-selected.has-add .studio-ov-label {
+    border-radius: 0 var(--studio-radius-sm) 0 0;
+  }
+
+  .studio-ov-add {
+    color: var(--studio-neutral-0);
+    background: var(--studio-ed-mark-strong);
+  }
+
+  .studio-ov-insert-line,
+  .studio-ov-handle {
+    background: var(--studio-ed-mark);
+  }
+
+  .studio-ov-handle {
+    border-color: var(--studio-neutral-0);
+    border-radius: var(--studio-radius-xs);
+  }
+
+  .studio-ov-drop-box {
+    background: var(--studio-ed-mark-soft);
+    border: 2px dashed var(--studio-ed-mark);
+  }
+
+  .studio-ov-column {
+    border-color: var(--studio-ed-mark-line);
+  }
+
+  .studio-ov-resize-info {
+    color: var(--studio-text-inverse);
+    background: var(--studio-neutral-900);
+    border-radius: var(--studio-radius-sm);
+  }
+
+  // the component's tool bar: a small raised panel with an edge, like a menu
+  .studio-ov-toolbar {
+    background: var(--studio-surface-raised);
+    border: 1px solid var(--studio-border-strong);
+    border-radius: var(--studio-radius-md);
+    box-shadow: var(--studio-shadow-2);
+  }
+
+  .studio-toolbar {
+    gap: 1px;
+    padding: 3px;
+
+    .is-active {
+      color: var(--studio-text-strong);
+      background: var(--studio-surface-sunken);
+    }
+
+    &__gap {
+      border-right-color: var(--studio-border);
+    }
+  }
+
+  // ------------------------------------------------------------------------------- emulator, sizes
+  .studio-viewport-handle:hover,
+  .is-resizing-viewport .studio-viewport-handle {
+    background: var(--studio-ed-mark);
+  }
+
+  .studio-presets .is-current {
+    background: var(--studio-accent-50);
+    border-color: var(--studio-ed-mark);
+  }
+}
+
+// ------------------------------------------------------------------------------------ editor workspace v2
+// Quiet chrome around the page. The command bar owns page-level tasks; content and properties dock
+// beside the canvas instead of covering it.
+.studio-theme .studio-app.studio-app {
+  position: relative;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
+  color: var(--studio-text);
+  background: var(--studio-surface-canvas);
+
+  > .studio-topbar {
+    grid-row: 1;
+    grid-column: 1 / -1;
+  }
+
+  > .studio-statusbar,
+  > .studio-tpl-banner {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
+  .studio-workspace > .studio-sidepanel {
+    grid-row: 3;
+    grid-column: 1;
+  }
+
+  .studio-workspace > .studio-stage {
+    grid-row: 3;
+    grid-column: 2;
+  }
+}
+
+.studio-theme .studio-topbar {
+  display: grid;
+  grid-template-columns: auto minmax(260px, 1fr) auto auto auto;
+  gap: var(--studio-space-4);
+  height: 56px;
+  padding: 0 var(--studio-space-4);
+  color: var(--studio-bar-text);
+  background: var(--studio-bar-bg);
+  border-bottom-color: var(--studio-bar-border);
+  box-shadow: var(--studio-shadow-1);
+
+  &__navigation,
+  &__identity,
+  &__view,
+  &__actions,
+  &__history,
+  &__state {
+    display: flex;
+    align-items: center;
+  }
+
+  &__identity {
+    min-width: 0;
+    gap: var(--studio-space-2);
+  }
+
+  &__navigation {
+    padding-right: var(--studio-space-4);
+    border-right: 1px solid var(--studio-bar-rule);
+  }
+
+  &__page {
+    min-width: 0;
+    margin-left: var(--studio-space-3);
+    padding-left: var(--studio-space-5);
+    border-left: 1px solid var(--studio-bar-rule);
+  }
+
+  &__title {
+    max-width: 34vw;
+    font-size: var(--studio-type-md);
+    font-weight: 600;
+    line-height: var(--studio-leading-tight);
+    color: var(--studio-bar-text);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  &__state {
+    gap: var(--studio-space-4);
+    margin-top: var(--studio-space-1);
+  }
+
+  &__view,
+  &__actions {
+    gap: var(--studio-space-2);
+  }
+
+  &__history,
+  &__view {
+    padding-left: var(--studio-space-4);
+    border-left: 1px solid var(--studio-bar-rule);
+  }
+
+  &__history {
+    gap: 0;
+  }
+
+  &__actions {
+    justify-content: flex-end;
+
+    .studio-closebtn {
+      padding-left: var(--studio-space-4);
+      border-left: 1px solid var(--studio-bar-rule);
+    }
+  }
+
+  .studio-mode {
+    gap: 0;
+    padding: var(--studio-space-1);
+    background: var(--studio-tab-idle-bg);
+    border: 1px solid var(--studio-tab-idle-border);
+    border-radius: var(--studio-radius-md);
+
+    .is-current {
+      color: var(--studio-tab-active-text);
+      background: var(--studio-tab-active-bg);
+      box-shadow: var(--studio-shadow-1);
+    }
+  }
+
+  [class*='spectrum-ActionButton'] {
+    color: inherit;
+  }
+
+  // React Spectrum's selected toggle fill is deliberately replaced by the shared frame language.
+  [aria-pressed='false'] {
+    color: inherit;
+    background: transparent;
+    border: 1px solid transparent;
+
+    &:hover {
+      background: var(--studio-bar-hover);
+    }
+  }
+
+  [aria-pressed='true'] {
+    color: var(--studio-text-strong);
+    background: var(--studio-surface-sunken);
+    border: 1px solid var(--studio-border);
+    box-shadow: none;
+  }
+}
+
+.studio-state {
+  display: inline-flex;
+  gap: var(--studio-space-2);
+  align-items: center;
+  padding: 0;
+  font: inherit;
+  font-size: var(--studio-type-xs);
+  line-height: var(--studio-leading-tight);
+  color: var(--studio-bar-dim);
+  white-space: nowrap;
+  background: none;
+  border: 0;
+
+  &::before {
+    width: 5px;
+    height: 5px;
+    content: '';
+    background: currentColor;
+    border-radius: var(--studio-radius-pill);
+  }
+
+  &--saved {
+    color: var(--studio-success);
+  }
+
+  &--saving,
+  &--modified,
+  &--locked {
+    color: var(--studio-warning);
+  }
+
+  &--locked {
+    cursor: pointer;
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
+// Labeled task tabs replace the detached icon rail.
+.studio-theme .studio-sidepanel {
+  width: auto;
+  background: var(--studio-surface-panel);
+  border-right: 1px solid var(--studio-border);
+  box-shadow: var(--studio-shadow-1);
+
+  &__panel {
+    width: 320px;
+  }
+
+  // each tab as wide as its word: "Components" is never cut
+  &__tabs {
+    display: flex;
+    gap: var(--studio-space-1);
+    padding: var(--studio-space-3);
+
+    > * {
+      flex: 1 1 auto;
+    }
+
+    [class*='spectrum-ActionButton-label'] {
+      overflow: visible;
+    }
+    background: var(--studio-surface-canvas);
+    border-bottom: 1px solid var(--studio-border);
+
+    [class*='spectrum-Button'] {
+      justify-content: center;
+      min-width: 0;
+      border-radius: var(--studio-radius-sm);
+    }
+
+    [aria-pressed='true'] {
+      color: var(--studio-text-strong);
+      background: var(--studio-surface-raised);
+      box-shadow: inset 0 0 0 1px var(--studio-border);
+    }
+  }
+
+  &__title {
+    min-height: auto;
+    padding: var(--studio-space-5) var(--studio-space-6) var(--studio-space-3);
+  }
+
+  &__resizer {
+    width: 4px;
+    margin-right: -2px;
+  }
+}
+
+.studio-theme .studio-app.studio-app .studio-sidepanel__title {
+  min-height: auto;
+  padding: var(--studio-space-5) var(--studio-space-6) var(--studio-space-3);
+}
+
+.studio-theme .studio-stage {
+  padding: var(--studio-space-5);
+  background: var(--studio-surface-sunken);
+  transition: margin-right 120ms ease-out;
+
+  &__viewport {
+    border: 1px solid var(--studio-border);
+    box-shadow: var(--studio-shadow-2);
+  }
+}
+
+.studio-selection-path {
+  display: flex;
+  flex: none;
+  gap: var(--studio-space-3);
+  align-items: center;
+  min-height: 30px;
+  margin: calc(var(--studio-space-5) * -1) calc(var(--studio-space-5) * -1) var(--studio-space-5);
+  padding: 0 var(--studio-space-5);
+  overflow: hidden;
+  font-size: var(--studio-type-sm);
+  color: var(--studio-text-muted);
+  white-space: nowrap;
+  background: var(--studio-surface-panel);
+  border-bottom: 1px solid var(--studio-border);
+
+  &__label {
+    flex: none;
+    font-size: var(--studio-type-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  button {
+    min-width: 0;
+    padding: var(--studio-space-1) var(--studio-space-2);
+    overflow: hidden;
+    font: inherit;
+    color: inherit;
+    text-overflow: ellipsis;
+    background: none;
+    border: 0;
+    border-radius: var(--studio-radius-sm);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--studio-text-strong);
+      background: var(--studio-surface-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--studio-focus-color);
+      outline-offset: 1px;
+    }
+  }
+
+  strong {
+    overflow: hidden;
+    color: var(--studio-text-strong);
+    text-overflow: ellipsis;
+  }
+}
+
+// Selection is deliberately neutral; accent is reserved for focus, current mode, insertion and drop.
+.studio-theme .studio-overlay {
+  .studio-ov-hover {
+    background: color-mix(in srgb, var(--studio-surface-selected) 55%, transparent);
+    border-color: var(--studio-border-strong);
+  }
+
+  .studio-ov-selected {
+    border-color: var(--studio-neutral-700);
+    box-shadow: 0 0 0 1px var(--studio-neutral-0);
+
+    &.is-placeholder {
+      background: color-mix(in srgb, var(--studio-surface-selected) 65%, transparent);
+    }
+  }
+
+  .studio-ov-label {
+    color: var(--studio-text-inverse);
+    background: var(--studio-neutral-800);
+  }
+
+  .studio-ov-placeholder {
+    color: var(--studio-text-muted);
+    background: color-mix(in srgb, var(--studio-surface-raised) 82%, transparent);
+    border-color: var(--studio-border-strong);
+    border-radius: var(--studio-radius-sm);
+  }
+
+  .studio-ov-drop-box,
+  .studio-ov-insert-line {
+    border-color: var(--studio-accent-600);
+    background: var(--studio-accent-600);
+  }
+}
+
+.studio-theme .studio-ov-toolbar {
+  max-width: min(680px, 90%);
+  border-radius: var(--studio-radius-md);
+}
+
+.studio-theme .studio-toolbar {
+  align-items: center;
+  gap: var(--studio-space-1);
+
+  [class*='spectrum-ActionButton'] {
+    min-width: auto;
+  }
+}
+
+// Component properties: a floating window over the page, as AEM's component dialog. It is not modal: the page,
+// the side panel and the editor bar stay usable, so only the window itself takes the pointer.
+.studio-theme .studio-app {
+  position: relative;
+}
+
+.studio-theme .studio-dialog--floating {
+  // inside the editor, never over the shell's tabs; the whole editor is its area, whatever grid cell it falls in
+  position: absolute;
+  grid-row: 1 / -1;
+  grid-column: 1 / -1;
+  z-index: 30;
+  pointer-events: none;
+
+  .studio-dialog__window {
+    width: min(640px, 94vw);
+    min-width: 360px;
+    min-height: 240px;
+    max-width: 96vw;
+    max-height: 84vh;
+    overflow: hidden;
+    pointer-events: auto;
+    resize: both;
+    background: var(--studio-surface-panel);
+    border: 1px solid var(--studio-border-strong);
+    border-radius: var(--studio-radius-lg);
+    box-shadow: var(--studio-shadow-3);
+  }
+
+  // moved by its title band: placed where the author left it
+  &.is-placed {
+    display: block;
+    padding: 0;
+
+    .studio-dialog__window {
+      position: absolute;
+    }
+  }
+
+  // full screen is the page's area (measured in ComponentDialog): the editor bar and the side panel stay
+  &.is-fullscreen {
+    display: block;
+    padding: 0;
+  }
+
+  &.is-fullscreen .studio-dialog__window {
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    resize: none;
+    border-width: 0 0 0 1px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .studio-dialog__header {
+    min-height: 56px;
+    padding: 0 var(--studio-space-4) 0 var(--studio-space-6);
+    touch-action: none;
+    user-select: none;
+    background: var(--studio-surface-raised);
+    border-bottom-color: var(--studio-border);
+  }
+
+  .studio-dialog__title {
+    margin-top: var(--studio-space-1);
+    font-size: var(--studio-type-lg);
+  }
+
+  .studio-dialog__body {
+    padding: var(--studio-space-6);
+  }
+}
+
+.studio-dialog__eyebrow {
+  display: block;
+  font-size: var(--studio-type-xs);
+  font-weight: 600;
+  color: var(--studio-text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+// Narrow windows: the editor bar keeps every control and gives up words first, then the state line,
+// so Publish, full screen and close never leave the screen.
+@media (max-width: 1180px) {
+  .studio-topbar__navigation [class*='spectrum-ActionButton-label'],
+  .studio-topbar__identity > button [class*='spectrum-ActionButton-label'],
+  .studio-topbar__view > button [class*='spectrum-ActionButton-label'] { display: none; }
+  .studio-topbar { gap: var(--studio-space-2); }
+}
+@media (max-width: 980px) {
+  .studio-topbar__state { display: none; }
+  .studio-topbar__title { max-width: 160px; }
+  .studio-topbar { overflow-x: auto; scrollbar-width: none; }
+}

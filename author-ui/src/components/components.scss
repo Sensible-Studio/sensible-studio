@@ -1,0 +1,62 @@
+// Components console (AEM's Tools › General › Components) and a component's details.
+
+.studio-comp__count { font-size: 12px; color: var(--studio-bar-dim, var(--studio-text-muted)); white-space: nowrap; }
+
+.studio-comp__list { padding: 0; }
+
+.studio-comp__icon {
+  display: inline-flex; flex: none; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 4px; object-fit: contain;
+  font-size: 11px; font-weight: 600; color: var(--studio-neutral-0, #fff); background: var(--studio-neutral-600, #6e6e6e);
+
+  &.is-hidden { opacity: .55; }
+  &.is-large { width: 48px; height: 48px; border-radius: 6px; font-size: 17px; }
+}
+img.studio-comp__icon { background: none; }
+
+.studio-comp__title { display: inline-flex; align-items: center; gap: var(--studio-space-2); min-width: 0; }
+.studio-comp__title > span:first-child { overflow: hidden; text-overflow: ellipsis; }
+.studio-comp__tag {
+  flex: none; padding: 0 6px; font-size: 11px; line-height: 18px; color: var(--studio-text-muted);
+  border: 1px solid var(--studio-border); border-radius: 9px;
+}
+.studio-comp__muted { color: var(--studio-text-muted); }
+.studio-comp__path { font-family: var(--studio-font-mono); font-size: 12px; color: var(--studio-text-muted); }
+a.studio-comp__path { text-decoration: none; }
+a.studio-comp__path:hover { text-decoration: underline; }
+.studio-comp__link { color: var(--studio-accent-700, var(--studio-accent)); text-underline-offset: 2px; }
+
+.studio-comp__details { padding: var(--studio-space-6) var(--studio-space-7); overflow: auto; }
+.studio-comp__head {
+  display: flex; align-items: center; gap: var(--studio-space-4); max-width: 1100px; margin-bottom: var(--studio-space-4);
+
+  h1 { margin: 0; font-size: var(--studio-type-xl, 22px); font-weight: 600; }
+  code { font-family: var(--studio-font-mono); font-size: 12px; color: var(--studio-text-muted); }
+}
+.studio-comp__tabs { max-width: 1100px; }
+.studio-comp__panel { padding: var(--studio-space-5) 0; }
+.studio-comp__panel code { font-family: var(--studio-font-mono); font-size: 12.5px; }
+.studio-comp__iconrow { display: inline-flex; align-items: center; gap: var(--studio-space-3); }
+.studio-comp__chain { display: inline-flex; flex-wrap: wrap; align-items: baseline; }
+
+.studio-comp__table {
+  width: 100%; border-collapse: collapse; font-size: var(--studio-type-sm, 13px);
+
+  th {
+    padding: var(--studio-space-2) var(--studio-space-3); text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--studio-text-muted); border-bottom: 1px solid var(--studio-border);
+  }
+  td { padding: var(--studio-space-3); vertical-align: top; border-bottom: 1px solid var(--studio-border-subtle); }
+  .is-num { text-align: right; font-variant-numeric: tabular-nums; }
+}
+.studio-comp__list-plain { margin: 0; padding: 0; list-style: none; }
+
+.studio-comp__readme {
+  margin: var(--studio-space-5) 0; padding: var(--studio-space-5); overflow: auto; white-space: pre-wrap;
+  font-family: var(--studio-font-mono); font-size: 12.5px; line-height: 1.55;
+  background: var(--studio-surface-sunken); border: 1px solid var(--studio-border-subtle); border-radius: 6px;
+}
+
+// the icon column starts where the other cells' text does
+.studio-comp__list [role='gridcell']:first-child .studio-comp__icon,
+.studio-comp__list [role='rowheader']:first-child .studio-comp__icon { margin-left: var(--studio-space-3); }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="group">io.sensible.studio</entry>
+<entry key="name">studio-siterail-index</entry>
+<entry key="version">1.0.0</entry>
+<entry key="description">Lucene index on the workspace property of version histories (pages deleted outside the Sites console)</entry>
+<entry key="requiresRoot">true</entry>
+</properties>

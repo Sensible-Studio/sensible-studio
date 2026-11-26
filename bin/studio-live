@@ -1,0 +1,204 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Sensible Studio Live cache: the service between Apache httpd and the publish instance(s). It
+# filters requests, keeps the pages the publish renders as files (instances/live/docroot, which is
+# Apache's DocumentRoot) and removes them when something is published.
+#   bin/studio-live build          - compiles it (needs cargo)
+#   bin/studio-live start          - starts it on 127.0.0.1:4520; log in instances/live/logs
+#   bin/studio-live stop | restart
+#   bin/studio-live status         - is it running, what has it served, which publish answers
+#   bin/studio-live check          - reads the configuration and says what it means
+#   bin/studio-live flush [path]   - invalidates as a publication of that path would (default /content)
+#   bin/studio-live clear          - forgets every cached file
+#   bin/studio-live explain URL [METHOD] [HOST]
+#                                  - what would happen to a visitor's request for that path
+#                                    (/content/wknd/us/en.html?page=2), and which rule decides;
+#                                    with HOST, as asked under that host name (a site's)
+#   bin/studio-live import FILE    - reads a dispatcher configuration (dispatcher.any and what it
+#                                    includes) and prints it as a live.toml; what has no equivalent
+#                                    is a comment that says why
+#   bin/studio-live apache start|stop|status|check
+#                                  - a trial Apache httpd in front of it, run as you on
+#                                    http://localhost:8085 with live-service/apache (HTTPD overrides
+#                                    which httpd; the module paths in apache/test are macOS's)
+# Without Apache it answers on its own port too: http://localhost:4520/content/wknd/us/en.html
+# Configuration: live-service/conf/live.toml (LIVE_CONFIG overrides); Apache's side: live-service/apache
+# ==============================================================================
+set -e
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+cd "$DIR"
+LIVE_HOME="${LIVE_HOME:-$DIR/instances/live}"
+CONFIG="${LIVE_CONFIG:-$DIR/live-service/conf/live.toml}"
+BIN="$DIR/live-service/target/release/studio-live"
+PID_FILE="$LIVE_HOME/live.pid"
+LOG_FILE="$LIVE_HOME/logs/live.log"
+
+# the address in the configuration, for status and flush
+listen() {
+    local l
+    l="$(sed -n 's/^listen *= *"\(.*\)".*/\1/p' "$CONFIG" | head -1)"
+    echo "${l:-127.0.0.1:4520}"
+}
+
+# the secret, when there is one, as a flush target would send it (bash 3.2 friendly)
+AUTH=()
+[ -n "$STUDIO_LIVE_FLUSH_SECRET" ] && AUTH=(-u "flush:$STUDIO_LIVE_FLUSH_SECRET")
+
+running() {
+    [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null
+}
+
+build() {
+    command -v cargo >/dev/null || { echo "cargo is needed to build the Live cache: https://rustup.rs"; exit 1; }
+    ( cd "$DIR/live-service" && cargo build --release )
+    echo "✅ Built $BIN"
+}
+
+start() {
+    [ -x "$BIN" ] || build
+    if running; then
+        echo "Live cache already running (pid $(cat "$PID_FILE"))"; exit 0
+    fi
+    mkdir -p "$LIVE_HOME/logs"
+    "$BIN" --config "$CONFIG" --check > /dev/null
+    echo "🚀 Starting the Live cache on $(listen) (cache in $LIVE_HOME/docroot)..."
+    nohup "$BIN" --config "$CONFIG" >> "$LOG_FILE" 2>&1 &
+    echo $! > "$PID_FILE"
+    sleep 1
+    if running; then
+        echo "   pid $(cat "$PID_FILE"); log: $LOG_FILE"
+    else
+        echo "   it stopped at once:"; tail -5 "$LOG_FILE"; rm -f "$PID_FILE"; exit 1
+    fi
+}
+
+stop() {
+    if [ -f "$PID_FILE" ]; then
+        kill "$(cat "$PID_FILE")" 2>/dev/null && echo "Stopped the Live cache (pid $(cat "$PID_FILE"))" || echo "The Live cache was not running"
+        rm -f "$PID_FILE"
+    else
+        echo "No pid file at $PID_FILE"
+    fi
+}
+
+status() {
+    if running; then
+        echo "Live cache running (pid $(cat "$PID_FILE")), http://$(listen)"
+        curl -s "${AUTH[@]}" "http://$(listen)/_live/status" || true
+        echo
+    else
+        echo "Live cache not running"
+    fi
+}
+
+flush() {
+    local path="${1:-/content}"
+    curl -s "${AUTH[@]}" -X POST -H "CQ-Action: Activate" -H "CQ-Handle: $path" "http://$(listen)/dispatcher/invalidate.cache"
+}
+
+explain() {
+    [ -n "$1" ] || { echo "Usage: bin/studio-live explain /content/site/page.html[?query] [METHOD]"; exit 1; }
+    local answer
+    answer="$(curl -s -G "${AUTH[@]}" --data-urlencode "url=$1" --data-urlencode "method=${2:-GET}" --data-urlencode "host=${3:-}" "http://$(listen)/_live/explain")" \
+        || { echo "The Live cache does not answer on $(listen): bin/studio-live start"; exit 1; }
+    if command -v python3 >/dev/null; then
+        printf '%s' "$answer" | python3 -c '
+import json, sys
+try:
+    d = json.load(sys.stdin)
+except ValueError:
+    print("Not allowed, or not a Live cache that explains (is STUDIO_LIVE_FLUSH_SECRET set as the service has it?)"); sys.exit(1)
+print(d.get("summary") or d.get("error"))
+if d.get("site"): print("  site       %s%s" % (d["site"], "   (asked as %s)" % d["host"] if d.get("host") else ""))
+if "sling" in d:
+    s = d["sling"]
+    print("  path       %s%s" % (d["path"], "   (a short URL of it was asked)" if d.get("shortUrl") else ""))
+    print("  read as    resource %s, selectors %s, extension %s, suffix %s" % (s["path"], ".".join(s["selectors"]) or "-", s["extension"] or "-", s["suffix"] or "-"))
+    if d.get("rule"): print("  the rule   %s" % json.dumps(d["rule"]))
+    if d.get("file"): print("  cache file %s%s" % (d["file"], "   (now: %s)" % d["inCache"] if d.get("inCache") else ""))
+'
+    else
+        printf '%s\n' "$answer"
+    fi
+}
+
+clear_cache() {
+    # while it runs the service empties its own caches: it knows what it keeps (the index of what
+    # pages show, the expiry times) and what beside them is not cache (the redirect maps Apache reads)
+    if running; then
+        curl -sf "${AUTH[@]}" -X POST "http://$(listen)/_live/clear" && echo && return
+        echo "The Live cache did not answer on $(listen); not cleared"; exit 1
+    fi
+    # the document root, the answers kept with their headers beside it, and the stale copies; the
+    # redirect maps (<site>.redirects.txt) stay, Apache cannot start without them
+    local found=0 dir old
+    for dir in "$LIVE_HOME/docroot" "$LIVE_HOME/docroot.held" "$LIVE_HOME/docroot.stale"; do
+        [ -d "$dir" ] || continue
+        found=1
+        # moved aside first, so that no request is answered from half a cache
+        old="$dir.cleared.$$"
+        mkdir "$old"
+        find "$dir" -mindepth 1 -maxdepth 1 ! -name '*.redirects.txt' -exec mv {} "$old"/ \;
+        rm -rf "$old"
+    done
+    [ "$found" = 1 ] && echo "Cleared $LIVE_HOME/docroot" || echo "Nothing cached ($LIVE_HOME/docroot does not exist)"
+}
+
+apache() {
+    local httpd="${HTTPD:-$(command -v httpd || echo /usr/sbin/httpd)}"
+    [ -x "$httpd" ] || { echo "No Apache httpd found (set HTTPD=/path/to/httpd)"; exit 1; }
+    local run="$LIVE_HOME/apache-test" docroot
+    docroot="$(sed -n 's/^docroot *= *"\(.*\)".*/\1/p' "$CONFIG" | head -1)"
+    case "$docroot" in /*) ;; *) docroot="$DIR/$docroot" ;; esac
+    mkdir -p "$run" "$docroot"
+    local args=(-f "$DIR/live-service/apache/test/httpd-test.conf" -d "$DIR/live-service/apache"
+                -C "Define STUDIO_LIVE_DOCROOT $docroot" -C "Define TEST_RUN $run")
+    local pid_file="$run/httpd.pid"
+    case "$1" in
+        check) "$httpd" "${args[@]}" -t ;;
+        start)
+            if [ -f "$pid_file" ] && kill -0 "$(cat "$pid_file")" 2>/dev/null; then
+                echo "Apache already running (pid $(cat "$pid_file")), http://localhost:8085"; return 0
+            fi
+            "$httpd" "${args[@]}" -t > /dev/null 2>&1 || { "$httpd" "${args[@]}" -t; exit 1; }
+            "$httpd" "${args[@]}" -k start
+            sleep 1
+            if [ -f "$pid_file" ]; then
+                echo "🚀 Apache in front of the Live cache: http://localhost:8085 (pid $(cat "$pid_file"); log: $run/error.log)"
+                running || echo "   The Live cache itself is not running: bin/studio-live start"
+            else
+                echo "Apache did not start:"; tail -5 "$run/error.log" 2>/dev/null
+                echo "   (on macOS, \"Operation not permitted\" means httpd may not read this folder:"
+                echo "    System Settings → Privacy & Security → Full Disk Access → add $httpd)"
+                exit 1
+            fi ;;
+        stop)
+            if [ -f "$pid_file" ]; then
+                "$httpd" "${args[@]}" -k stop && echo "Stopped Apache"
+            else
+                echo "Apache is not running"
+            fi ;;
+        status)
+            if [ -f "$pid_file" ] && kill -0 "$(cat "$pid_file")" 2>/dev/null; then
+                echo "Apache running (pid $(cat "$pid_file")), http://localhost:8085, serving $docroot"
+            else
+                echo "Apache not running"
+            fi ;;
+        *) echo "Usage: bin/studio-live apache start|stop|status|check" ;;
+    esac
+}
+
+case "$1" in
+    apache) apache "$2" ;;
+    build) build ;;
+    start) start ;;
+    stop) stop ;;
+    restart) stop; sleep 1; start ;;
+    status) status ;;
+    check) [ -x "$BIN" ] || build; "$BIN" --config "$CONFIG" --check ;;
+    flush) flush "$2" ;;
+    clear) clear_cache ;;
+    explain) explain "$2" "$3" "$4" ;;
+    import) [ -n "$2" ] || { echo "Usage: bin/studio-live import path/to/dispatcher.any [--var NAME=VALUE]... [--vars FILE]..."; exit 1; }; [ -x "$BIN" ] || build; shift; "$BIN" --import-dispatcher "$@" ;;
+    *) echo "Usage: bin/studio-live build|start|stop|restart|status|check|flush [path]|clear|explain URL [METHOD] [HOST]|import FILE|apache start|stop|status|check   (LIVE_CONFIG, LIVE_HOME, STUDIO_LIVE_FLUSH_SECRET)" ;;
+esac

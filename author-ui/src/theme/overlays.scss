@@ -1,0 +1,269 @@
+.studio-theme {
+  [class*='spectrum-Underlay']:not([class*='spectrum-Underlay--transparent']) {
+    background: color-mix(in srgb, var(--studio-neutral-900) 48%, transparent);
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] {
+    width: 100%;
+    max-width: none;
+    max-height: min(760px, calc(100vh - 48px));
+    padding: 0;
+    overflow: hidden;
+    color: var(--studio-text);
+    background: var(--studio-surface-raised);
+    border: 1px solid var(--studio-border-strong);
+    border-radius: var(--studio-radius-lg);
+    box-shadow: var(--studio-shadow-3);
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] > [class*='spectrum-Dialog-grid'] {
+    display: grid;
+    grid-template-areas:
+      'heading header close'
+      'content content content'
+      'footer footer buttons';
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: minmax(52px, auto) minmax(0, 1fr) auto;
+    width: 100%;
+    max-height: inherit;
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] [class*='spectrum-Dialog-heading'] {
+    display: flex;
+    grid-area: heading;
+    align-items: center;
+    min-width: 0;
+    min-height: 52px;
+    padding: var(--studio-space-5) 0 var(--studio-space-5) var(--studio-space-7);
+    margin: 0;
+    color: var(--studio-text-strong);
+    font-size: var(--studio-type-lg);
+    font-weight: 600;
+    line-height: var(--studio-leading-tight);
+    border-bottom: 1px solid var(--studio-border);
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] > [class*='spectrum-Dialog-grid']:not(:has([class*='spectrum-Dialog-header'], .studio-dialog-standard__subject)) [class*='spectrum-Dialog-heading'] {
+    grid-column: 1 / 3;
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] > [class*='spectrum-Dialog-grid']:not(:has([class*='spectrum-Dialog-closeButton'], .studio-dialog-standard__close)) [class*='spectrum-Dialog-heading'] {
+    grid-column-end: 4;
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] > [class*='spectrum-Dialog-grid']:not(:has([class*='spectrum-Dialog-closeButton'], .studio-dialog-standard__close)) :is([class*='spectrum-Dialog-header'], .studio-dialog-standard__subject) {
+    grid-column: 2 / 4;
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] [class*='spectrum-Dialog-header'],
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] .studio-dialog-standard__subject {
+    display: flex;
+    grid-area: header;
+    align-items: center;
+    min-width: 0;
+    min-height: 52px;
+    padding: var(--studio-space-5);
+    margin: 0;
+    overflow: hidden;
+    color: var(--studio-text-muted);
+    font-size: var(--studio-type-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--studio-border);
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] [class*='spectrum-Dialog-closeButton'],
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] .studio-dialog-standard__close {
+    position: static;
+    grid-area: close;
+    place-self: stretch;
+    align-self: stretch;
+    min-width: 52px;
+    min-height: 52px;
+    margin: 0;
+    border-bottom: 1px solid var(--studio-border);
+    border-radius: 0;
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] [class*='spectrum-Dialog-divider'] {
+    display: none;
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] [class*='spectrum-Dialog-content'] {
+    grid-area: content;
+    min-height: 0;
+    max-height: calc(100vh - 180px);
+    padding: var(--studio-space-7);
+    margin: 0;
+    overflow: auto;
+    color: var(--studio-text);
+    font-size: var(--studio-type-sm);
+    line-height: var(--studio-leading-normal);
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] [class*='spectrum-Dialog-footer'],
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] [class*='spectrum-Dialog-buttonGroup'] {
+    min-height: 56px;
+    padding: var(--studio-space-5) var(--studio-space-6);
+    margin: 0;
+    background: var(--studio-surface-sunken);
+    border-top: 1px solid var(--studio-border);
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] [class*='spectrum-Dialog-footer'] {
+    display: flex;
+    grid-area: footer;
+    align-items: center;
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] [class*='spectrum-Dialog-buttonGroup'] {
+    display: flex;
+    grid-area: buttons;
+    gap: var(--studio-space-3);
+    align-items: center;
+    justify-content: flex-end;
+    max-width: none;
+  }
+
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] [class*='spectrum-Dialog-buttonGroup']:only-child,
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] > [class*='spectrum-Dialog-grid']:not(:has([class*='spectrum-Dialog-footer'])) [class*='spectrum-Dialog-buttonGroup'] {
+    grid-column: 1 / -1;
+  }
+
+  [class*='spectrum-Popover'][class*='react-spectrum-Popover'] {
+    color: var(--studio-text);
+    background: var(--studio-surface-raised);
+    border: 1px solid var(--studio-border-strong);
+    border-radius: var(--studio-radius-md);
+    box-shadow: var(--studio-shadow-2);
+  }
+
+  [role='menu'] {
+    padding: var(--studio-space-2);
+  }
+
+  [role='menuitem'] {
+    border-radius: var(--studio-radius-sm);
+  }
+
+  [role='tooltip'] {
+    color: var(--studio-text-inverse);
+    background: var(--studio-neutral-900);
+    border: 1px solid var(--studio-neutral-700);
+    border-radius: var(--studio-radius-sm);
+    box-shadow: var(--studio-shadow-2);
+  }
+
+  // Toasts keep their meaning colour (positive / negative / info); only the geometry is ours.
+  // The body inside carries role="alert", so nothing here may match by role.
+  [class*='spectrum-Toast']:not([class*='spectrum-Toast-']):not([class*='spectrum-ToastContainer']) {
+    border-radius: var(--studio-radius-md);
+    box-shadow: var(--studio-shadow-3);
+    font-size: var(--studio-type-sm);
+  }
+
+  [class*='spectrum-ContextualHelp'] button {
+    color: var(--studio-text-muted);
+    background: transparent;
+    border: 1px solid var(--studio-border);
+  }
+
+  [role='columnheader'] {
+    min-height: 40px;
+    color: var(--studio-text-muted);
+    background: var(--studio-surface-subtle);
+    border-bottom-color: var(--studio-border-strong);
+    font-size: var(--studio-type-xs);
+    font-weight: 650;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  [role='row'] [role='gridcell'] {
+    min-height: 44px;
+    border-bottom-color: var(--studio-border);
+  }
+}
+
+.studio-theme div[class*='spectrum-Modal']:not([class*='spectrum-Modal-wrapper']):has(> section:is(.studio-dialog-standard--s, [class*='spectrum-Dialog--small'])) {
+  width: min(420px, calc(100vw - 32px));
+  max-width: min(420px, calc(100vw - 32px));
+}
+
+.studio-theme div[class*='spectrum-Modal']:not([class*='spectrum-Modal-wrapper']):has(> section:is(.studio-dialog-standard--m, [class*='spectrum-Dialog--medium'])) {
+  width: min(640px, calc(100vw - 32px));
+  max-width: min(640px, calc(100vw - 32px));
+}
+
+.studio-theme div[class*='spectrum-Modal']:not([class*='spectrum-Modal-wrapper']):has(> section:is(.studio-dialog-standard--l, [class*='spectrum-Dialog--large'])) {
+  width: min(920px, calc(100vw - 32px));
+  max-width: min(920px, calc(100vw - 32px));
+}
+
+// A dialog Spectrum opens as a full-screen takeover (Restore Version, Restore Tree, Compare) keeps the whole
+// window: the S / M / L widths above are for ordinary dialogs (it was squeezed to 640px at the left edge).
+.studio-theme div[class*='spectrum-Modal']:not([class*='spectrum-Modal-wrapper']):has(> section[class*='spectrum-Dialog--fullscreenTakeover']) {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+}
+
+.studio-theme div[class*='spectrum-Modal']:not([class*='spectrum-Modal-wrapper']):has(> section[class*='spectrum-Dialog--fullscreen']:not([class*='spectrum-Dialog--fullscreenTakeover'])) {
+  width: calc(100vw - 64px);
+  max-width: calc(100vw - 64px);
+  height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+}
+
+section[class*='spectrum-Dialog--fullscreen'] { width: 100%; height: 100%; }
+
+.studio-dialog-standard--s { width: 100%; }
+.studio-dialog-standard--m { width: 100%; }
+.studio-dialog-standard--l { width: 100%; }
+.studio-dialog-standard__footer { display: flex; width: 100%; align-items: center; }
+.studio-dialog-standard__spacer { flex: 1; }
+.studio-picker-dialog { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: var(--studio-space-6); min-height: 320px; }
+.studio-picker-dialog > aside { padding-left: var(--studio-space-6); border-left: 1px solid var(--studio-border); }
+
+// Fit: one 52px header row; the close button fills it so the header's bottom line is continuous.
+.studio-theme :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] {
+  [class*='spectrum-Dialog-heading'] { box-sizing: border-box; height: 52px; padding-top: 0; padding-bottom: 0; }
+  [class*='spectrum-Dialog-header'], .studio-dialog-standard__subject { box-sizing: border-box; height: 52px; padding-top: 0; padding-bottom: 0; }
+  [class*='spectrum-Dialog-closeButton'], .studio-dialog-standard__close { box-sizing: border-box; width: 52px; height: 52px; }
+}
+
+// Polish on top of the anatomy: a compact action band, a filled destructive action, a short entrance.
+.studio-theme :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] {
+  [class*='spectrum-Dialog-buttonGroup'] {
+    box-sizing: border-box;
+    height: 56px;
+    min-height: 56px;
+    padding-top: 0;
+    padding-bottom: 0;
+
+    > * { margin-top: 0; margin-bottom: 0; }
+  }
+
+  [class*='spectrum-Dialog-buttonGroup'] [class*='spectrum-Button'][data-variant='negative'] {
+    color: var(--studio-neutral-0);
+    background: var(--studio-danger);
+    border-color: var(--studio-danger);
+
+    &:hover:not(:disabled) { background: var(--studio-danger-strong); border-color: var(--studio-danger-strong); }
+  }
+
+  [class*='spectrum-Dialog-heading'] { letter-spacing: -0.005em; }
+  [class*='spectrum-Dialog-content'] strong { color: var(--studio-text-strong); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .studio-theme div[class*='spectrum-Modal']:not([class*='spectrum-Modal-wrapper']) {
+    animation: studio-dialog-in 140ms cubic-bezier(.2, .8, .2, 1);
+  }
+}
+
+@keyframes studio-dialog-in {
+  from { opacity: 0; transform: translateY(6px) scale(.985); }
+  to { opacity: 1; transform: none; }
+}

@@ -1,0 +1,161 @@
+// The editor's frame as in AEM: the side panel runs the full height of the window, from the very top, and the
+// top bar, banners and the page sit to its right. `.studio-workspace` gives its children to the grid.
+// (Doubled class: editor.scss, loaded after this file, lays `.studio-app` out as a column.)
+
+.studio-app.studio-app {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
+
+  > * {
+    grid-column: 2;
+  }
+
+  > .studio-topbar {
+    grid-row: 1;
+  }
+
+  > .studio-tpl-banner {
+    grid-row: 2;
+  }
+
+  > .studio-workspace {
+    display: contents;
+  }
+
+  .studio-workspace > .studio-sidepanel {
+    grid-row: 1 / -1;
+    grid-column: 1;
+    min-height: 0;
+  }
+
+  .studio-workspace > .studio-stage {
+    grid-row: 3;
+    grid-column: 2;
+    min-height: 0;
+  }
+
+  // the rail's first tab lines up with the top bar's buttons
+  .studio-sidepanel__rail {
+    padding-top: 8px;
+  }
+
+  .studio-sidepanel__title {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 13px;
+  }
+}
+
+// ------------------------------------------------------------------------------------------ components panel
+
+.studio-app .studio-complist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &__item {
+    position: relative;
+    gap: 10px;
+    min-height: 48px;
+    padding: 4px 8px;
+    border: 1px solid transparent;
+
+    &:hover {
+      background: #eee;
+    }
+
+    &:focus-within {
+      border-color: var(--spectrum-global-color-blue-400);
+    }
+  }
+
+  &__icon.is-icon {
+    color: var(--spectrum-global-color-gray-700);
+    background: none;
+  }
+
+  &__text {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 13px;
+  }
+
+  &__info {
+    flex: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+
+}
+
+.studio-app .studio-complist__item:hover .studio-complist__info,
+.studio-app .studio-complist__info:focus-within {
+  opacity: 1;
+}
+
+.studio-compinfo {
+  font-size: 13px;
+
+  &__description {
+    margin: 0 0 12px;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 4px 12px;
+    margin: 0;
+  }
+
+  dt {
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  code {
+    font-size: 12px;
+  }
+}
+
+// ------------------------------------------------------------------------------------------ component hover
+
+// AEM's hover: a 1px blue frame (no fill) and the component's name in a tab at the bottom right
+.studio-overlay .studio-ov-hover {
+  background: none;
+  border: 1px solid #1473e6;
+}
+
+.studio-overlay .studio-ov-label {
+  right: -1px;
+  bottom: -1px;
+  padding: 4px 6px 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 15px;
+  border-radius: 8px 0 0;
+}
+
+.studio-overlay .studio-ov-selected .studio-ov-label {
+  right: -2px;
+  bottom: -2px;
+}
+
+.studio-overlay .studio-ov-hover.is-unlocked {
+  border-color: #e68619;
+}
+
+// the toolbar's size must not depend on where it is placed (it is placed from its size): near the right edge an
+// absolutely positioned box would shrink to the space left, wrap, change height, move again, ...
+.studio-overlay .studio-ov-toolbar {
+  width: max-content;
+}

@@ -1,0 +1,10 @@
+# brand2's home page
+RewriteRule ^/?$ /en.html [R=301,L]
+
+# the publish's short spelling of its own and of the shared trees
+RewriteRule ^/(brand2|experience-fragments|dam)/(.*)$ /content/$1/$2 [PT,L]
+
+# short URLs: /en/news.html is /content/brand2/en/news.html
+RewriteCond %{REQUEST_URI} !^/(apps|bin|content|etc|etc\.clientlibs|home|libs|system|tmp|var|dispatcher|_live)(/|\.|$)
+RewriteCond %{REQUEST_URI} \.(html|json|jpe?g|png|svg|webp)$
+RewriteRule ^/(.*)$ /content/brand2/$1 [PT,L]

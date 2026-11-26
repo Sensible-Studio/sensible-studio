@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0"
+    jcr:primaryType="cq:Page">
+    <jcr:content
+        cq:template="/conf/global/settings/wcm/templates/form"
+        jcr:primaryType="cq:PageContent"
+        jcr:title="Contact us"
+        sling:resourceType="studio/forms/components/formpage">
+        <root
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="studio/forms/components/form"
+            layout="responsiveGrid"
+            afterSubmit="message"
+            thankYou="Thanks — we read every message and answer within two days.">
+            <intro jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/text" text="&lt;p&gt;Questions about a trip, a magazine story or the site? Write to us.&lt;/p&gt;"/>
+            <name jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/textfield" name="name" label="Your name" required="{Boolean}true" maxLength="{Long}80">
+                <cq:responsive jcr:primaryType="nt:unstructured"><default jcr:primaryType="nt:unstructured" width="6" offset="0"/></cq:responsive>
+            </name>
+            <email jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/email" name="email" label="Email" required="{Boolean}true" placeholder="you@example.com">
+                <cq:responsive jcr:primaryType="nt:unstructured"><default jcr:primaryType="nt:unstructured" width="6" offset="0"/></cq:responsive>
+            </email>
+            <topic jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/dropdown" name="topic" label="Topic" placeholder="Choose…" required="{Boolean}true" options="[A trip,The magazine,The website,Something else]"/>
+            <travellers jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/number" name="travellers" label="How many of you are travelling?" min="{Long}1" max="{Long}20" step="{Long}1">
+                <rules jcr:primaryType="nt:unstructured">
+                    <item0 jcr:primaryType="nt:unstructured" action="show" field="topic" op="is" value="A trip"/>
+                    <item1 jcr:primaryType="nt:unstructured" action="require" field="topic" op="is" value="A trip"/>
+                </rules>
+            </travellers>
+            <message jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/textarea" name="message" label="Message" required="{Boolean}true" rows="{Long}6" minLength="{Long}10"/>
+            <newsletter jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/checkbox" name="newsletter" label="Send me the WKND newsletter"/>
+            <submit jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/submit" label="Send"/>
+        </root>
+    </jcr:content>
+</jcr:root>

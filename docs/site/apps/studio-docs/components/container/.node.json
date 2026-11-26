@@ -1,0 +1,6 @@
+{
+  "jcr:primaryType": "cq:Component",
+  "jcr:title": "Container",
+  "sling:resourceSuperType": "core/wcm/components/container/v1/container",
+  "componentGroup": "Studio Docs"
+}

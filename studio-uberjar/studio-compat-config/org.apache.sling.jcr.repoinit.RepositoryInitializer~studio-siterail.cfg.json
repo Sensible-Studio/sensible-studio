@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "create path (sling:OrderedFolder) /content\ncreate path (sling:Folder) /var/studio/comments\ncreate path (sling:Folder) /var/studio/deleted\ncreate path (sling:Folder) /var/studio/searches\ncreate path (sling:Folder) /var/studio/kept\ncreate path (sling:Folder) /var/workflow/instances\ncreate service user studio-siterail-service\nset ACL for studio-siterail-service\n    allow jcr:read,rep:write on /var/studio/comments\n    allow jcr:read,rep:write on /var/studio/deleted\n    allow jcr:read,rep:write on /var/studio/searches\n    allow jcr:read,rep:write,jcr:nodeTypeManagement on /var/studio/kept\n    allow jcr:read on /var/workflow\n    allow jcr:read,jcr:versionManagement on /jcr:system/jcr:versionStorage\n    allow jcr:read,rep:write,jcr:versionManagement,jcr:nodeTypeManagement on /content\nend"
+  ]
+}

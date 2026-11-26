@@ -1,0 +1,46 @@
+/publishfarm {
+  /clientheaders { "*" }
+  /virtualhosts {
+    $include "../virtualhosts/default.vhosts"
+  }
+  /renders {
+    /rend01 { /hostname "127.0.0.1" /port "4503" /timeout "10000" }
+  }
+  /filter {
+    $include "../filters/default.any"
+  }
+  /cache {
+    /docroot "/mnt/var/www/html"
+    /statfileslevel "2"
+    /allowAuthorized "0"
+    /rules {
+      /0000 { /glob "*" /type "allow" }
+      /0001 { /glob "/libs/*" /type "deny" }
+    }
+    /invalidate {
+      /0000 { /glob "*" /type "deny" }
+      /0001 { /glob "*.html" /type "allow" }
+      /0002 { /glob "/etc/segmentation.segment.js" /type "allow" }
+    }
+    /ignoreUrlParams {
+      /0001 { /glob "*" /type "deny" }
+      /0002 { /glob "utm_*" /type "allow" }
+      /0003 { /glob "gclid" /type "allow" }
+    }
+    /headers { "Cache-Control" "Content-Disposition" "Content-Type" }
+    /gracePeriod "2"
+    /enableTTL "1"
+  }
+  /vanity_urls {
+    /url "/libs/granite/dispatcher/content/vanityUrls.html"
+    /file "/tmp/vanity_urls"
+    /delay 300
+  }
+  /auth_checker {
+    /url "/bin/permissioncheck"
+    /filter {
+      /0000 { /glob "*" /type "deny" }
+      /0001 { /glob "/content/mysite/members/*.html" /type "allow" }
+    }
+  }
+}

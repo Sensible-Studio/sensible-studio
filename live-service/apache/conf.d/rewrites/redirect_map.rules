@@ -1,0 +1,47 @@
+# A site's redirect map, as AEM's managed rewrite maps: the rules are written by authors in a text
+# file published like any asset (site.redirect_map in live.toml), and studio-live writes them beside
+# the document root as "<source> <status>|<target>" lines (<site>.redirects.txt) whenever they
+# change. Apache reads a txt map again when the file changes, so no reload is needed.
+#
+# The virtual host declares the map first, under the name site_redirects:
+#   RewriteMap site_redirects "txt:${STUDIO_LIVE_DOCROOT}/<site>.redirects.txt"
+# and includes this file before its own rewrite rules, so that a redirect wins over a short URL and
+# over a cached file. The query of the request is kept, as with any R rule.
+#
+# A host may have a map of its own (site.host_redirect_maps): its rules are written with the host
+# name in front of the source ("<host><source> <status>|<target>") and win over the site's. The
+# host is the one asked for, lowercased and without its port (SERVER_NAME, UseCanonicalName Off).
+
+RewriteMap lc int:tolower
+
+# the host's own rules first
+RewriteCond ${site_redirects:${lc:%{SERVER_NAME}}%{REQUEST_URI}|-} ^301\|(.+)$
+RewriteRule ^ %1 [R=301,NE,L]
+
+RewriteCond ${site_redirects:${lc:%{SERVER_NAME}}%{REQUEST_URI}|-} ^302\|(.+)$
+RewriteRule ^ %1 [R=302,NE,L]
+
+RewriteCond ${site_redirects:${lc:%{SERVER_NAME}}%{REQUEST_URI}|-} ^303\|(.+)$
+RewriteRule ^ %1 [R=303,NE,L]
+
+RewriteCond ${site_redirects:${lc:%{SERVER_NAME}}%{REQUEST_URI}|-} ^307\|(.+)$
+RewriteRule ^ %1 [R=307,NE,L]
+
+RewriteCond ${site_redirects:${lc:%{SERVER_NAME}}%{REQUEST_URI}|-} ^308\|(.+)$
+RewriteRule ^ %1 [R=308,NE,L]
+
+# then the site's
+RewriteCond ${site_redirects:%{REQUEST_URI}|-} ^301\|(.+)$
+RewriteRule ^ %1 [R=301,NE,L]
+
+RewriteCond ${site_redirects:%{REQUEST_URI}|-} ^302\|(.+)$
+RewriteRule ^ %1 [R=302,NE,L]
+
+RewriteCond ${site_redirects:%{REQUEST_URI}|-} ^303\|(.+)$
+RewriteRule ^ %1 [R=303,NE,L]
+
+RewriteCond ${site_redirects:%{REQUEST_URI}|-} ^307\|(.+)$
+RewriteRule ^ %1 [R=307,NE,L]
+
+RewriteCond ${site_redirects:%{REQUEST_URI}|-} ^308\|(.+)$
+RewriteRule ^ %1 [R=308,NE,L]

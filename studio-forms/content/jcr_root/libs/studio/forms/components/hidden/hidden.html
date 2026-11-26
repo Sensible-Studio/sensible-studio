@@ -1,0 +1,5 @@
+<div class="studio-form__field studio-form__field--hidden" data-studio-field="${properties.name}" hidden data-sly-attribute.hidden="${wcmmode.edit ? '' : 'hidden'}">
+    <span class="studio-form__text studio-form__text--empty" data-sly-test="${wcmmode.edit}">Hidden field ${properties.name}: ${properties.value || 'the page’s address'}</span>
+    <input type="hidden" name="${properties.name}" value="${properties.value}" data-sly-attribute.data-studio-page="${properties.value ? '' : 'true'}"/>
+    <sly data-sly-resource="${'rules' @ resourceType='studio/forms/components/rules'}"></sly>
+</div>

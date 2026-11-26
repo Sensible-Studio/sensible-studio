@@ -1,0 +1,22 @@
+#
+# The virtual host Apache gives a request whose host name no other one names: it must come first.
+# It answers 404 to everything, so that such a request never borrows a site's virtual host and its
+# cached pages. Over HTTPS too (a name no certificate is for gets this one's, then 404), with the
+# certificate ${STUDIO_LIVE_TLS_DIR}/default.crt and default.key.
+#
+<VirtualHost *:${STUDIO_LIVE_PORT}>
+    ServerName default.invalid
+    RewriteEngine On
+    RewriteRule ^ - [R=404,L]
+</VirtualHost>
+
+<IfDefine STUDIO_LIVE_TLS>
+<VirtualHost *:${STUDIO_LIVE_TLS_PORT}>
+    ServerName default.invalid
+    SSLEngine on
+    SSLCertificateFile    "${STUDIO_LIVE_TLS_DIR}/default.crt"
+    SSLCertificateKeyFile "${STUDIO_LIVE_TLS_DIR}/default.key"
+    RewriteEngine On
+    RewriteRule ^ - [R=404,L]
+</VirtualHost>
+</IfDefine>

@@ -1,0 +1,715 @@
+// The page properties screen, laid out and coloured like AEM's properties page (Coral UI 3, light).
+// The Granite form keeps its own markup; this file re-themes it through its `--studio-*` tokens and a few overrides.
+
+.studio-pp {
+  // colours, type and shape come from the theme (theme/theme.scss)
+  --studio-radius: var(--studio-radius-sm);
+  --pp-title: var(--studio-text-strong);
+  --pp-rule: var(--studio-border-subtle);
+  --pp-column: 512px;
+
+  // the app's body does not scroll (the editor and consoles lay out to the viewport): this screen scrolls itself,
+  // under its sticky header
+  height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  font-family: var(--studio-font);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--studio-text);
+  background: var(--studio-neutral-100);
+  color-scheme: light;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+
+// ------------------------------------------------------------------------------------------------- header
+
+.studio-pp-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 80px;
+  margin: 0 40px 64px;
+  background: var(--studio-neutral-100);
+  border-bottom: 1px solid var(--studio-neutral-300);
+
+  &__title {
+    margin: 0;
+    overflow: hidden;
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 38px;
+    color: var(--pp-title);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__actions {
+    display: flex;
+    flex: none;
+    gap: 10px;
+    align-items: center;
+  }
+}
+
+.studio-pp-btn {
+  height: 32px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--studio-radius-sm);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--studio-focus);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  &--secondary {
+    color: var(--studio-text);
+    background: var(--studio-surface-panel);
+    border: 1px solid var(--studio-border);
+
+    &:hover:not(:disabled) {
+      background: var(--studio-surface-hover);
+      border-color: var(--studio-border-strong);
+    }
+  }
+
+  &--primary {
+    color: var(--studio-neutral-0);
+    background: var(--studio-accent);
+    border: 1px solid var(--studio-accent);
+
+    &:hover:not(:disabled) {
+      background: var(--studio-accent-hover);
+      border-color: var(--studio-accent-hover);
+    }
+  }
+}
+
+.studio-pp-split {
+  position: relative;
+  display: flex;
+
+  &__main {
+    padding: 0 12px 0 14px;
+    border-radius: var(--studio-radius-sm) 0 0 var(--studio-radius-sm);
+  }
+
+  &__more {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    padding: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 0 var(--studio-radius-sm) var(--studio-radius-sm) 0;
+  }
+}
+
+.studio-pp-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 140px;
+  padding: 4px 0;
+  background: var(--studio-neutral-0);
+  border: 1px solid var(--studio-neutral-400);
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 6px 14px;
+    font: inherit;
+    text-align: left;
+    color: var(--studio-text);
+    background: none;
+    border: 0;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: #f0f0f0;
+      outline: none;
+    }
+  }
+}
+
+.studio-pp-failure {
+  margin: -48px 40px 16px;
+  padding: 8px 12px;
+  color: var(--studio-danger-strong);
+  background: #fbe9ea;
+  border-left: 3px solid var(--studio-danger);
+  border-radius: 4px;
+}
+
+.studio-pp-loading {
+  display: grid;
+  place-items: center;
+  padding: 80px 0;
+}
+
+.studio-pp-error {
+  color: var(--studio-danger-strong);
+}
+
+// ------------------------------------------------------------------------------------------------- tabs
+
+.studio-pp-body {
+  padding: 0 40px 96px;
+
+  .studio-g-form {
+    color: var(--studio-text);
+  }
+}
+
+.studio-pp-tabs {
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 24px;
+    padding: 0 8px;
+    border-bottom: 2px solid var(--pp-rule);
+  }
+
+  &__tab {
+    position: relative;
+    height: 46px;
+    padding: 0;
+    font: inherit;
+    font-size: 14px;
+    line-height: 46px;
+    color: var(--studio-neutral-600);
+    white-space: nowrap;
+    background: none;
+    border: 0;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--studio-neutral-800);
+    }
+
+    &.is-active {
+      color: var(--studio-neutral-800);
+
+      &::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        bottom: -2px;
+        left: 0;
+        height: 2px;
+        background: var(--studio-neutral-700);
+        border-radius: 1px;
+      }
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--spectrum-blue-900) 50%, transparent);
+      border-radius: 4px;
+    }
+  }
+
+  &__panel {
+    position: relative;
+    padding-top: 48px;
+  }
+}
+
+// sits in the space above the column, at the left, like AEM's
+.studio-pp-actionbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  min-height: 40px;
+  margin: -40px 0 0;
+}
+
+// the fields: one centered column, like Coral's fixed columns
+.studio-pp-column,
+.studio-pp .studio-g-columns__column {
+  width: 100%;
+  max-width: var(--pp-column);
+  margin: 0 auto;
+}
+
+.studio-pp .studio-g-columns {
+  display: flex;
+  justify-content: center;
+}
+
+.studio-pp .studio-g-container {
+  gap: 0;
+}
+
+.studio-pp .studio-g-fieldset {
+  gap: 0;
+
+  &__legend {
+    width: 100%;
+    margin: 12px 0 10px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 20px;
+    color: var(--pp-title);
+  }
+}
+
+// the first heading of a tab, 25px below the top of the column (AEM's spacing)
+.studio-pp .studio-g-columns__column .studio-g-node:first-child > .studio-g-fieldset > .studio-g-fieldset__legend,
+.studio-pp-column > .studio-pp-section:first-child > .studio-pp-section__title {
+  margin-top: 25px;
+}
+
+// a field: 27px label row, 32px control, 14px to the next one (Coral's field wrapper)
+.studio-pp .studio-g-field {
+  gap: 0;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+
+  &__head {
+    min-height: 36px;
+    align-items: center;
+  }
+
+  &__label {
+    padding: 4px 0 5px;
+    font-size: 12px;
+    line-height: 27px;
+    color: var(--studio-neutral-600);
+  }
+}
+
+.studio-pp .studio-g-field:has(> .studio-g-checkrow) {
+  padding-bottom: 0;
+}
+
+.studio-pp .studio-g-taglist {
+  margin-top: 1px;
+  margin-bottom: 0;
+}
+
+.studio-pp .studio-g-input {
+  min-height: 32px;
+  padding: 5px 11px 6px;
+  font-size: 14px;
+  line-height: 19px;
+  color: var(--studio-neutral-700);
+  background: var(--studio-neutral-0);
+  border-color: var(--studio-neutral-500);
+  border-radius: 4px;
+
+  &::placeholder {
+    font-style: italic;
+    color: var(--studio-neutral-500);
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--studio-neutral-600);
+  }
+
+  &:disabled,
+  &[readonly] {
+    color: var(--studio-neutral-500);
+    background: var(--studio-neutral-200);
+    border-color: var(--studio-neutral-200);
+  }
+}
+
+.studio-pp .studio-g-textarea {
+  min-height: 80px;
+}
+
+.studio-pp .studio-g-checkrow {
+  min-height: 32px;
+  align-items: center;
+}
+
+.studio-pp .studio-g-checkbox__text {
+  font-size: 14px;
+  color: var(--studio-neutral-700);
+}
+
+.studio-pp .studio-g-path__browse {
+  width: 32px;
+  color: var(--studio-neutral-700);
+  background: var(--studio-neutral-50);
+  border-color: var(--studio-neutral-500);
+}
+
+.studio-pp .studio-g-well {
+  gap: 0;
+  padding: 10px;
+  background: var(--studio-neutral-200);
+  border: 0;
+  border-radius: 0;
+}
+
+.studio-pp .studio-g-upload {
+  padding: 20px 16px;
+  background: transparent;
+  border: 1px dashed var(--studio-neutral-400);
+  border-radius: 4px;
+}
+
+.studio-pp .studio-g-info__icon {
+  width: 14px;
+  height: 14px;
+  color: var(--studio-neutral-700);
+}
+
+// the chain of inherited fields sits outside the column, like AEM's
+.studio-pp .studio-g-msm {
+  grid-template-columns: minmax(0, 1fr) 0;
+  gap: 0;
+
+  &__chain {
+    margin-left: 8px;
+    margin-top: 26px;
+  }
+}
+
+// ------------------------------------------------------------------------------------------------- Sensible Studio's tabs
+
+.studio-pp-section {
+  margin: 0;
+
+  &__title {
+    margin: 12px 0 10px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 20px;
+    color: var(--pp-title);
+  }
+}
+
+.studio-pp-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    line-height: 26px;
+  }
+}
+
+.studio-pp-link,
+.studio-pp-links a {
+  color: var(--spectrum-blue-800);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.studio-pp-muted,
+.studio-pp-hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--studio-neutral-600);
+
+  &--inline {
+    margin: 0 0 0 4px;
+  }
+}
+
+.studio-pp-facts {
+  margin: 0;
+
+  div {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    line-height: 32px;
+  }
+
+  dt {
+    color: var(--studio-neutral-700);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--studio-neutral-700);
+  }
+}
+
+// permissions tables (full width, like AEM's)
+.studio-pp-permissions {
+  .studio-pp-table {
+    width: calc(100% - 36px);
+    margin: 4px 18px 0;
+  }
+
+  .studio-pp-table + .studio-pp-table {
+    margin-top: 12px;
+  }
+}
+
+.studio-pp-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th,
+  td {
+    padding: 0 16px;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  thead th {
+    height: 36px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--studio-neutral-600);
+    text-transform: uppercase;
+  }
+
+  tbody tr {
+    height: 48px;
+    background: var(--studio-neutral-0);
+
+    th,
+    td {
+      border-top: 1px solid var(--studio-neutral-200);
+    }
+  }
+
+  tbody th {
+    font-weight: 400;
+  }
+
+  &__empty td {
+    height: 52px;
+    text-align: center !important;
+    color: var(--studio-neutral-700);
+  }
+
+  &__actions {
+    width: 96px;
+    text-align: right !important;
+    white-space: nowrap;
+  }
+}
+
+.studio-pp-principal {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+
+  &__id {
+    display: block;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--studio-neutral-500);
+  }
+}
+
+.studio-pp-dialog__who {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 16px 0 8px;
+}
+
+.studio-pp-dialog__flags {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.studio-pp-cuglist {
+  margin-top: 12px;
+}
+
+@media (max-width: 700px) {
+  .studio-pp-header {
+    margin: 0 16px 24px;
+    height: auto;
+    min-height: 64px;
+    flex-wrap: wrap;
+  }
+
+  .studio-pp-body {
+    padding: 0 16px 64px;
+  }
+
+  .studio-pp-tabs__list {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+}
+
+// ------------------------------------------------------------------------------------------------- cloud services
+
+.studio-pp-pending {
+  display: flex;
+  justify-content: center;
+  padding-top: 32px;
+}
+
+.studio-pp-hint--lead {
+  margin: 0 0 16px;
+  font-size: 13px;
+
+  code {
+    font-size: 12px;
+  }
+}
+
+.studio-pp code {
+  font-family: 'Source Code Pro', Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--studio-text);
+}
+
+.studio-pp-service {
+  background: var(--studio-bg);
+  border: 1px solid var(--pp-rule);
+  border-radius: var(--studio-radius);
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--pp-rule);
+    color: var(--pp-title);
+
+    h4 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+  }
+
+  &__manage {
+    margin-left: auto;
+    font-size: 13px;
+  }
+
+  &__empty {
+    margin: 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--studio-text-muted);
+    border-bottom: 1px solid var(--pp-rule);
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 16px;
+
+    & + & {
+      border-top: 1px solid var(--pp-rule);
+    }
+
+    &.is-used {
+      background: var(--studio-accent-soft);
+    }
+  }
+
+  &__what {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__name {
+    font-weight: 700;
+    color: var(--pp-title);
+  }
+
+  &__where {
+    font-size: 12px;
+    color: var(--studio-text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  &__problem {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 17px;
+    color: var(--studio-danger-strong);
+  }
+
+  &__badges {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.studio-pp-badge {
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  &--used {
+    color: var(--studio-accent);
+    background: var(--studio-bg);
+    border: 1px solid var(--studio-accent);
+  }
+}
+
+.studio-pp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  &.is-ready::before {
+    background: var(--studio-success);
+  }
+
+  &.is-missing::before {
+    background: var(--studio-warning);
+  }
+}

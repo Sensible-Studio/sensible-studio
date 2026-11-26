@@ -1,0 +1,6 @@
+# A dispatcher configuration laid out as AEM projects keep theirs: the farms in files of their
+# own, rules and host names included from beside them. Written for the import test.
+/name "test-dispatcher"
+/farms {
+  $include "enabled_farms/*.farm"
+}

@@ -1,0 +1,6 @@
+{
+  "jcr:primaryType": "cq:Component",
+  "jcr:title": "Navigation",
+  "sling:resourceSuperType": "core/wcm/components/navigation/v2/navigation",
+  "componentGroup": ".hidden"
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:oak="http://jackrabbit.apache.org/oak/ns/1.0"
+    jcr:primaryType="oak:QueryIndexDefinition"
+    type="lucene"
+    async="[async]"
+    compatVersion="{Long}2"
+    includedPaths="[/jcr:system/jcr:versionStorage]"
+    queryPaths="[/jcr:system/jcr:versionStorage]"
+    evaluatePathRestrictions="{Boolean}true">
+    <indexRules jcr:primaryType="nt:unstructured">
+        <nt:versionHistory jcr:primaryType="nt:unstructured">
+            <properties jcr:primaryType="nt:unstructured">
+                <default jcr:primaryType="nt:unstructured" name="default" propertyIndex="{Boolean}true"/>
+            </properties>
+        </nt:versionHistory>
+    </indexRules>
+</jcr:root>

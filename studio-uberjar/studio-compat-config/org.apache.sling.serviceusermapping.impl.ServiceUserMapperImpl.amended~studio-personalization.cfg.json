@@ -1,0 +1,5 @@
+{
+  "user.mapping": [
+    "io.sensible.studio.personalization:personalization=[studio-personalization-service]"
+  ]
+}

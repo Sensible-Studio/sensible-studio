@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "create service user studio-personalization-service with path system/studio\ncreate path (sling:Folder) /var/studio/personalization/stats\nset ACL for studio-personalization-service\n  allow jcr:all on /var/studio/personalization\nend\nset ACL for everyone\n  allow jcr:read on /var/studio/personalization\nend"
+  ]
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0"
+    jcr:primaryType="cq:Component"
+    jcr:title="Target"
+    jcr:description="A targeted component: its default experience and one experience per audience. ContextHub picks the experience the visitor sees; in the editor's Targeting mode authors edit each experience."
+    componentGroup=".hidden"/>

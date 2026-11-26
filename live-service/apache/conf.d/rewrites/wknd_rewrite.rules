@@ -1,0 +1,22 @@
+#
+# WKND's rewrite rules: plain mod_rewrite, as a site's existing rules are. They run before the
+# cache is looked at, so the cache holds files under the repository path (/content/wknd/…) however
+# short the public URL is.
+#
+
+# The home page.
+RewriteRule ^/?$ /us/en.html [R=301,L]
+
+# What search engines ask for at the root: the robots.txt and the sitemap index of the site's top
+# page (studio-cq-impl's SitemapServlet). The sitemaps they name are at /wknd/<…>.sitemap.xml.
+RewriteRule ^/robots\.txt$ /content/wknd.robots.txt [PT,L]
+RewriteRule ^/sitemap\.xml$ /content/wknd.sitemap-index.xml [PT,L]
+
+# The publish's own short spelling, in images and blocks: /wknd/… and /experience-fragments/… are
+# /content/wknd/… and /content/experience-fragments/… (the content_prefix of live.toml).
+RewriteRule ^/(wknd|experience-fragments|dam)/(.*)$ /content/$1/$2 [PT,L]
+
+# Short URLs: /us/en/adventures.html is /content/wknd/us/en/adventures.html.
+RewriteCond %{REQUEST_URI} !^/(apps|bin|content|etc|etc\.clientlibs|home|libs|system|tmp|var|dispatcher|_live)(/|\.|$)
+RewriteCond %{REQUEST_URI} \.(html|jpe?g|png|svg|webp)$
+RewriteRule ^/(.*)$ /content/wknd/$1 [PT,L]

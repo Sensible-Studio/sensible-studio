@@ -1,0 +1,210 @@
+// Sensible Studio link checker (/etc/linkchecker.html): the list of links and the panel of the focused one.
+
+.studio-links {
+  &__filters {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    align-items: center;
+    min-height: 44px;
+    padding: 2px 12px;
+    background: var(--spectrum-global-color-gray-50);
+    border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+  }
+
+  &__run {
+    margin-left: auto;
+  }
+
+  &__body {
+    display: grid;
+    flex: 1;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+
+    &.has-panel {
+      grid-template-columns: minmax(0, 1fr) 380px;
+    }
+  }
+
+  &__list {
+    overflow: auto;
+  }
+
+  &__muted {
+    display: block;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__table table {
+    table-layout: fixed;
+  }
+
+  &__col-check {
+    width: 44px;
+  }
+
+  &__col-status {
+    width: 190px;
+  }
+
+  &__col-used {
+    width: 30%;
+  }
+
+  &__col-when {
+    width: 100px;
+  }
+
+  &__clip {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-800);
+    direction: rtl;
+    text-align: left;
+  }
+
+  &__used {
+    overflow: hidden;
+  }
+
+  &__status {
+    white-space: nowrap;
+    overflow: hidden;
+
+    .studio-links__muted {
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-left: 22px;
+    }
+  }
+
+  &__url {
+    overflow: hidden;
+
+    .studio-listview__title {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: left;
+    }
+
+    .studio-links__muted {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  tr.is-focused td {
+    background: var(--spectrum-global-color-blue-100);
+  }
+
+  &__more {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    max-width: 520px;
+    margin: 80px auto;
+    text-align: center;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 8px 16px 24px;
+    overflow: auto;
+    background: var(--spectrum-global-color-gray-50);
+    border-left: 1px solid var(--spectrum-global-color-gray-300);
+  }
+
+  &__panelhead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__paneltitle {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--spectrum-global-color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__bigurl {
+    font-size: 14px;
+    font-weight: 600;
+    word-break: break-all;
+
+    a {
+      color: var(--spectrum-global-color-blue-700);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      svg {
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  &__panelactions {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__refs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      word-break: break-all;
+    }
+
+    a {
+      font-weight: 600;
+      color: var(--spectrum-global-color-gray-900);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

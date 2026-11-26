@@ -1,0 +1,135 @@
+/*
+ * Licensed under the Apache License, Version 2.0. Clean-room Sensible Studio node type definitions.
+ *
+ * These register the node type NAMES used by AEM content packages (cq:Page, dam:Asset, ...)
+ * so that existing ui.apps / ui.content packages import unchanged. The definitions are Sensible Studio's
+ * own and deliberately permissive: every type accepts arbitrary properties and children.
+ * Stricter validation, if ever wanted, belongs in Sensible Studio services, not in the repository schema.
+ *
+ * The list was derived from the jcr:primaryType / jcr:mixinTypes values that actually occur in
+ * the WKND 4.0.4 and Core Components 2.33.0 packages (see docs/compat-scan-wknd.md).
+ */
+<'cq'='http://www.day.com/jcr/cq/1.0'>
+<'dam'='http://www.day.com/dam/1.0'>
+<'granite'='http://www.adobe.com/jcr/granite/1.0'>
+<'sling'='http://sling.apache.org/jcr/sling/1.0'>
+<'nt'='http://www.jcp.org/jcr/nt/1.0'>
+<'mix'='http://www.jcp.org/jcr/mix/1.0'>
+
+// ------------------------------------------------------------------ hierarchy (site tree)
+
+[cq:Page] > nt:hierarchyNode
+  orderable
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured version
+
+[cq:Template] > nt:hierarchyNode
+  orderable
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured version
+
+[cq:Tag] > nt:hierarchyNode, mix:title
+  orderable
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = cq:Tag version
+
+[dam:Asset] > nt:hierarchyNode
+  orderable
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured version
+
+// ------------------------------------------------------------------ application tree (/apps)
+
+[cq:Component] > nt:folder, mix:title
+  orderable
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured version
+
+[cq:ClientLibraryFolder] > sling:Folder
+  orderable
+
+// ------------------------------------------------------------------ unstructured content
+
+[cq:PageContent] > nt:unstructured
+[dam:AssetContent] > nt:unstructured
+[cq:EditConfig] > nt:unstructured
+[cq:DropTargetConfig] > nt:unstructured
+[cq:InplaceEditingConfig] > nt:unstructured
+[cq:EditListenersConfig] > nt:unstructured
+[cq:LiveCopy] > nt:unstructured
+[cq:BlueprintSyncConfig] > nt:unstructured
+[cq:RolloutConfig] > nt:unstructured
+  orderable
+[cq:LiveSyncAction] > nt:unstructured
+[cq:Widget] > nt:unstructured
+[cq:WidgetCollection] > nt:unstructured
+[cq:Dialog] > nt:unstructured
+[cq:TabPanel] > nt:unstructured
+[cq:Panel] > nt:unstructured
+
+// ------------------------------------------------------------------ mixins
+
+[cq:Taggable] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[cq:ReplicationStatus] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[cq:LiveRelationship] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[cq:LiveSync] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[cq:LiveSyncCancelled] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[cq:PropertyLiveSyncCancelled] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[dam:Metadata] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[dam:color] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[dam:Thumbnails] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[dam:cfVariationNode] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[granite:Ranking] mixin
+  - * (undefined) multiple
+  - * (undefined)
+  + * (nt:base) = nt:unstructured
+
+[granite:AbstractArea] mixin abstract
+[granite:PublicArea] > granite:AbstractArea mixin
+[granite:FinalArea] > granite:AbstractArea mixin
+[granite:InternalArea] > granite:AbstractArea mixin

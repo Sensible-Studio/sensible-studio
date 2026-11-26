@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sensible Studio | Sign In</title>
+<style>
+  /* Proof, the default scheme of the author interface: cool light workspace, ink-blue accent,
+     visible edges, 4px controls. The same values as author-ui/src/theme/theme.scss. */
+  :root {
+    --canvas: #f3f5f7;
+    --panel: #ffffff;
+    --bar: #eef1f4;
+    --text: #28323d;
+    --strong: #141a21;
+    --muted: #5f6b77;
+    --faint: #7a8590;
+    --border: #c9cfd6;
+    --border-subtle: #dde2e7;
+    --accent: #394fa2;
+    --accent-hover: #2f4189;
+    --focus: #4962bd;
+    --danger: #b83e46;
+    --danger-surface: #fae9eb;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font: 13px/1.5 Inter, "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background-color: var(--canvas);
+    /* a ruled sheet: the product is a desk for content, not a poster */
+    background-image:
+      linear-gradient(var(--border-subtle) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+    background-size: 56px 56px;
+    background-position: -1px -1px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    min-height: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+    gap: 72px;
+    align-items: center;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 48px 56px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 44px; }
+  .brand__mark {
+    width: 32px; height: 32px; border-radius: 6px;
+    display: grid; place-items: center;
+    background: var(--strong);
+    font-weight: 700; font-size: 16px; color: #fff;
+  }
+  .brand__name { font-size: 13px; font-weight: 600; letter-spacing: 0.01em; color: var(--strong); }
+  .welcome h1 {
+    margin: 0 0 16px;
+    font-size: clamp(30px, 3.8vw, 46px);
+    line-height: 1.08;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: var(--strong);
+  }
+  .welcome h1 strong { font-weight: 600; color: var(--accent); }
+  .welcome p { margin: 0; max-width: 32em; font-size: 15px; line-height: 1.55; color: var(--muted); }
+  .welcome ul {
+    list-style: none; padding: 0; margin: 36px 0 0;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 30em;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+  }
+  .welcome li {
+    padding: 10px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); border-right: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);
+  }
+  .welcome li:nth-child(3n) { border-right: 0; }
+  .welcome li:nth-last-child(-n+3) { border-bottom: 0; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(20, 26, 33, 0.06), 0 12px 32px rgba(20, 26, 33, 0.10);
+    overflow: hidden;
+  }
+  .panel h2 {
+    margin: 0; padding: 0 24px; height: 52px; display: flex; align-items: center;
+    font-size: 16px; font-weight: 600; color: var(--strong);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .panel form { padding: 24px; }
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin: 0 0 6px; }
+  .field { margin-bottom: 16px; }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    font: inherit;
+    color: var(--strong);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.12s, box-shadow 0.12s;
+  }
+  input:hover { border-color: var(--faint); }
+  input:focus { border-color: var(--focus); box-shadow: 0 0 0 2px rgba(73, 98, 189, 0.28); }
+  input[aria-invalid="true"] { border-color: var(--danger); }
+  .error {
+    display: none;
+    margin: 0 0 16px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--danger);
+    background: var(--danger-surface);
+    border: 1px solid var(--danger);
+  }
+  .error.is-visible { display: block; }
+  button {
+    width: 100%;
+    height: 36px;
+    margin-top: 4px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    font: inherit;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  button:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  button[disabled] { opacity: 0.6; cursor: progress; }
+  .panel footer {
+    padding: 12px 24px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--faint); background: var(--bar); border-top: 1px solid var(--border-subtle);
+  }
+  @media (max-width: 860px) {
+    .page { grid-template-columns: 1fr; gap: 32px; padding: 32px 16px; align-content: center; }
+    .brand { margin-bottom: 24px; }
+    .welcome ul { display: none; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <section class="welcome">
+    <div class="brand"><span class="brand__mark" aria-hidden="true">S</span><span class="brand__name">Sensible Studio</span></div>
+    <h1>Welcome to <strong>Sensible Studio</strong></h1>
+    <p>Pages, media, records and blocks, with the flows and linked copies that keep them moving: everything your content needs, on one desk.</p>
+    <ul aria-label="What you can do">
+      <li>Pages</li><li>Media</li><li>Records</li><li>Blocks</li><li>Flows</li><li>Linked copies</li>
+    </ul>
+  </section>
+  <section class="panel" aria-labelledby="signin-title">
+    <h2 id="signin-title">Sign in</h2>
+    <form id="login" method="POST" action="{{action}}" novalidate>
+      <input type="hidden" name="_charset_" value="UTF-8">
+      <input type="hidden" name="resource" value="{{resource}}">
+      <p id="error" class="error{{errorClass}}" role="alert">{{error}}</p>
+      <div class="field">
+        <label for="username">User name</label>
+        <input id="username" name="j_username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="j_password" type="password" autocomplete="current-password" required>
+      </div>
+      <button id="submit" type="submit">Sign In</button>
+    </form>
+    <footer>Sensible Studio author</footer>
+  </section>
+</main>
+<script>
+(function () {
+  var form = document.getElementById('login');
+  var error = document.getElementById('error');
+  var button = document.getElementById('submit');
+  var user = document.getElementById('username');
+  var pass = document.getElementById('password');
+  function show(message) {
+    error.textContent = message;
+    error.classList.add('is-visible');
+    user.setAttribute('aria-invalid', 'true');
+    pass.setAttribute('aria-invalid', 'true');
+  }
+  form.addEventListener('submit', function (e) {
+    if (!window.fetch) return; // plain form POST: Sling redirects to the resource, or back here with j_reason
+    e.preventDefault();
+    if (!user.value.trim() || !pass.value) {
+      show('Enter your user name and password.');
+      return;
+    }
+    button.disabled = true;
+    var data = new URLSearchParams(new FormData(form));
+    data.set('j_validate', 'true');
+    fetch(form.action, { method: 'POST', body: data, credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+      .then(function (r) {
+        if (r.ok) {
+          window.location.replace(form.elements.resource.value || '/');
+          return;
+        }
+        button.disabled = false;
+        pass.value = '';
+        pass.focus();
+        show(r.status === 403 ? 'User name and password do not match.' : 'Sign in failed (HTTP ' + r.status + ').');
+      })
+      .catch(function () {
+        button.disabled = false;
+        show('Sensible Studio could not be reached. Try again.');
+      });
+  });
+  user.addEventListener('input', function () {
+    error.classList.remove('is-visible');
+    user.removeAttribute('aria-invalid');
+    pass.removeAttribute('aria-invalid');
+  });
+})();
+</script>
+</body>
+</html>

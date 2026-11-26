@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Responsive Image"
+    sling:resourceType="cq/gui/components/authoring/dialog">
+    <content
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="granite/ui/components/coral/foundation/container">
+        <items jcr:primaryType="nt:unstructured">
+            <tabs
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/tabs"
+                maximized="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <breakpoints
+                        jcr:primaryType="nt:unstructured"
+                        jcr:title="Breakpoints"
+                        sling:resourceType="granite/ui/components/coral/foundation/container"
+                        margin="{Boolean}true">
+                        <items jcr:primaryType="nt:unstructured">
+                            <columns
+                                jcr:primaryType="nt:unstructured"
+                                sling:resourceType="granite/ui/components/coral/foundation/fixedcolumns"
+                                margin="{Boolean}true">
+                                <items jcr:primaryType="nt:unstructured">
+                                    <column
+                                        jcr:primaryType="nt:unstructured"
+                                        sling:resourceType="granite/ui/components/coral/foundation/container">
+                                        <items jcr:primaryType="nt:unstructured">
+                                            <intro
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/text"
+                                                text="The screen ranges authors choose a focus crop for. Each one becomes a &lt;source media&gt; of the picture. Empty: Small 0–767, Medium 768–1023, Large 1024–1279, X-Large 1280–1919, XX-Large from 1920."/>
+                                            <breakpoints
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/multifield"
+                                                fieldLabel="Breakpoints"
+                                                composite="{Boolean}true">
+                                                <field
+                                                    jcr:primaryType="nt:unstructured"
+                                                    sling:resourceType="granite/ui/components/coral/foundation/container"
+                                                    name="./breakpoints">
+                                                    <items jcr:primaryType="nt:unstructured">
+                                                        <name
+                                                            jcr:primaryType="nt:unstructured"
+                                                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                                                            fieldLabel="Name"
+                                                            required="{Boolean}true"
+                                                            name="./name"/>
+                                                        <min
+                                                            jcr:primaryType="nt:unstructured"
+                                                            sling:resourceType="granite/ui/components/coral/foundation/form/numberfield"
+                                                            fieldLabel="From (px)"
+                                                            min="{Long}0"
+                                                            max="{Long}10000"
+                                                            value="0"
+                                                            name="./min"/>
+                                                        <max
+                                                            jcr:primaryType="nt:unstructured"
+                                                            sling:resourceType="granite/ui/components/coral/foundation/form/numberfield"
+                                                            fieldLabel="Up to (px)"
+                                                            fieldDescription="Empty: no upper limit (the largest breakpoint)."
+                                                            min="{Long}0"
+                                                            max="{Long}10000"
+                                                            name="./max"/>
+                                                    </items>
+                                                </field>
+                                            </breakpoints>
+                                        </items>
+                                    </column>
+                                </items>
+                            </columns>
+                        </items>
+                    </breakpoints>
+                    <delivery
+                        jcr:primaryType="nt:unstructured"
+                        jcr:title="Delivery"
+                        sling:resourceType="granite/ui/components/coral/foundation/container"
+                        margin="{Boolean}true">
+                        <items jcr:primaryType="nt:unstructured">
+                            <columns
+                                jcr:primaryType="nt:unstructured"
+                                sling:resourceType="granite/ui/components/coral/foundation/fixedcolumns"
+                                margin="{Boolean}true">
+                                <items jcr:primaryType="nt:unstructured">
+                                    <column
+                                        jcr:primaryType="nt:unstructured"
+                                        sling:resourceType="granite/ui/components/coral/foundation/container">
+                                        <items jcr:primaryType="nt:unstructured">
+                                            <preset
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/select"
+                                                fieldLabel="Image preset"
+                                                fieldDescription="Format, quality and sharpening of every image of this component (Home › System › Media › Image Presets). Its size is ignored: the breakpoints and widths decide the size. A breakpoint may choose another preset in the component's dialog."
+                                                emptyOption="{Boolean}true"
+                                                name="./preset">
+                                                <datasource
+                                                    jcr:primaryType="nt:unstructured"
+                                                    sling:resourceType="dam/components/scene7/common/imagepresetdatasource"/>
+                                            </preset>
+                                            <webp
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
+                                                text="Serve as WebP"
+                                                fieldDescription="Adds fmt=webp to every URL, whatever the preset's format."
+                                                value="{Boolean}true"
+                                                uncheckedValue="{Boolean}false"
+                                                checked="{Boolean}true"
+                                                name="./webp"/>
+                                            <widths
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                                                fieldLabel="Widths"
+                                                fieldDescription="The widths offered to the browser, comma separated. Empty: 320, 480, 768, 1024, 1366, 1600, 1920."
+                                                name="./widths"/>
+                                        </items>
+                                    </column>
+                                </items>
+                            </columns>
+                        </items>
+                    </delivery>
+                    <gallery
+                        jcr:primaryType="nt:unstructured"
+                        jcr:title="Gallery"
+                        sling:resourceType="granite/ui/components/coral/foundation/container"
+                        margin="{Boolean}true">
+                        <items jcr:primaryType="nt:unstructured">
+                            <columns
+                                jcr:primaryType="nt:unstructured"
+                                sling:resourceType="granite/ui/components/coral/foundation/fixedcolumns"
+                                margin="{Boolean}true">
+                                <items jcr:primaryType="nt:unstructured">
+                                    <column
+                                        jcr:primaryType="nt:unstructured"
+                                        sling:resourceType="granite/ui/components/coral/foundation/container">
+                                        <items jcr:primaryType="nt:unstructured">
+                                            <galleryPreset
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/select"
+                                                fieldLabel="Gallery preset"
+                                                fieldDescription="A look saved under a name (Media › Image Presets › Gallery Presets). The options below, when set, win over it."
+                                                emptyOption="{Boolean}true"
+                                                name="./galleryPreset">
+                                                <datasource
+                                                    jcr:primaryType="nt:unstructured"
+                                                    sling:resourceType="studio/dam/datasources/gallerypresets"/>
+                                            </galleryPreset>
+                                            <galleryThumbs
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/select"
+                                                fieldLabel="Thumbnails"
+                                                fieldDescription="How an image set shown as a gallery lets visitors pick a picture."
+                                                name="./galleryThumbs">
+                                                <items jcr:primaryType="nt:unstructured">
+                                                    <below jcr:primaryType="nt:unstructured" text="Below the picture" value="below" selected="{Boolean}true"/>
+                                                    <left jcr:primaryType="nt:unstructured" text="Left of the picture" value="left"/>
+                                                    <right jcr:primaryType="nt:unstructured" text="Right of the picture" value="right"/>
+                                                    <dots jcr:primaryType="nt:unstructured" text="Dots instead of thumbnails" value="dots"/>
+                                                    <none jcr:primaryType="nt:unstructured" text="None" value="none"/>
+                                                </items>
+                                            </galleryThumbs>
+                                            <galleryArrows
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/select"
+                                                fieldLabel="Arrows on the picture"
+                                                fieldDescription="Previous and next, at the sides of the picture."
+                                                name="./galleryArrows">
+                                                <items jcr:primaryType="nt:unstructured">
+                                                    <no jcr:primaryType="nt:unstructured" text="No" value="false" selected="{Boolean}true"/>
+                                                    <yes jcr:primaryType="nt:unstructured" text="Yes" value="true"/>
+                                                </items>
+                                            </galleryArrows>
+                                            <galleryRatio
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/select"
+                                                fieldLabel="Shape of the pictures"
+                                                fieldDescription="One shape cuts every picture to it, so the gallery keeps its height; image maps are then not shown."
+                                                name="./galleryRatio">
+                                                <items jcr:primaryType="nt:unstructured">
+                                                    <own jcr:primaryType="nt:unstructured" text="Each picture's own" value="" selected="{Boolean}true"/>
+                                                    <r169 jcr:primaryType="nt:unstructured" text="16:9" value="16:9"/>
+                                                    <r32 jcr:primaryType="nt:unstructured" text="3:2" value="3:2"/>
+                                                    <r43 jcr:primaryType="nt:unstructured" text="4:3" value="4:3"/>
+                                                    <r11 jcr:primaryType="nt:unstructured" text="1:1" value="1:1"/>
+                                                </items>
+                                            </galleryRatio>
+                                        </items>
+                                    </column>
+                                </items>
+                            </columns>
+                        </items>
+                    </gallery>
+                </items>
+            </tabs>
+        </items>
+    </content>
+</jcr:root>

@@ -1,0 +1,561 @@
+// Targeting mode (side panel), the ContextHub bar in Preview, the audience editor and the Audiences console.
+
+.studio-sidepanel--targeting .studio-sidepanel__panel {
+  width: 360px;
+}
+
+.studio-targeting {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-size: 13px;
+
+  &__section h3 {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--spectrum-global-color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h3 {
+      margin: 0;
+    }
+  }
+
+  &__hint {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__experiences,
+  &__segments {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-radius: 4px;
+    background: var(--spectrum-global-color-gray-50);
+  }
+
+  &__experience,
+  &__segment {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 6px 6px 6px 10px;
+    border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  &__experience {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--spectrum-global-color-gray-100);
+    }
+
+    &.is-current {
+      background: var(--spectrum-global-color-blue-100);
+      box-shadow: inset 3px 0 0 var(--spectrum-global-color-blue-500);
+    }
+  }
+
+  &__exp-main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__exp-title {
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__exp-seg {
+    overflow: hidden;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-700);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__exp-actions {
+    display: flex;
+    flex: none;
+  }
+
+  &__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+}
+
+// the audience editor: nested groups of conditions
+.studio-expr {
+  padding: 8px 10px;
+  margin-top: 12px;
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 4px;
+
+  &--odd {
+    background: var(--spectrum-global-color-gray-100);
+  }
+
+  &__head {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  &__spacer {
+    flex: 1;
+  }
+
+  &__empty {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__item {
+    margin-top: 6px;
+  }
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: end;
+  }
+
+  &__group {
+    display: flex;
+    gap: 4px;
+    align-items: start;
+
+    .studio-expr {
+      flex: 1;
+      margin-top: 0;
+    }
+  }
+}
+
+// ContextHub in Preview
+.studio-contexthub {
+  flex: none;
+  padding: 6px 16px 8px;
+  background: var(--spectrum-global-color-gray-100);
+  border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+
+  &__row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  &__stores {
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    align-items: end;
+    margin-top: 2px;
+  }
+
+  &__status {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__spacer {
+    flex: 1;
+  }
+
+  // AEM's UI modes (Persona, Device…) beside the fields
+  &__modes {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+
+    button {
+      padding: 2px 10px;
+      font: inherit;
+      font-size: 12px;
+      color: inherit;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &[aria-selected='true'] {
+        background: var(--spectrum-global-color-gray-50);
+        border-color: var(--spectrum-global-color-gray-400);
+        font-weight: 600;
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--spectrum-global-color-blue-600);
+      }
+    }
+  }
+
+  &__module {
+    padding: 3px 8px;
+    font-size: 12px;
+    border: 1px solid var(--spectrum-global-color-gray-400);
+    border-radius: 4px;
+    align-self: center;
+
+    &.is-off {
+      color: var(--spectrum-global-color-gray-600);
+      border-style: dashed;
+    }
+  }
+
+  &__pair {
+    display: inline-flex;
+    gap: 16px;
+    align-items: end;
+  }
+}
+
+// the Audiences console
+.studio-audiences {
+  &__table {
+    // the side margins come off the width: at 100% the last column (the actions) ran off the screen
+    width: calc(100% - 48px);
+    margin: 16px 24px;
+    font-size: 13px;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+    }
+
+    th {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--spectrum-global-color-gray-700);
+      text-transform: uppercase;
+    }
+  }
+
+  &__conditions {
+    max-width: 520px;
+    color: var(--spectrum-global-color-gray-800);
+  }
+
+  &__actions {
+    white-space: nowrap;
+    text-align: right;
+  }
+}
+
+// narrow windows: the row actions keep their icons (the tooltip names them) so the table stays on screen
+@media (max-width: 900px) {
+  .studio-audiences__actions [class*='spectrum-ActionButton-label'] { display: none; }
+}
+
+// launches: the source picker and the promote dialog's page list
+.studio-launch {
+  &__crumbs {
+    margin: 10px 0 6px;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__crumb {
+    padding: 0;
+    font: inherit;
+    color: var(--spectrum-global-color-blue-600);
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  &__list {
+    max-height: 320px;
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    list-style: none;
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-radius: 4px;
+
+    li {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      &.is-selected {
+        background: var(--spectrum-global-color-blue-100);
+      }
+    }
+  }
+
+  &__item {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 6px 10px;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: 0;
+
+    &:hover {
+      background: var(--spectrum-global-color-gray-100);
+    }
+  }
+
+  &__pages {
+    margin-top: 12px;
+
+    ul {
+      max-height: 260px;
+      padding: 0;
+      margin: 6px 0 0;
+      overflow: auto;
+      list-style: none;
+    }
+
+    li {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 8px;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+    }
+  }
+}
+
+// Goal & Settings, the activity report and the audience redirects
+.studio-targeting {
+  &__exp-stats {
+    display: block;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-600);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__report h4 {
+    margin: 14px 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+
+    th,
+    td {
+      padding: 4px 6px;
+      text-align: right;
+      border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    th {
+      font-weight: 600;
+      color: var(--spectrum-global-color-gray-700);
+    }
+
+    .is-best td {
+      color: var(--spectrum-global-color-green-700);
+      font-weight: 600;
+    }
+
+    .is-total td {
+      font-weight: 600;
+      border-bottom: 0;
+    }
+  }
+
+  &__redirects {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  &__redirect {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-radius: 4px;
+    background: var(--spectrum-global-color-gray-50);
+  }
+
+  &__redirect-target {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+}
+
+// the shared table rule sets 100%; with the side margins that ran 48px past the screen
+table.studio-audiences__table { width: calc(100% - 48px); }
+
+// ContextHub (Tools › ContextHub): the stores of a configuration and the fields of the bar
+.studio-chconf {
+  padding: 16px 24px 40px;
+
+  section {
+    margin-top: 20px;
+  }
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+}
+
+.studio-chconf__intro {
+  margin: 0 0 6px;
+  color: var(--studio-text-muted, #555);
+}
+
+.studio-chconf__note {
+  margin: 0 0 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  background: var(--studio-info-surface, #e3e8ff);
+  border-radius: 4px;
+}
+
+.studio-chconf__help {
+  font-size: 12px;
+  color: var(--studio-text-muted, #666);
+}
+
+.studio-chconf__stores {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.studio-chconf__store {
+  padding: 10px 14px;
+  background: var(--spectrum-global-color-gray-50);
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 6px;
+
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+
+    code {
+      font-size: 12px;
+      color: var(--studio-text-muted, #666);
+    }
+
+    .studio-chconf__help {
+      flex: 1;
+      min-width: 200px;
+    }
+  }
+}
+
+.studio-chconf__fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 16px;
+  margin-top: 6px;
+}
+
+.studio-chconf__modules {
+  margin-bottom: 10px;
+
+  td {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+}
+
+.studio-chconf__row-tools {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.studio-chconf__problems {
+  margin: 16px 0 0;
+  padding-left: 1.2em;
+  color: var(--studio-danger, #b83e46);
+}
+
+// Who sees what: an A/B test's shares
+.studio-targeting__split {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.studio-targeting__hint--problem {
+  color: var(--studio-danger-strong, var(--spectrum-semantic-negative-color-default));
+}
+
+.studio-targeting__tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  border: 1px solid var(--spectrum-global-color-gray-400);
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.studio-chconf__modes {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}

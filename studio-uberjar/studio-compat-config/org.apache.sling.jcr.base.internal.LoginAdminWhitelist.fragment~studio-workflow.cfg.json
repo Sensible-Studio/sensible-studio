@@ -1,0 +1,6 @@
+{
+  "whitelist.name": "studio-workflow",
+  "whitelist.bundles": [
+    "io.sensible.studio.workflow"
+  ]
+}

@@ -1,0 +1,119 @@
+import { Button, ButtonGroup, Content, Divider, Form, Heading, Text, TextField, useDialogContainer } from '@adobe/react-spectrum';
+import { useEffect, useState } from 'react';
+import { ReferenceList, useReferences } from './References';
+import { nameOf, parentOf, type StudioClient, type SiteItem } from '../editor/api/StudioClient';
+import { StudioDialog } from '../shell/StudioDialog';
+
+interface Props {
+  client: StudioClient;
+  item: SiteItem;
+  /** `adjust`: pages whose references to the item are rewritten */
+  onMove(destParent: string, name: string, adjust: string[]): void;
+}
+
+const NAME = /^[A-Za-z0-9_.~-]+$/;
+
+/**
+ * Rename and/or move a page or folder: new name, destination parent below /content and which of the
+ * pages referring to it get their links rewritten (all by default; links inside it always are).
+ */
+export function MoveDialog({ client, item, onMove }: Props) {
+  const container = useDialogContainer();
+  const [name, setName] = useState(nameOf(item.path));
+  const [dest, setDest] = useState(parentOf(item.path));
+  const [destOk, setDestOk] = useState<boolean | null>(true);
+  const [destTitle, setDestTitle] = useState<string | null>(null);
+  const refs = useReferences(client, [item.path]);
+  const [adjust, setAdjust] = useState<Set<string> | null>(null);
+  const chosen = adjust ?? new Set((refs.pages ?? []).map((p) => p.page));
+
+  useEffect(() => {
+    const d = dest.replace(/\/$/, '');
+    if (!d.startsWith('/content')) {
+      setDestOk(false);
+      return;
+    }
+    let cancelled = false;
+    setDestOk(null);
+    const t = setTimeout(() => {
+      client.siteChildren(d).then(
+        (l) => {
+          if (cancelled) return;
+          const insideItself = d === item.path || d.startsWith(`${item.path}/`);
+          setDestOk(!insideItself);
+          setDestTitle(l.item.title);
+        },
+        () => !cancelled && setDestOk(false),
+      );
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [client, dest, item.path]);
+
+  const nameOk = NAME.test(name);
+  const unchanged = name === nameOf(item.path) && dest.replace(/\/$/, '') === parentOf(item.path);
+
+  return (
+    <StudioDialog size="M">
+      <Heading>Move {item.title}</Heading>
+      <Divider />
+      <Content>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (nameOk && destOk && !unchanged) {
+              container.dismiss();
+              onMove(dest.replace(/\/$/, ''), name, [...chosen]);
+            }
+          }}
+        >
+          <TextField
+            label="Name"
+            value={name}
+            onChange={setName}
+            isRequired
+            validationState={nameOk ? undefined : 'invalid'}
+            errorMessage="Letters, digits and - _ . ~ only"
+            autoFocus
+          />
+          <TextField
+            label="Destination"
+            description={destOk && destTitle ? `Into ${destTitle}` : undefined}
+            value={dest}
+            onChange={setDest}
+            isRequired
+            validationState={destOk === false ? 'invalid' : undefined}
+            errorMessage="Choose an existing location below /content, outside the item itself"
+          />
+          <div className="studio-move__refs">
+            <Text UNSAFE_className="studio-move__label">Adjust references</Text>
+            <ReferenceList
+              pages={refs.pages}
+              error={refs.error}
+              selected={chosen}
+              onSelected={setAdjust}
+              empty="No other page refers to it. Links inside it are adjusted."
+            />
+          </div>
+        </Form>
+      </Content>
+      <ButtonGroup>
+        <Button variant="secondary" onPress={container.dismiss}>
+          Cancel
+        </Button>
+        <Button
+          variant="accent"
+          isDisabled={!nameOk || !destOk || unchanged || (!refs.pages && !refs.error)}
+          onPress={() => {
+            container.dismiss();
+            onMove(dest.replace(/\/$/, ''), name, [...chosen]);
+          }}
+        >
+          Move
+        </Button>
+      </ButtonGroup>
+    </StudioDialog>
+  );
+}

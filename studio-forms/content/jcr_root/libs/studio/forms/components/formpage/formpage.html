@@ -1,0 +1,22 @@
+<!--/*
+    Sensible Studio: the page of a form. The page's head (Core Components page v3 head with the site's libraries)
+    and a body holding the template's structure: the form container with the fields. The form's own client
+    library (studio.forms: validation, submission) is loaded by the page policy's clientlibs.
+*/-->
+<!DOCTYPE HTML>
+<html data-sly-use.page="com.adobe.cq.wcm.core.components.models.Page" lang="${page.language}"
+      data-sly-use.pwa="com.adobe.cq.wcm.core.components.models.PWA"
+      data-sly-use.head="/apps/core/wcm/components/page/v3/page/head.html"
+      data-sly-use.footer="/apps/core/wcm/components/page/v3/page/footer.html">
+    <head data-sly-call="${head.head @ page = page, pwa = pwa}"></head>
+    <body class="studio-formpage ${page.cssClassNames}"
+          id="${page.id}"
+          data-cmp-data-layer-enabled="${page.data ? true : false}"
+          data-cmp-data-layer-name="${page.dataLayerName @ context='scriptToken'}">
+        <main class="studio-formpage__main" data-sly-use.templatedContainer="com.day.cq.wcm.foundation.TemplatedContainer">
+            <sly data-sly-repeat.child="${templatedContainer.structureResources}"
+                 data-sly-resource="${child @ resourceType=child.resourceType, decorationTagName='div'}"></sly>
+        </main>
+        <sly data-sly-call="${footer.footer @ page = page, pwa = pwa}"></sly>
+    </body>
+</html>

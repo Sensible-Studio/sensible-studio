@@ -1,0 +1,265 @@
+// MSM: live copy status, rollout, overview. Spectrum global colors, like the Sites console.
+
+.studio-msm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__section {
+    h3 {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--spectrum-global-color-gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+  }
+
+  &__facts {
+    display: grid;
+    gap: 6px;
+    margin: 0 0 10px;
+
+    div {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    dt {
+      color: var(--spectrum-global-color-gray-700);
+    }
+
+    dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    a {
+      color: var(--spectrum-global-color-blue-700);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__copies,
+  &__targets {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  &__targets {
+    margin: 12px 0;
+  }
+
+  &__copy {
+    color: var(--spectrum-global-color-blue-700);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__muted {
+    color: var(--spectrum-global-color-gray-600);
+    font-size: 12px;
+  }
+
+  &__error {
+    color: var(--spectrum-global-color-red-700);
+  }
+}
+
+.studio-msm-state {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  color: var(--spectrum-global-color-gray-800);
+  background: var(--spectrum-global-color-gray-200);
+
+  &.is-synced {
+    color: var(--spectrum-global-color-green-700);
+    background: var(--spectrum-global-color-green-100, #e6f6ec);
+  }
+
+  &.is-cancelled,
+  &.is-suspended {
+    color: var(--spectrum-global-color-orange-700);
+    background: var(--spectrum-global-color-orange-100, #fdeedd);
+  }
+
+  &.is-sourceMissing {
+    color: var(--spectrum-global-color-red-700);
+    background: var(--spectrum-global-color-red-100, #fde7e7);
+  }
+}
+
+.studio-msm-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  color: var(--spectrum-global-color-blue-600);
+  vertical-align: middle;
+
+  &.is-suspended {
+    color: var(--spectrum-global-color-orange-600);
+  }
+}
+
+.studio-msm-overview {
+  &__path {
+    color: var(--spectrum-global-color-gray-700);
+    font-size: 13px;
+  }
+
+  &__copy {
+    max-width: 1100px;
+    margin: 0 auto 32px;
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--spectrum-global-color-gray-50);
+    font-size: 13px;
+
+    th {
+      padding: 8px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--spectrum-global-color-gray-700);
+      border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+    }
+
+    td {
+      padding: 4px 8px;
+      border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+    }
+  }
+
+  &__row-actions {
+    white-space: nowrap;
+    text-align: right;
+  }
+}
+
+// editor: inherited components are outlined differently and labelled
+.studio-ov-label.is-inherited::after {
+  content: ' · inherited';
+  opacity: 0.8;
+}
+
+.studio-ov-label.is-cancelled::after {
+  content: ' · inheritance cancelled';
+  opacity: 0.8;
+}
+
+// Create Site: blueprint cards
+.studio-msm-blueprints {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+
+  &__new {
+    grid-column: 1 / -1;
+  }
+}
+
+.studio-msm-blueprint {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 110px;
+  padding: 16px;
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 6px;
+  background: var(--spectrum-global-color-gray-50);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  code {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+    overflow-wrap: anywhere;
+  }
+
+  span {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &:hover {
+    border-color: var(--spectrum-global-color-gray-500);
+  }
+
+  &.is-selected {
+    border-color: var(--spectrum-global-color-blue-500);
+    box-shadow: 0 0 0 1px var(--spectrum-global-color-blue-500);
+  }
+}
+
+// page versions in the Sites preview
+.studio-msm-versions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    font-size: 12px;
+
+    span {
+      overflow-wrap: anywhere;
+    }
+  }
+}
+
+.studio-msm-versions li > :last-child {
+  flex: none;
+}

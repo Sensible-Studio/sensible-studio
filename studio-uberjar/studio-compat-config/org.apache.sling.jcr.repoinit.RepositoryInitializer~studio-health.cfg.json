@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "create path (sling:OrderedFolder) /content\ncreate path (sling:Folder) /conf\ncreate path (sling:Folder) /var/studio/health\ncreate service user studio-health-service\nset ACL for studio-health-service\n    allow jcr:read on /\n    allow jcr:read,rep:write on /var/studio/health\n    allow jcr:read,jcr:versionManagement on /content\n    allow jcr:read,jcr:versionManagement on /conf\nend"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "queue.name": "Sensible Studio MSM rollouts",
+  "queue.topics": [
+    "studio/msm/rollout"
+  ],
+  "queue.type": "ORDERED",
+  "queue.retries": 5,
+  "queue.retrydelay": 10000,
+  "queue.priority": "NORM"
+}

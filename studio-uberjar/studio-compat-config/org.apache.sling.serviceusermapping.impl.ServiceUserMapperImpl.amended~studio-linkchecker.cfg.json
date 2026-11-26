@@ -1,0 +1,5 @@
+{
+  "user.mapping": [
+    "io.sensible.studio.linkchecker:linkchecker=[studio-linkchecker-service]"
+  ]
+}

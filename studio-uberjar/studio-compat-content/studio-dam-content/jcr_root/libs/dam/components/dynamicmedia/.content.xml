@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0"
+    jcr:primaryType="cq:Component"
+    jcr:title="Responsive Image"
+    jcr:description="An image from Media with a focus crop per breakpoint, a preset and responsive sizes; shows the image map drawn in Media."
+    componentGroup="Media"/>

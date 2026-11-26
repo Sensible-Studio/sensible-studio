@@ -1,0 +1,11 @@
+<div class="studio-form__field studio-form__field--textarea" data-studio-field="${properties.name}">
+    <label class="studio-form__label" for="${resource.name}-${properties.name}">${properties.label || 'Text'}<span class="studio-form__required" data-sly-test="${properties.required}" aria-hidden="true"> *</span></label>
+    <textarea class="studio-form__input studio-form__textarea" id="${resource.name}-${properties.name}" name="${properties.name}"
+              placeholder="${properties.placeholder}" rows="${properties.rows || 4}"
+              minlength="${properties.minLength}" maxlength="${properties.maxLength}"
+              data-sly-attribute.required="${properties.required ? 'required' : ''}"
+              data-studio-messages="${properties.requiredMessage}|">${properties.value}</textarea>
+    <p class="studio-form__help" data-sly-test="${properties.help}">${properties.help}</p>
+    <p class="studio-form__error" data-studio-error aria-live="polite"></p>
+    <sly data-sly-resource="${'rules' @ resourceType='studio/forms/components/rules'}"></sly>
+</div>

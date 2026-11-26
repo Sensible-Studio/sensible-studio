@@ -1,0 +1,136 @@
+{
+  "jcr:primaryType": "sling:Folder",
+  "wknd": {
+    "settings": {
+      "wcm": {
+        "templates": {
+          "page-content": {
+            "jcr:primaryType": "cq:Template",
+            "jcr:content": {
+              "jcr:primaryType": "cq:PageContent",
+              "jcr:title": "Content Page",
+              "ranking": 10
+            },
+            "structure": {
+              "jcr:content": {
+                "jcr:primaryType": "cq:PageContent",
+                "sling:resourceType": "wknd/components/page",
+                "root": {
+                  "sling:resourceType": "wknd/components/container",
+                  "container": {
+                    "sling:resourceType": "wknd/components/container",
+                    "editable": true
+                  }
+                }
+              }
+            },
+            "initial": {
+              "jcr:content": {
+                "jcr:primaryType": "cq:PageContent",
+                "sling:resourceType": "wknd/components/page",
+                "cq:template": "/conf/wknd/settings/wcm/templates/page-content",
+                "root": {
+                  "sling:resourceType": "wknd/components/container",
+                  "container": {
+                    "sling:resourceType": "wknd/components/container"
+                  }
+                }
+              }
+            },
+            "policies": {
+              "jcr:content": {
+                "cq:policy": "wknd/components/page/policy_page",
+                "root": {
+                  "cq:policy": "wknd/components/container/policy_root",
+                  "container": {
+                    "cq:policy": "wknd/components/container/policy_main",
+                    "wknd": {
+                      "components": {
+                        "title": {
+                          "cq:policy": "wknd/components/title/policy_title"
+                        },
+                        "text": {
+                          "cq:policy": "wknd/components/text/policy_text"
+                        },
+                        "container": {
+                          "cq:policy": "wknd/components/container/policy_nested"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "restricted": {
+            "jcr:primaryType": "cq:Template",
+            "jcr:title": "Only below /content/other",
+            "allowedPaths": [
+              "/content/other(/.*)?"
+            ],
+            "jcr:content": {
+              "jcr:primaryType": "cq:PageContent",
+              "sling:resourceType": "wknd/components/static"
+            }
+          }
+        },
+        "policies": {
+          "wknd": {
+            "components": {
+              "page": {
+                "policy_page": {
+                  "jcr:title": "Page policy",
+                  "clientlibs": [
+                    "wknd.site"
+                  ]
+                }
+              },
+              "container": {
+                "policy_root": {
+                  "jcr:title": "Root"
+                },
+                "policy_main": {
+                  "jcr:title": "Main container",
+                  "layout": "responsiveGrid",
+                  "components": [
+                    "/apps/wknd/components/container",
+                    "group:WKND Sites Project - Content"
+                  ],
+                  "cq:authoring": {
+                    "assetToComponentMapping": {
+                      "image": {
+                        "resourceType": "wknd/components/title",
+                        "assetMimetype": "image/*",
+                        "droptarget": "image"
+                      }
+                    }
+                  }
+                },
+                "policy_nested": {
+                  "jcr:title": "Nested container"
+                }
+              },
+              "title": {
+                "policy_title": {
+                  "jcr:title": "WKND Title",
+                  "type": "h2",
+                  "allowedTypes": [
+                    "h1",
+                    "h2",
+                    "h3"
+                  ]
+                }
+              },
+              "text": {
+                "policy_text": {
+                  "jcr:title": "Rich text",
+                  "description": "minimal toolbar"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

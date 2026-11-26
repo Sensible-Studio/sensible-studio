@@ -1,0 +1,250 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Sensible Studio - Quickstart Runner
+# ==============================================================================
+
+set -e
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+cd "$DIR"
+
+# Java 21 (WKND's core bundle requires JavaSE 21); falls back to 17, then 11
+if [ -z "$JAVA_HOME" ] || [ $("$JAVA_HOME/bin/java" -version 2>&1 | head -1 | awk -F '"' '{print $2}' | cut -d'.' -f1) -lt 21 ]; then
+    if [ -x "/usr/libexec/java_home" ]; then
+        DETECTED_JAVA="$(/usr/libexec/java_home -v 21 2>/dev/null || /usr/libexec/java_home -v 17 2>/dev/null || /usr/libexec/java_home -v 11 2>/dev/null || true)"
+        if [ -n "$DETECTED_JAVA" ]; then
+            export JAVA_HOME="$DETECTED_JAVA"
+        fi
+    fi
+fi
+
+JAVA_BIN="${JAVA_HOME:+$JAVA_HOME/bin/}java"
+
+JAR_PATH="$DIR/studio-quickstart/target/studio-quickstart-1.0.0-SNAPSHOT.jar"
+# The author instance lives in instances/author (the publish one in instances/publish, see bin/studio-publish)
+AUTHOR_HOME="${AUTHOR_HOME:-$DIR/instances/author}"
+PID_FILE="$AUTHOR_HOME/author.pid"
+
+build_if_needed() {
+    if [ ! -f "$JAR_PATH" ]; then
+        echo "⚙️  Building Sensible Studio Engine..."
+        mvn package -DskipTests
+    fi
+}
+
+# Builds the Rust DAM service (dam-service/) and puts it where Sensible Studio's process manager looks for it:
+# instances/author/dam/bin/studio-dam. Without Rust, Sensible Studio still starts; assets just are not processed.
+install_dam_service() {
+    local src="$DIR/dam-service" bin="$DIR/dam-service/target/release/studio-dam" dest="$AUTHOR_HOME/dam/bin/studio-dam"
+    [ -f "$src/Cargo.toml" ] || return 0
+    if ! command -v cargo >/dev/null 2>&1; then
+        [ -x "$dest" ] || echo "⚠️  Rust not installed: DAM processing disabled (install from https://rustup.rs)"
+        return 0
+    fi
+    if [ ! -x "$bin" ] || [ -n "$(find "$src/src" "$src/Cargo.toml" -newer "$bin" 2>/dev/null | head -1)" ]; then
+        echo "🦀 Building DAM service..."
+        (cd "$src" && cargo build --release --quiet) || { echo "⚠️  DAM service build failed"; return 0; }
+    fi
+    if [ ! -x "$dest" ] || ! cmp -s "$bin" "$dest"; then
+        mkdir -p "$(dirname "$dest")" && cp "$bin" "$dest" && chmod +x "$dest"
+    fi
+}
+
+# Videos need ffmpeg next to studio-dam (posters, thumbnails, a copy every browser plays). It is not
+# shipped with Sensible Studio (licences, patents, security updates): the machine provides it.
+check_ffmpeg() {
+    if [ -n "$STUDIO_DAM_FFMPEG" ] && [ -x "$STUDIO_DAM_FFMPEG" ]; then return 0; fi
+    command -v ffmpeg >/dev/null 2>&1 && return 0
+    for p in /opt/homebrew/bin/ffmpeg /usr/local/bin/ffmpeg /usr/bin/ffmpeg /opt/local/bin/ffmpeg; do [ -x "$p" ] && return 0; done
+    echo "⚠️  ffmpeg not found: videos get no thumbnail, poster or browser copy (macOS: brew install ffmpeg; Debian/Ubuntu: apt install ffmpeg)"
+}
+
+# Word, Excel, PowerPoint and OpenDocument files get their preview through LibreOffice, which is not
+# shipped either.
+check_office() {
+    if [ -n "$STUDIO_DAM_SOFFICE" ] && [ -x "$STUDIO_DAM_SOFFICE" ]; then return 0; fi
+    command -v soffice >/dev/null 2>&1 && return 0
+    for p in /Applications/LibreOffice.app/Contents/MacOS/soffice /opt/homebrew/bin/soffice /usr/local/bin/soffice /usr/bin/soffice /usr/bin/libreoffice; do [ -x "$p" ] && return 0; done
+    echo "⚠️  LibreOffice not found: Office documents get no preview (macOS: brew install --cask libreoffice; Debian/Ubuntu: apt install libreoffice-core)"
+}
+
+# What a new instance installs at its first start, in $AUTHOR_HOME/install: Sensible Studio's own bundles,
+# content packages and configurations (built from this repository), the authoring interface (author-ui), and
+# what they need from elsewhere: a few libraries and the Core Components, from Maven Central. Nothing here is
+# kept in git: instances/ is the machine's own. Run again after pulling new code; an instance that already
+# ran picks up what changed (a content package only when its version did).
+#   bin/studio setup           the product
+#   bin/studio setup --wknd    and the WKND reference site (Apache 2.0, downloaded from its GitHub releases)
+THIRD_PARTY="
+org.apache.commons:commons-imaging:1.0-alpha3:jar
+org.apache.commons:commons-lang3:3.17.0:jar
+com.fasterxml.jackson.core:jackson-annotations:2.17.3:jar
+org.apache.jackrabbit:oak-authorization-cug:1.42.0:jar
+org.apache.servicemix.bundles:org.apache.servicemix.bundles.commons-httpclient:3.1_7:jar
+org.apache.servicemix.bundles:org.apache.servicemix.bundles.json:20090211_2:jar
+org.apache.sling:org.apache.sling.models.api:1.5.4:jar
+org.apache.sling:org.apache.sling.models.impl:1.6.4:jar
+com.adobe.cq:core.wcm.components.all:2.33.0:zip
+"
+# every content package of the product: a folder with META-INF/vault and jcr_root, zipped as it is
+CONTENT_PACKAGES="
+studio-authoring-content
+studio-cfm/content
+studio-forms/content
+studio-translation/content
+studio-uberjar/studio-compat-content/cq-platform-content
+studio-uberjar/studio-compat-content/studio-dam-content
+studio-uberjar/studio-compat-content/studio-dam-defaults
+studio-uberjar/studio-compat-content/studio-msm-content
+studio-uberjar/studio-compat-content/studio-personalization-content
+studio-uberjar/studio-compat-content/studio-wcm-foundation
+studio-uberjar/studio-compat-content/studio-workflow-content
+studio-uberjar/studio-siterail/oak-index
+"
+WKND_VERSION="4.0.4"
+WKND_URL="https://github.com/adobe/aem-guides-wknd/releases/download/aem-guides-wknd-$WKND_VERSION/aem-guides-wknd.all-$WKND_VERSION.zip"
+
+need() {
+    command -v "$1" >/dev/null 2>&1 || { echo "❌ $1 is needed: $2"; exit 1; }
+}
+
+setup() {
+    local install="$AUTHOR_HOME/install" wknd=0 arg
+    for arg in "$@"; do
+        case "$arg" in
+            --wknd) wknd=1 ;;
+            *) echo "Usage: bin/studio setup [--wknd]"; exit 1 ;;
+        esac
+    done
+    need mvn "Apache Maven 3.9 or newer, https://maven.apache.org"
+    need node "Node.js 20 or newer, https://nodejs.org"
+    need npm "it comes with Node.js"
+    need zip "the zip command"
+    need unzip "the unzip command"
+    local java_major
+    java_major=$("$JAVA_BIN" -version 2>&1 | head -1 | awk -F '"' '{print $2}' | cut -d'.' -f1)
+    if [ -z "$java_major" ] || [ "$java_major" -lt 21 ]; then
+        echo "❌ Java 21 or newer is needed (found: ${java_major:-none}). Set JAVA_HOME to one."; exit 1
+    fi
+    mkdir -p "$install"
+
+    echo "🔨 Building the modules (mvn package)..."
+    mvn -q package -DskipTests
+    local jar count=0
+    for jar in studio-adapter/target/studio-adapter-*.jar studio-translation/target/studio-translation-*.jar \
+               studio-cfm/target/studio-cfm-*.jar studio-uberjar/studio-*/target/studio-*.jar; do
+        case "$jar" in
+            *-sources.jar|*-tests.jar|*/original-*|*studio-compat-scanner*) continue ;;   # the scanner is a tool, not a bundle
+        esac
+        [ -f "$jar" ] || continue
+        cp -f "$jar" "$install/" && count=$((count + 1))
+    done
+    echo "   $count bundles"
+
+    echo "📦 Libraries and the Core Components (Maven Central)..."
+    local artifact
+    for artifact in $THIRD_PARTY; do
+        mvn -q dependency:copy -Dartifact="$artifact" -DoutputDirectory="$install" -Dmdep.overWriteReleases=false
+    done
+    # the Core Components' configuration and content packages sit inside the "all" package; the installer of
+    # the install/ folder does not unpack a package from inside another, so they are put beside it
+    local all="$install/core.wcm.components.all-2.33.0.zip" inner
+    for inner in config content; do
+        unzip -p "$all" "jcr_root/etc/packages/adobe/cq60/core.wcm.components.$inner-2.33.0.zip" > "$install/core.wcm.components.$inner-2.33.0.zip"
+    done
+
+    echo "📦 Content packages..."
+    local dir name version props
+    for dir in $CONTENT_PACKAGES; do
+        props="$DIR/$dir/META-INF/vault/properties.xml"
+        [ -f "$props" ] || { echo "❌ $dir has no META-INF/vault/properties.xml"; exit 1; }
+        name=$(sed -n 's/.*<entry key="name">\([^<]*\)<.*/\1/p' "$props")
+        version=$(sed -n 's/.*<entry key="version">\([^<]*\)<.*/\1/p' "$props")
+        rm -f "$install/$name-$version.zip"
+        (cd "$DIR/$dir" && zip -q -r -X "$install/$name-$version.zip" META-INF jcr_root -x '*.DS_Store')
+    done
+
+    echo "🖥  The authoring interface (author-ui)..."
+    (
+        cd "$DIR/author-ui"
+        [ -d node_modules ] || npm ci --no-audit --no-fund
+        npm run --silent package
+    )
+    local ui
+    ui=$(ls -t "$DIR/author-ui/dist-package"/studio-editor-*.zip | head -1)
+    cp -f "$ui" "$install/"
+
+    echo "⚙️  Configurations..."
+    cp -f "$DIR/studio-uberjar/studio-compat-config"/*.cfg.json "$install/"
+
+    if [ "$wknd" = 1 ]; then
+        echo "🏔  The WKND reference site $WKND_VERSION..."
+        need curl "to download WKND"
+        local pack="$install/aem-guides-wknd.all-$WKND_VERSION.zip"
+        [ -s "$pack" ] || curl -fL --progress-bar -o "$pack" "$WKND_URL"
+        for inner in ui.content ui.content.sample; do
+            unzip -p "$pack" "jcr_root/apps/wknd-packages/content/install/aem-guides-wknd.$inner-$WKND_VERSION.zip" > "$install/aem-guides-wknd.$inner-$WKND_VERSION.zip"
+        done
+    fi
+
+    install_dam_service
+    echo "✅ $AUTHOR_HOME is ready ($(ls "$install" | wc -l | tr -d ' ') files in install/). Start it: bin/studio start"
+}
+
+case "$1" in
+    setup)
+        shift
+        setup "$@"
+        ;;
+    start)
+        if [ ! -d "$AUTHOR_HOME/install" ]; then
+            echo "⚠️  $AUTHOR_HOME/install does not exist: run 'bin/studio setup' first, or this instance is only Apache Sling."
+        fi
+        build_if_needed
+        install_dam_service
+        check_ffmpeg
+        check_office
+        shift
+        echo "🚀 Starting Sensible Studio, home $AUTHOR_HOME..."
+        mkdir -p "$AUTHOR_HOME"
+        echo $$ > "$PID_FILE"
+        exec "$JAVA_BIN" -jar "$JAR_PATH" -c "$AUTHOR_HOME" "$@"
+        ;;
+    stop)
+        if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+            kill "$(cat "$PID_FILE")" && echo "Stopped author (pid $(cat "$PID_FILE"))"
+            rm -f "$PID_FILE"
+        else
+            echo "Author is not running (no live pid in $PID_FILE)"
+        fi
+        ;;
+    build)
+        shift
+        echo "🔨 Building all Sensible Studio modules..."
+        mvn clean package "$@"
+        ;;
+    test)
+        echo "🧪 Running Sensible Studio test suite..."
+        mvn clean test
+        ;;
+    help|--help|-h|"")
+        echo "Sensible Studio Control Script"
+        echo ""
+        echo "Usage: ./bin/studio <command> [options]"
+        echo ""
+        echo "Commands:"
+        echo "  setup [--wknd]                               Build everything and fill the instance's install/ folder (first, and after pulling new code)"
+        echo "  start [-p <port>] [-r <mode>]                Start the author instance (home: instances/author, AUTHOR_HOME overrides)"
+        echo "  stop                                         Stop the author instance started with 'start'"
+        echo "  build                                        Compile and package all modules"
+        echo "  test                                         Run full unit and compatibility tests"
+        echo "  help                                         Show this help message"
+        echo ""
+        echo "Example:"
+        echo "  ./bin/studio start -p 4502"
+        ;;
+    *)
+        build_if_needed
+        exec "$JAVA_BIN" -jar "$JAR_PATH" "$@"
+        ;;
+esac

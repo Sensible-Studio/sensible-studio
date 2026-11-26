@@ -1,0 +1,13 @@
+{
+  "queue.name": "Sensible Studio DAM processing",
+  "queue.topics": [
+    "studio/dam/process",
+    "studio/dam/smarttag",
+    "studio/dam/smartcrop"
+  ],
+  "queue.type": "UNORDERED",
+  "queue.maxparallel": 2,
+  "queue.retries": 60,
+  "queue.retrydelay": 30000,
+  "queue.priority": "NORM"
+}

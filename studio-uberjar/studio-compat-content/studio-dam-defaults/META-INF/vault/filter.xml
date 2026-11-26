@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- mode="merge": nodes that exist are left alone, so presets and profiles an administrator changed survive a reinstall -->
+<workspaceFilter version="1.0">
+    <filter root="/conf/global/settings/dam/dm/presets" mode="merge"/>
+    <filter root="/conf/global/settings/dam/dm/imageprofiles" mode="merge"/>
+</workspaceFilter>

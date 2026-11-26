@@ -1,0 +1,10 @@
+# deny everything, then open what visitors need
+/0001 { /type "deny" /url "*" }
+/0010 { /type "allow" /extension '(css|eot|gif|ico|jpeg|jpg|js|gif|pdf|png|svg|swf|ttf|woff|woff2|html|mp4)' /path "/content/*" }
+/0011 { /type "allow" /method "GET" /url "/etc.clientlibs/*" }
+/0012 { /type "allow" /method '(GET|HEAD)' /path "/content/mysite/*" /selectors '(model|searchresults)' /extension "json" }
+/0013 { /type "allow" /method "POST" /url "/content/[.]*.form.html" }
+/0014 { /type "allow" /glob "GET /libs/granite/csrf/token.json*" }
+/0015 { /type "deny" /selectors '(feed|rss|pages|languages|blueprint|infinity|tidy|sysview|docview|query|[0-9-]+|jcr:content)' /extension '(json|xml|html|feed)' }
+/0016 { /type "allow" /path "/content/mysite/*" /suffix '(.*)\.html' }
+/0017 { /type "allow" /url '^/content/(a|b)/.*$' }

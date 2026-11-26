@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0"
+    jcr:primaryType="cq:Component"
+    jcr:title="Sensible Studio Base Page"
+    jcr:description="Base page component provided by Sensible Studio. Page components (e.g. Core Components page) inherit from it."
+    componentGroup=".hidden"/>

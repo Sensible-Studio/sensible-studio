@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0"
+    xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="sling:OrderedFolder"
+    jcr:title="Rollout Configurations">
+    <default
+        jcr:primaryType="cq:RolloutConfig"
+        jcr:title="Standard rollout"
+        jcr:description="On a manual rollout: updates, creates and removes content, keeps the order of the blueprint and points links (also to experience and content fragments) to the live copy."
+        cq:trigger="rollout">
+        <contentUpdate jcr:primaryType="cq:LiveSyncAction"/>
+        <contentCopy jcr:primaryType="cq:LiveSyncAction"/>
+        <contentDelete jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdate jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdateXF jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdateCF jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdateXFEmbedded jcr:primaryType="cq:LiveSyncAction"/>
+        <orderChildren jcr:primaryType="cq:LiveSyncAction"/>
+    </default>
+    <pushonmodify
+        jcr:primaryType="cq:RolloutConfig"
+        jcr:title="Push on modify"
+        jcr:description="Whenever a blueprint page changes: the same synchronisation as the standard rollout, for that page."
+        cq:trigger="modification">
+        <contentUpdate jcr:primaryType="cq:LiveSyncAction"/>
+        <contentCopy jcr:primaryType="cq:LiveSyncAction"/>
+        <contentDelete jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdate jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdateXF jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdateXFEmbedded jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdateCF jcr:primaryType="cq:LiveSyncAction"/>
+        <orderChildren jcr:primaryType="cq:LiveSyncAction"/>
+    </pushonmodify>
+    <versioned
+        jcr:primaryType="cq:RolloutConfig"
+        jcr:title="Standard rollout with versions"
+        jcr:description="Like the standard rollout, but first saves each live copy page as a version, so the rollout can be undone from the page's versions."
+        cq:trigger="rollout">
+        <targetVersion jcr:primaryType="cq:LiveSyncAction"/>
+        <contentUpdate jcr:primaryType="cq:LiveSyncAction"/>
+        <contentCopy jcr:primaryType="cq:LiveSyncAction"/>
+        <contentDelete jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdate jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdateXF jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdateCF jcr:primaryType="cq:LiveSyncAction"/>
+        <referencesUpdateXFEmbedded jcr:primaryType="cq:LiveSyncAction"/>
+        <orderChildren jcr:primaryType="cq:LiveSyncAction"/>
+    </versioned>
+    <activate
+        jcr:primaryType="cq:RolloutConfig"
+        jcr:title="Publish with the blueprint"
+        jcr:description="When a blueprint page is published, publishes the live copy page too (needs replication)."
+        cq:trigger="publish">
+        <targetActivate jcr:primaryType="cq:LiveSyncAction"/>
+    </activate>
+    <deactivate
+        jcr:primaryType="cq:RolloutConfig"
+        jcr:title="Unpublish with the blueprint"
+        jcr:description="When a blueprint page is unpublished, unpublishes the live copy page too (needs replication)."
+        cq:trigger="deactivate">
+        <targetDeactivate jcr:primaryType="cq:LiveSyncAction"/>
+    </deactivate>
+</jcr:root>

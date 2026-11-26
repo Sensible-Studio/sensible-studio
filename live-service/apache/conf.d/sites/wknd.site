@@ -1,0 +1,52 @@
+#
+# What the WKND site does inside its virtual host, the same over HTTP and HTTPS
+# (available_vhosts/wknd.vhost includes it): its cache directory, headers and rewrite rules.
+#
+
+# The site's own cache directory: the Live cache keeps each site's pages apart, in
+# <docroot>/<site name>, so that one site's files are never served under another's name.
+DocumentRoot "${STUDIO_LIVE_DOCROOT}/wknd"
+
+<IfModule mod_headers.c>
+    Header always append X-Frame-Options SAMEORIGIN
+    Header always set X-Content-Type-Options nosniff
+</IfModule>
+
+RewriteEngine On
+# The cache's own endpoints are for the publish, not for visitors.
+RewriteRule ^/(dispatcher|_live)(/|$) - [F,L]
+# the site's redirect map, from the publish (site.redirect_map in live.toml): before the short URLs
+RewriteMap site_redirects "txt:${STUDIO_LIVE_DOCROOT}/wknd.redirects.txt"
+Include conf.d/rewrites/redirect_map.rules
+Include conf.d/rewrites/wknd_rewrite.rules
+
+# The site's own error pages (what AEM's dispatcher does with DispatcherPassError and ErrorDocument):
+# a 404 or 500 the publish answers, or the cache's own 404 for what is not served, is shown as the
+# site's page for it, with the same status. Only for answers that come from the publish through the
+# service: a file Apache serves is never an error. The pages are published like any other.
+<IfModule mod_proxy.c>
+    ProxyErrorOverride On 404 500
+</IfModule>
+ErrorDocument 404 /content/wknd/us/en/errors/404.html
+ErrorDocument 500 /content/wknd/us/en/errors/500.html
+
+# What the service answers when no publish does.
+ErrorDocument 502 "The site is not available at the moment."
+ErrorDocument 503 "The site is not available at the moment."
+
+# How long browsers and a CDN in front may keep things. The Live cache itself keeps a page
+# until something is published.
+<IfModule mod_headers.c>
+    # Client libraries: their URLs change when they do.
+    <LocationMatch "^/etc\.clientlibs/.*\.(?i:js|css|ttf|woff2?)$">
+        Header set Cache-Control "max-age=2592000,public,immutable" "expr=%{REQUEST_STATUS} < 400"
+    </LocationMatch>
+    # Pages.
+    <LocationMatch "^/content/.*\.html$">
+        Header set Cache-Control "max-age=300,stale-while-revalidate=3600" "expr=%{REQUEST_STATUS} < 400"
+    </LocationMatch>
+    # Media.
+    <LocationMatch "^/content/dam/.*\.(?i:jpe?g|gif|png|svg|webp|avif|pdf|mp4|mov)$">
+        Header set Cache-Control "max-age=43200,stale-while-revalidate=43200" "expr=%{REQUEST_STATUS} < 400"
+    </LocationMatch>
+</IfModule>

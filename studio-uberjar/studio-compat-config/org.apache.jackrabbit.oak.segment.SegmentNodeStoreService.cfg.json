@@ -1,0 +1,7 @@
+// The segment store: compaction runs whenever maintenance asks (Health, nightly), not only when Oak's
+// estimation finds the store has grown by compaction.sizeDeltaEstimation (1 GB) since the last one —
+// on 4.11.2026 the nightly run "succeeded" in two seconds having done nothing because of that.
+{
+  "name": "Default NodeStore",
+  "compaction.disableEstimation": true
+}

@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "create path (sling:OrderedFolder) /content\nset ACL for anonymous\n    deny jcr:read on /content\nend"
+  ]
+}

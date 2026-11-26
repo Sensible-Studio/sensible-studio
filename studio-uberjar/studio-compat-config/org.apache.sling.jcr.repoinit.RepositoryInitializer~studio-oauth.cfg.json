@@ -1,0 +1,7 @@
+{
+  "scripts": [
+    "create path (sling:Folder) /var/studio/oauth\ncreate path (sling:Folder) /var/studio/oauth/clients\ncreate path (sling:Folder) /var/studio/oauth/codes\ncreate path (sling:Folder) /var/studio/oauth/tokens",
+    "create service user studio-oauth-service\nset ACL for studio-oauth-service\n    allow jcr:all on /var/studio/oauth\n    allow jcr:read on /home\nend",
+    "set ACL for everyone\n    deny jcr:all on /var/studio/oauth\nend"
+  ]
+}

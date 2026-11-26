@@ -1,0 +1,45 @@
+[package]
+name = "studio-dam"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Sensible Studio asset processing and delivery service (renditions, metadata, on-the-fly resize)"
+publish = false
+
+[[bin]]
+name = "studio-dam"
+path = "src/main.rs"
+
+[dependencies]
+axum = "0.8"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+fast_image_resize = { version = "5", features = ["image"] }
+webp = "0.3"
+kamadak-exif = "0.6"
+sha1 = "0.10"
+sha2 = "0.10"
+hmac = "0.12"
+hex = "0.4"
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+hayro = "0.8"
+resvg = "0.48"
+candle-core = "0.11"
+candle-nn = "0.11"
+candle-transformers = "0.11"
+futures-util = "0.3"
+memmap2 = "0.9"
+tokenizers = { version = "0.21", default-features = false, features = ["fancy-regex"] }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
+tempfile = "3"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

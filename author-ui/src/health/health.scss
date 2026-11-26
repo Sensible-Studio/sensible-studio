@@ -1,0 +1,219 @@
+// Sensible Studio Health (/studio/health.html): the checks as cards, the maintenance history and settings.
+
+.studio-health {
+  &__body {
+    padding: 16px 24px 32px;
+  }
+
+  &__overall {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  &__running {
+    margin-left: auto;
+  }
+
+  &__muted {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__note {
+    display: block;
+  }
+
+  &__warn {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--spectrum-global-color-orange-700);
+  }
+
+  &__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    padding: 12px 14px 14px;
+    background: var(--spectrum-global-color-gray-50);
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-left-width: 4px;
+    border-radius: 6px;
+
+    &.is-ok {
+      border-left-color: var(--spectrum-global-color-green-500);
+    }
+
+    &.is-warn {
+      border-left-color: var(--spectrum-global-color-orange-500);
+    }
+
+    &.is-error {
+      border-left-color: var(--spectrum-global-color-red-500);
+    }
+
+    header {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+
+      h3 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--spectrum-global-color-gray-800);
+      }
+    }
+  }
+
+  &__summary {
+    margin: 0;
+    font-size: 14px;
+    color: var(--spectrum-global-color-gray-900);
+  }
+
+  &__bar {
+    position: relative;
+    height: 18px;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 18px;
+    color: var(--spectrum-global-color-gray-800);
+    background: var(--spectrum-global-color-gray-200);
+    border-radius: 3px;
+
+    &-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      background: var(--spectrum-global-color-blue-400);
+      opacity: 0.55;
+    }
+
+    span {
+      position: relative;
+      padding-left: 6px;
+    }
+  }
+
+  &__spark {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: var(--spectrum-global-color-blue-600);
+
+    svg {
+      max-width: 100%;
+    }
+  }
+
+  &__dl {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 0;
+
+    div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    dt {
+      font-size: 11px;
+      color: var(--spectrum-global-color-gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    dd {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+  }
+
+  &__list,
+  &__log {
+    margin: 0;
+    padding-left: 16px;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-800);
+  }
+
+  &__log li {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+  }
+
+  &__columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 1000px) {
+    &__columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  &__panel {
+    h2 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--spectrum-global-color-gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+  }
+
+  &__runs td {
+    vertical-align: top;
+  }
+
+  &__settings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px 16px;
+    background: var(--spectrum-global-color-gray-50);
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-radius: 6px;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 6px;
+  }
+}

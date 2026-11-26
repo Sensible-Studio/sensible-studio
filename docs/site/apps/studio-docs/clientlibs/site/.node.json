@@ -1,0 +1,15 @@
+{
+  "jcr:primaryType": "cq:ClientLibraryFolder",
+  "categories": [
+    "studio-docs.site"
+  ],
+  "allowProxy": true,
+  "cssProcessor": [
+    "default:none",
+    "min:none"
+  ],
+  "jsProcessor": [
+    "default:none",
+    "min:none"
+  ]
+}

@@ -1,0 +1,41 @@
+# Sensible Studio Live cache as a systemd service. A starting point: adjust the paths, then
+#   systemctl daemon-reload && systemctl enable --now studio-live
+# See "On a server" in ../README.md for the user, the directories and the secret.
+
+[Unit]
+Description=Sensible Studio Live cache (filter, page cache and invalidation in front of the publish)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Ready (sd_notify) once the port is bound and the redirect maps Apache's RewriteMap reads exist:
+# a web server started After= this one finds them, on a server's first boot too.
+Type=notify
+User=studio-live
+Group=studio-live
+# The docroot of live.toml may be relative to this directory.
+WorkingDirectory=/var/cache/studio-live
+# STUDIO_LIVE_FLUSH_SECRET=... ; readable by root and the service's group only.
+EnvironmentFile=/etc/studio-live/env
+ExecStartPre=/usr/local/bin/studio-live --config /etc/studio-live/live.toml --check
+ExecStart=/usr/local/bin/studio-live --config /etc/studio-live/live.toml
+Restart=on-failure
+RestartSec=2
+
+# New files are readable by the group (Apache's), writable by the service only.
+UMask=0027
+# It needs nothing but its cache directories and the network.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+# AF_UNIX: only for telling systemd it is ready.
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ReadWritePaths=/var/cache/studio-live
+
+[Install]
+WantedBy=multi-user.target

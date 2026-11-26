@@ -1,0 +1,5 @@
+{
+  "user.mapping": [
+    "io.sensible.studio.health:health=[studio-health-service]"
+  ]
+}

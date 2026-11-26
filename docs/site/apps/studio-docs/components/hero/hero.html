@@ -1,0 +1,12 @@
+<section class="docs-hero" data-sly-test.has="${properties.jcr:title}">
+    <p class="docs-hero__eyebrow" data-sly-test="${properties.eyebrow}">${properties.eyebrow}</p>
+    <h1 class="docs-hero__title">${properties.jcr:title}</h1>
+    <p class="docs-hero__text" data-sly-test="${properties.text}">${properties.text}</p>
+    <p class="docs-hero__actions">
+        <a class="docs-button docs-button--primary" data-sly-test="${properties.primaryLabel}"
+           href="${properties.primaryLink @ extension='html'}">${properties.primaryLabel}</a>
+        <a class="docs-button" data-sly-test="${properties.secondaryLabel}"
+           href="${properties.secondaryLink @ extension='html'}">${properties.secondaryLabel}</a>
+    </p>
+</section>
+<div class="cq-placeholder" data-sly-test="${!has && wcmmode.edit}" data-emptytext="Hero"></div>

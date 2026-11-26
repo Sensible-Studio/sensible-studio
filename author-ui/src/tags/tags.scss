@@ -1,0 +1,229 @@
+// Sensible Studio Tags console. Builds on the Sites console styles (columns, list, action bar, preview).
+
+.studio-tags {
+  .studio-tags__icon {
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  .studio-tags__bigicon {
+    aspect-ratio: auto;
+    height: 120px;
+  }
+}
+
+// references of a tag (preview, delete dialog)
+.studio-tagrefs {
+  li {
+    flex-direction: column;
+    gap: 0 !important;
+  }
+
+  a {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--spectrum-global-color-gray-900);
+    text-decoration: none;
+
+    &:hover .studio-tagrefs__title {
+      text-decoration: underline;
+    }
+
+    svg {
+      flex: none;
+      color: var(--spectrum-global-color-gray-700);
+    }
+  }
+
+  &__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__kind {
+    flex: none;
+    padding: 0 5px;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 16px;
+    color: var(--spectrum-global-color-gray-700);
+    border: 1px solid var(--spectrum-global-color-gray-400);
+    border-radius: 8px;
+  }
+
+  &__path {
+    padding-left: 18px;
+    overflow: hidden;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-700);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// full-screen forms (Create, Edit, Move, Merge)
+.studio-formpage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--spectrum-global-color-gray-75);
+
+  &__bar {
+    display: flex;
+    flex: none;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: var(--spectrum-global-color-gray-50);
+    border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 300;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: min(480px, 100% - 32px);
+    margin: 0 auto;
+    padding: 28px 0 48px;
+    overflow-y: auto;
+
+    &.is-wide {
+      width: min(920px, 100% - 32px);
+    }
+
+    h2 {
+      margin: 8px 0 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+  }
+
+  &__columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+
+    section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  &__error {
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--spectrum-global-color-red-700);
+    background: var(--spectrum-global-color-red-100);
+    border-radius: 4px;
+  }
+
+  &__note {
+    margin: 0;
+    font-size: 13px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 24px;
+    margin: 0;
+    font-size: 13px;
+
+    dt {
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 18px;
+      color: var(--spectrum-global-color-gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+}
+
+// tag picker dialog (Move to, Merge into, Tag Path)
+.studio-tagpicker {
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+  margin: 12px 0 8px;
+  overflow-y: auto;
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 4px;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    padding-right: 4px;
+
+    &.is-selected {
+      background: var(--spectrum-global-color-blue-100);
+    }
+
+    &.is-disabled {
+      opacity: 0.45;
+    }
+  }
+
+  &__pick {
+    display: flex;
+    flex: 1;
+    gap: 8px;
+    align-items: center;
+    min-width: 0;
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--spectrum-global-color-gray-900);
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: 0;
+
+    &:disabled {
+      cursor: default;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--spectrum-global-color-blue-500);
+      outline-offset: -2px;
+    }
+
+    svg {
+      flex: none;
+      color: var(--spectrum-global-color-gray-700);
+    }
+  }
+
+  &__id {
+    margin-left: auto;
+    overflow: hidden;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__choice {
+    display: block;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+}

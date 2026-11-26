@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="group">io.sensible.studio</entry>
+<entry key="name">studio-cfm-content</entry>
+<entry key="version">0.1.0</entry>
+<entry key="description">Content Fragment components AEM content refers to (dam/cfm/components/grid, the in-between content of the Content Fragment component). Written for Sensible Studio; contains no Adobe content.</entry>
+<entry key="createdBy">Sensible Studio</entry>
+<entry key="packageType">application</entry>
+<entry key="requiresRoot">false</entry>
+</properties>

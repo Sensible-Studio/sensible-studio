@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="sling:Folder">
+    <web
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Web">
+        <ratios jcr:primaryType="nt:unstructured">
+            <r0 jcr:primaryType="nt:unstructured" name="Square" width="{Long}1" height="{Long}1"/>
+            <r1 jcr:primaryType="nt:unstructured" name="Banner" width="{Long}16" height="{Long}5"/>
+            <r2 jcr:primaryType="nt:unstructured" name="Story" width="{Long}9" height="{Long}16"/>
+        </ratios>
+    </web>
+</jcr:root>

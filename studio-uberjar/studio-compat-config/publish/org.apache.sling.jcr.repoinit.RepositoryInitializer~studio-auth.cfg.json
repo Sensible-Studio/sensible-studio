@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "create service user studio-auth-service\nset ACL for studio-auth-service\n    allow jcr:read on /home\nend"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "scripts": [
+    "create path (sling:Folder) /apps\ncreate path (sling:Folder) /libs\ncreate path (sling:Folder) /content\ncreate path (sling:Folder) /conf\ncreate path (sling:Folder) /etc\ncreate path (sling:Folder) /etc/replication\ncreate path (sling:Folder) /etc/replication/agents.publish\ncreate path (sling:Folder) /content/usergenerated\ncreate path (sling:Folder) /var/studio\ncreate path (sling:Folder) /var/studio/replication",
+    "set ACL for everyone\n    remove * on /conf,/etc,/apps,/libs\n    allow jcr:read on /conf restriction(rep:glob,/*/settings/graphql/persistentQueries*)\n    allow jcr:read on /conf restriction(rep:glob,/*/settings/dam/cfm/models*)\n    deny jcr:read on /content/usergenerated\nend",
+    "create user studio-transport with password dev-WhxFuxTcdwK_htCtFK55K29a\nset ACL for studio-transport\n    allow jcr:read on /\n    allow jcr:all on /content\n    allow jcr:all on /conf\n    allow jcr:all on /var/studio/replication\nend\nset repository ACL for studio-transport\n    allow jcr:namespaceManagement, jcr:nodeTypeDefinitionManagement\nend",
+    "create path /etc/replication/agents.publish/live_cache(cq:Page)/jcr:content(cq:PageContent)\nset properties on /etc/replication/agents.publish/live_cache/jcr:content\n  default sling:resourceType{String} to \"cq/replication/components/agent\"\n  default jcr:title{String} to \"Live cache\"\n  default jcr:description{String} to \"Tells the Live cache in front of this instance what was published, once it has arrived here. Enable it when a Live cache runs.\"\n  default enabled{Boolean} to false\n  default transportUri{String} to \"http://127.0.0.1:4520/dispatcher/invalidate.cache\"\n  default retryDelay{Long} to 60000\n  default serializationType{String} to \"flush\"\nend",
+    "create service user studio-replication-service\nset ACL for studio-replication-service\n    allow jcr:all on /home\nend"
+  ]
+}

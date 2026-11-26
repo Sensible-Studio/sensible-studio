@@ -1,0 +1,13 @@
+<!--/* Sensible Studio: a segment page rendered on its own (the Audiences console is where it is edited). */-->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>${properties.jcr:title}</title>
+<style>body{font:14px/1.5 system-ui,sans-serif;margin:32px;color:#222}table{border-collapse:collapse}td,th{border:1px solid #ddd;padding:4px 10px;text-align:left}</style></head>
+<body>
+<h1>${properties.jcr:title}</h1>
+<p data-sly-test="${properties.jcr:description}">${properties.jcr:description}</p>
+<sly data-sly-use.s="io.sensible.studio.personalization.htl.SegmentPageUse"/>
+<p>Visitors match when these conditions hold:</p>
+<table><thead><tr><th>Condition</th><th>Operator</th><th>Value</th></tr></thead>
+<tbody><tr data-sly-repeat.r="${s.rules}"><td style="padding-left: ${r.indent @ context='styleToken'}"><strong data-sly-test="${r.logic}">${r.logic}</strong>${r.property}</td><td>${r.operator}</td><td>${r.value}</td></tr></tbody></table>
+</body></html>

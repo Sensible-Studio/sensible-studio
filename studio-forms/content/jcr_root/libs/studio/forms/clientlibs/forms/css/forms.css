@@ -1,0 +1,327 @@
+/* Sensible Studio Forms — a plain, neutral look a site can restyle; everything is a .studio-form__* class. */
+
+.studio-form {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 0 40px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.studio-form__trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.studio-form__field {
+  margin: 0 0 20px;
+  padding: 0;
+  border: 0;
+}
+
+.studio-form__label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.studio-form__required {
+  color: #c9252d;
+}
+
+.studio-form__input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  color: inherit;
+  background: #fff;
+  border: 1px solid #8e8e8e;
+  border-radius: 4px;
+}
+
+.studio-form__input:focus {
+  outline: none;
+  border-color: #1473e6;
+  box-shadow: 0 0 0 1px #1473e6;
+}
+
+.studio-form__textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.studio-form__select {
+  appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236e6e6e' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.studio-form__check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 6px 0;
+  cursor: pointer;
+}
+
+.studio-form__checkbox,
+.studio-form__radio {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: #1473e6;
+}
+
+.studio-form__help {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #6e6e6e;
+}
+
+.studio-form__error {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #c9252d;
+}
+
+.studio-form__error:empty {
+  display: none;
+}
+
+.studio-form__field.is-invalid .studio-form__input {
+  border-color: #c9252d;
+}
+
+.studio-form__text {
+  margin: 0 0 20px;
+}
+
+.studio-form__text--empty {
+  padding: 8px 12px;
+  color: #6e6e6e;
+  background: #f4f4f4;
+  border: 1px dashed #c8c8c8;
+}
+
+.studio-form__panel {
+  margin: 0 0 24px;
+  padding: 0;
+  border: 0;
+}
+
+.studio-form__panel-title {
+  margin: 0 0 4px;
+  font-size: 1.25em;
+  font-weight: 700;
+}
+
+.studio-form__panel-text {
+  margin: 0 0 16px;
+  color: #6e6e6e;
+}
+
+.studio-form__actions {
+  margin: 8px 0 0;
+}
+
+.studio-form__submit {
+  padding: 12px 28px;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  background: #1473e6;
+  border: 0;
+  border-radius: 999px;
+}
+
+.studio-form__submit:hover {
+  background: #0d66d0;
+}
+
+.studio-form__submit:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.studio-form__status {
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+
+.studio-form__status:empty {
+  display: none;
+}
+
+.studio-form__status--error {
+  color: #c9252d;
+}
+
+.studio-form__done {
+  max-width: 720px;
+  margin: 24px auto;
+  padding: 20px 24px;
+  font-size: 18px;
+  background: #eef7ee;
+  border: 1px solid #2d9d78;
+  border-radius: 6px;
+}
+
+/* the form page itself: a quiet frame for the form, under the site's header */
+.studio-formpage__main {
+  padding: 0 16px;
+}
+
+/* the form components keep the layout grid's columns: a field half-wide sits next to another */
+.studio-form .aem-Grid > .aem-GridColumn {
+  box-sizing: border-box;
+  padding-right: 16px;
+}
+
+/* ---- the layout grid (12 columns), so fields placed side by side in Layout mode stay side by side
+   on the form page even when the site's own grid stylesheet is not loaded */
+.studio-form .aem-Grid {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.studio-form .aem-Grid > .aem-GridColumn {
+  box-sizing: border-box;
+  flex: 0 0 100%;
+  max-width: 100%;
+  padding-right: 16px;
+}
+
+.studio-form .aem-GridColumn--default--1 { flex-basis: 8.3333%; max-width: 8.3333%; }
+.studio-form .aem-GridColumn--default--2 { flex-basis: 16.6667%; max-width: 16.6667%; }
+.studio-form .aem-GridColumn--default--3 { flex-basis: 25%; max-width: 25%; }
+.studio-form .aem-GridColumn--default--4 { flex-basis: 33.3333%; max-width: 33.3333%; }
+.studio-form .aem-GridColumn--default--5 { flex-basis: 41.6667%; max-width: 41.6667%; }
+.studio-form .aem-GridColumn--default--6 { flex-basis: 50%; max-width: 50%; }
+.studio-form .aem-GridColumn--default--7 { flex-basis: 58.3333%; max-width: 58.3333%; }
+.studio-form .aem-GridColumn--default--8 { flex-basis: 66.6667%; max-width: 66.6667%; }
+.studio-form .aem-GridColumn--default--9 { flex-basis: 75%; max-width: 75%; }
+.studio-form .aem-GridColumn--default--10 { flex-basis: 83.3333%; max-width: 83.3333%; }
+.studio-form .aem-GridColumn--default--11 { flex-basis: 91.6667%; max-width: 91.6667%; }
+.studio-form .aem-GridColumn--default--12 { flex-basis: 100%; max-width: 100%; }
+.studio-form .aem-GridColumn--default--hide { display: none; }
+
+@media (max-width: 767px) {
+  .studio-form .aem-Grid > .aem-GridColumn { flex-basis: 100%; max-width: 100%; padding-right: 0; }
+}
+
+/* the form page: a readable default typeface when the site brings none */
+.studio-formpage {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: #2c2c2c;
+}
+
+/* ---- rules: a field hidden by a rule takes no room; in the editor it is only dimmed, so it can still be edited */
+.studio-form [hidden] {
+  display: none !important;
+}
+
+.studio-form__field--ruled-off {
+  opacity: 0.45;
+  outline: 1px dashed #c8c8c8;
+}
+
+/* ---- steps */
+.studio-form__steps {
+  margin: 8px 0 0;
+}
+
+.studio-form__progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.studio-form__step {
+  padding: 4px 12px;
+  font-size: 13px;
+  color: #6e6e6e;
+  background: #f4f4f4;
+  border-radius: 999px;
+}
+
+.studio-form__step.is-done {
+  color: #2d9d78;
+  background: #eef7ee;
+}
+
+.studio-form__step.is-current {
+  color: #fff;
+  background: #1473e6;
+}
+
+.studio-form__stepnav {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin: 0 0 8px;
+}
+
+.studio-form__stepnav > .studio-form__actions {
+  margin: 0 0 0 auto;
+}
+
+.studio-form__stepnav > .studio-form__back:only-child,
+.studio-form__stepnav > [hidden] + .studio-form__actions {
+  margin-left: auto;
+}
+
+.studio-form__back,
+.studio-form__next {
+  padding: 10px 24px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.studio-form__back {
+  color: #2c2c2c;
+  background: #fff;
+  border: 1px solid #8e8e8e;
+}
+
+.studio-form__next {
+  margin-left: auto;
+  color: #fff;
+  background: #1473e6;
+  border: 0;
+}
+
+/* ---- files, dates */
+.studio-form__file {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.studio-form__file::file-selector-button {
+  margin-right: 12px;
+  padding: 6px 14px;
+  font: inherit;
+  font-weight: 600;
+  color: #2c2c2c;
+  cursor: pointer;
+  background: #f4f4f4;
+  border: 1px solid #8e8e8e;
+  border-radius: 999px;
+}
+
+.studio-form__field--date .studio-form__input {
+  max-width: 16em;
+}

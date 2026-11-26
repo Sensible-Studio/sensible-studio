@@ -1,0 +1,26 @@
+// Site sources (AEM's Blueprints console).
+
+.studio-bp__body { padding: var(--studio-space-6) var(--studio-space-7); overflow: auto; }
+.studio-bp__intro { max-width: 860px; margin: 0 0 var(--studio-space-5); color: var(--studio-text-muted); }
+.studio-bp__muted { color: var(--studio-text-muted); font-size: var(--studio-type-sm, 13px); }
+.studio-bp__path, .studio-bp code { font-family: var(--studio-font-mono); font-size: 12px; }
+.studio-bp__path { color: var(--studio-text-muted); }
+.studio-bp__link { color: var(--studio-accent-700, var(--studio-accent)); text-underline-offset: 2px; }
+.studio-bp__tag {
+  margin-left: var(--studio-space-2); padding: 0 6px; font-size: 11px; line-height: 18px; color: var(--studio-text-muted);
+  border: 1px solid var(--studio-border); border-radius: 9px;
+}
+.studio-bp__table {
+  width: 100%; max-width: 1200px; border-collapse: collapse; font-size: var(--studio-type-sm, 13px);
+
+  th {
+    padding: var(--studio-space-2) var(--studio-space-3); text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--studio-text-muted); border-bottom: 1px solid var(--studio-border);
+  }
+  td { padding: var(--studio-space-3); vertical-align: top; border-bottom: 1px solid var(--studio-border-subtle); }
+}
+.studio-bp__actions { white-space: nowrap; text-align: right; }
+.studio-bp__sites { margin: 0; padding: 0; list-style: none; }
+.studio-bp__form { display: flex; flex-direction: column; gap: var(--studio-space-4); }
+.studio-bp__form p { margin: 0; }
+.studio-bp__problems { margin: 0; padding-left: 1.2em; color: var(--studio-danger); font-size: var(--studio-type-sm, 13px); }

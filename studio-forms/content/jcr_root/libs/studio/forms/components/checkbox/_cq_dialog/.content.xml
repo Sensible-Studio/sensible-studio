@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Checkbox"
+    sling:resourceType="cq/gui/components/authoring/dialog">
+    <content
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="granite/ui/components/coral/foundation/container">
+        <items jcr:primaryType="nt:unstructured">
+            <tabs
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/tabs"
+                maximized="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                <fieldtab
+                    jcr:primaryType="nt:unstructured"
+                    jcr:title="Field"
+                    sling:resourceType="granite/ui/components/coral/foundation/container"
+                    margin="{Boolean}true">
+                    <items jcr:primaryType="nt:unstructured">
+                        <name
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                            fieldLabel="Name"
+                            name="./name"
+                            fieldDescription="The key of this field in the submission (letters, digits, _ and -). Required."
+                            required="{Boolean}true"/>
+                        <label
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                            fieldLabel="Label"
+                            name="./label"/>
+                        <checkedValue
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                            fieldLabel="Value when ticked"
+                            name="./checkedValue"
+                            fieldDescription="Stored in the submission; default “yes”."/>
+                        <value
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
+                            text="Ticked by default"
+                            value="{Boolean}true"
+                            name="./value"/>
+                        <help
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                            fieldLabel="Help text"
+                            name="./help"
+                            fieldDescription="Shown under the field."/>
+                    </items>
+                </fieldtab>
+                <validation
+                    jcr:primaryType="nt:unstructured"
+                    jcr:title="Validation"
+                    sling:resourceType="granite/ui/components/coral/foundation/container"
+                    margin="{Boolean}true">
+                    <items jcr:primaryType="nt:unstructured">
+                        <required
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
+                            text="Required"
+                            value="{Boolean}true"
+                            name="./required"/>
+                        <requiredMessage
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                            fieldLabel="Message when empty"
+                            name="./requiredMessage"
+                            fieldDescription="Default: “This field is required.”"/>
+                    </items>
+                </validation>
+                <rules
+                    jcr:primaryType="nt:unstructured"
+                    jcr:title="Rules"
+                    sling:resourceType="granite/ui/components/coral/foundation/container"
+                    margin="{Boolean}true">
+                    <items jcr:primaryType="nt:unstructured">
+                        <rules
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/multifield"
+                            fieldLabel="Rules"
+                            name="./rules"
+                            composite="{Boolean}true"
+                            fieldDescription="Each rule: what happens to this field when another field has a value. Several rules of the same kind must all hold.">
+                        <field
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/container"
+                            name="./rules">
+                            <items jcr:primaryType="nt:unstructured">
+                                <action jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/select" fieldLabel="Then" name="./action">
+                                    <items jcr:primaryType="nt:unstructured">
+                                        <show jcr:primaryType="nt:unstructured" text="Show this field only when" value="show" selected="{Boolean}true"/>
+                                        <hide jcr:primaryType="nt:unstructured" text="Hide this field when" value="hide"/>
+                                        <require jcr:primaryType="nt:unstructured" text="Require this field when" value="require"/>
+                                        <disable jcr:primaryType="nt:unstructured" text="Disable this field when" value="disable"/>
+                                    </items>
+                                </action>
+                                <field jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Field" fieldDescription="The name of the other field." name="./field" required="{Boolean}true"/>
+                                <op jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/select" fieldLabel="Condition" name="./op">
+                                    <items jcr:primaryType="nt:unstructured">
+                                        <is jcr:primaryType="nt:unstructured" text="is" value="is" selected="{Boolean}true"/>
+                                        <isnot jcr:primaryType="nt:unstructured" text="is not" value="isnot"/>
+                                        <contains jcr:primaryType="nt:unstructured" text="contains" value="contains"/>
+                                        <empty jcr:primaryType="nt:unstructured" text="is empty" value="empty"/>
+                                        <notempty jcr:primaryType="nt:unstructured" text="is not empty" value="notempty"/>
+                                        <gt jcr:primaryType="nt:unstructured" text="is greater than" value="gt"/>
+                                        <lt jcr:primaryType="nt:unstructured" text="is less than" value="lt"/>
+                                    </items>
+                                </op>
+                                <value jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Value" fieldDescription="For a checkbox: its value when ticked (“yes” unless changed)." name="./value"/>
+                            </items>
+                        </field>
+                        </rules>
+                    </items>
+                </rules>
+                </items>
+            </tabs>
+        </items>
+    </content>
+</jcr:root>

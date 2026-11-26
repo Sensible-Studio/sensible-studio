@@ -1,0 +1,125 @@
+// Search Forms: the filters of the Media search, and a preview of them.
+
+// the bar stays; the form and its preview scroll below it
+.studio-searchforms.studio-assets__profiles {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.studio-searchforms__body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 860px) 300px;
+  gap: 24px;
+  padding: 0 24px;
+}
+
+// each column scrolls on its own, as in an editor
+.studio-searchforms__editor {
+  min-height: 0;
+  overflow: auto;
+  padding: 20px 4px 32px 0;
+}
+
+// Media search or Pages search: the form being edited
+.studio-searchforms__switch {
+  margin-bottom: 12px;
+}
+
+.studio-searchforms__head {
+  margin-bottom: 16px;
+
+  h1 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--studio-text-strong);
+  }
+  p { margin: 0; }
+}
+
+.studio-searchforms__empty {
+  margin: 0 0 12px;
+  color: var(--studio-text-muted);
+}
+
+.studio-searchforms__list {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.studio-searchforms__facet {
+  border: 1px solid var(--studio-border);
+  border-radius: var(--studio-radius-md);
+  background: var(--studio-surface-raised);
+  padding: 8px 16px 16px;
+}
+
+.studio-searchforms__facet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+}
+
+.studio-searchforms__kind {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--studio-text-muted);
+}
+
+.studio-searchforms__tools { display: flex; gap: 2px; }
+
+.studio-searchforms__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px 16px;
+}
+
+.studio-searchforms__options {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+}
+
+.studio-searchforms__read {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.studio-searchforms__preview {
+  box-sizing: border-box;
+  align-self: start;
+  margin: 20px 0;
+  max-height: calc(100% - 40px);
+  overflow: auto;
+  border: 1px solid var(--studio-border);
+  border-radius: var(--studio-radius-md);
+  background: var(--studio-surface-panel);
+  padding: 16px;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  > p { margin: 0 0 12px; font-size: 13px; }
+}
+
+@media (max-width: 900px) {
+  .studio-searchforms__body { grid-template-columns: minmax(0, 1fr); padding: 0 16px; overflow: auto; }
+  // min-height auto: the row grows with the filters, so the preview comes after them instead of over them
+  .studio-searchforms__editor { overflow: visible; min-height: auto; padding: 16px 0 0; }
+  .studio-searchforms__preview { margin: 0 0 24px; max-height: none; }
+}

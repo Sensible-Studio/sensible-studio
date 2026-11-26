@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="sling:Folder">
+    <hero
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Hero (1920 wide)"
+        jcr:description="Full-width hero images, sharpened, WebP"
+        wid="1920"
+        fmt="webp"
+        qlt="80"
+        fit="fit"
+        op_usm="1.2,1,0"/>
+    <banner
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Banner (1600×500)"
+        jcr:description="Wide banners cropped to fit"
+        wid="1600"
+        hei="500"
+        fmt="webp"
+        qlt="80"
+        fit="crop"/>
+    <card
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Card (800×600)"
+        jcr:description="Teaser/card images, 4:3, cropped"
+        wid="800"
+        hei="600"
+        fmt="webp"
+        qlt="80"
+        fit="crop"/>
+    <square
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Square (600)"
+        jcr:description="Square tiles"
+        wid="600"
+        hei="600"
+        fmt="webp"
+        qlt="80"
+        fit="crop"/>
+    <portrait
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Portrait (600×800)"
+        jcr:description="Portrait 3:4, cropped"
+        wid="600"
+        hei="800"
+        fmt="webp"
+        qlt="80"
+        fit="crop"/>
+    <thumb
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Thumbnail (320)"
+        jcr:description="Small list thumbnails"
+        wid="320"
+        fmt="webp"
+        qlt="70"
+        fit="fit"/>
+    <avatar
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Avatar (128)"
+        jcr:description="Round-able avatar, square"
+        wid="128"
+        hei="128"
+        fmt="webp"
+        qlt="80"
+        fit="crop"/>
+    <web
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Web (1200, WebP)"
+        jcr:description="General web delivery"
+        wid="1200"
+        fmt="webp"
+        qlt="75"
+        fit="fit"/>
+    <web-hq
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Web HQ (2400, WebP)"
+        jcr:description="High-quality web delivery for retina"
+        wid="2400"
+        fmt="webp"
+        qlt="85"
+        fit="fit"/>
+    <email
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Email (600, JPEG)"
+        jcr:description="Email-safe JPEG"
+        wid="600"
+        fmt="jpg"
+        qlt="70"
+        fit="fit"/>
+    <og
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Open Graph (1200×630)"
+        jcr:description="Social share image"
+        wid="1200"
+        hei="630"
+        fmt="jpg"
+        qlt="80"
+        fit="crop"/>
+    <png-white
+        jcr:primaryType="nt:unstructured"
+        jcr:title="PNG on white"
+        jcr:description="PNG flattened on a white background"
+        wid="1200"
+        fmt="png"
+        fit="fit"
+        bgc="ffffff"/>
+</jcr:root>

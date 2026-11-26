@@ -1,0 +1,5 @@
+{
+  "cookie.name": "studio-login",
+  "timeout.minutes:Integer": 30,
+  "key.file": "login.key"
+}

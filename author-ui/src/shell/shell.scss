@@ -1,0 +1,1140 @@
+// The shell: one window for all of Studio. Rows: the dark bar with the tabs, the toolbar, the views.
+// Columns: the sidebar and the content. Same Spectrum look as the consoles; the views keep their own CSS
+// and only lose their `100vh` — inside the shell a view is as tall as the content cell.
+
+.studio-shellroot {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  // one column that never grows past the window: with many tabs the bar's content is wider than the
+  // window, and an `auto` column would take that width and push the views (and their × ) off screen
+  grid-template-columns: minmax(0, 1fr);
+  height: 100vh;
+  overflow: hidden;
+  background: var(--spectrum-global-color-gray-100);
+
+  // full screen: the content alone, over the whole window
+  &--full {
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ the bar
+
+// One bar in the theme's colours (--studio-bar-*, --studio-tab-*: theme/theme.scss): the mark, ‹ › ⌂, the tabs, +, the bell and the user. The tabs sit on the bar's
+// bottom edge and the active one joins the content below it, like a browser.
+.studio-shellbar {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+  height: 44px;
+  padding: 0 8px 0 10px;
+  color: var(--studio-bar-text);
+  background: var(--studio-bar-bg);
+  border-bottom: 1px solid var(--studio-bar-border);
+
+  // Spectrum's quiet buttons are drawn for a light surface
+  button[class*='spectrum-ActionButton'] {
+    color: var(--studio-bar-text);
+    background: transparent;
+    border-color: transparent;
+
+    svg {
+      color: inherit;
+    }
+
+    &:hover,
+    &[aria-expanded='true'] {
+      color: var(--studio-bar-text);
+      background: var(--studio-bar-hover);
+    }
+
+    &[disabled] {
+      color: var(--studio-bar-dim);
+      background: transparent;
+    }
+  }
+
+  &[hidden] {
+    display: none;
+  }
+
+  &__brand {
+    display: flex;
+    flex: none;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  &__mark {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--studio-mark-text);
+    background: var(--studio-mark-bg);
+    border-radius: 7px;
+  }
+
+  &__nav {
+    display: flex;
+    flex: none;
+    gap: 0;
+    align-items: center;
+    padding-right: 4px;
+    margin-right: 4px;
+    border-right: 1px solid var(--studio-bar-rule);
+  }
+
+  &__actions {
+    display: flex;
+    flex: none;
+    gap: 2px;
+    align-items: center;
+  }
+
+  &__avatar {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--studio-avatar-text);
+    background: var(--studio-avatar-bg);
+    border-radius: 50%;
+  }
+}
+
+.studio-tabs {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 4px;
+  align-items: flex-end;
+  min-width: 0;
+  padding-top: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &__new {
+    align-self: center;
+    margin-left: 2px;
+  }
+}
+
+.studio-tab {
+  position: relative;
+  display: flex;
+  flex: 0 1 200px;
+  gap: 6px;
+  align-items: center;
+  min-width: 90px;
+  max-width: 220px;
+  height: 32px;
+  padding: 0 4px 0 12px;
+  margin-bottom: -1px;
+  font-size: 13px;
+  color: var(--studio-bar-text);
+  cursor: default;
+  user-select: none;
+  background: var(--studio-tab-idle-bg);
+  border: 1px solid var(--studio-tab-idle-border);
+  border-bottom: 0;
+  border-radius: var(--studio-radius-md) var(--studio-radius-md) 0 0;
+
+  &:hover {
+    background: var(--studio-tab-hover-bg);
+  }
+
+  // the active tab is the surface of the tool bar under it
+  &.is-active,
+  &.is-active:hover {
+    font-weight: 600;
+    color: var(--studio-tab-active-text);
+    background: var(--studio-tab-active-bg);
+    border-color: var(--studio-tab-active-border);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--studio-bar-focus);
+    outline-offset: -2px;
+  }
+
+  &__title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__close {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    opacity: 0;
+
+    svg {
+      width: 10px;
+      height: 10px;
+    }
+  }
+
+  &:hover &__close,
+  &.is-active &__close,
+  &__close:focus-visible {
+    opacity: 0.7;
+  }
+
+  &__full svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  &__close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    opacity: 1;
+  }
+}
+
+// the tab's context menu
+.studio-toolcrumbs__more {
+  margin-left: 2px;
+}
+
+.studio-toolcrumbs {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  min-width: 0;
+  height: 56px;
+
+  > .studio-crumbs {
+    min-width: 0;
+    margin-right: 0;
+  }
+}
+
+.studio-toolcrumbs__menu {
+  min-width: 280px;
+  max-width: 360px;
+}
+
+.studio-tabmenu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 180px;
+  padding: 4px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--spectrum-global-color-gray-800);
+  list-style: none;
+  background: var(--spectrum-global-color-gray-50, var(--studio-neutral-0));
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 6px 10px;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: default;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+
+    &:hover:not(:disabled) {
+      background: var(--spectrum-global-color-gray-200);
+    }
+
+    &:disabled {
+      color: var(--spectrum-global-color-gray-500);
+    }
+  }
+
+  &__sep {
+    height: 1px;
+    margin: 4px 6px;
+    background: var(--spectrum-global-color-gray-300);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ toolbar
+
+// Where a console is: a path in its own box, apart from the controls around it. Too long, it is
+// cut from the left (the end is where you are), with a fade and ‹ › to scroll.
+.studio-segmented {
+  display: inline-flex;
+  flex: none;
+  padding: 2px;
+  background: var(--spectrum-global-color-gray-200);
+  border-radius: 8px;
+
+  > a,
+  > button {
+    padding: 4px 12px;
+    margin: 0;
+    font: inherit;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--spectrum-global-color-gray-700);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-radius: 6px;
+
+    &:hover {
+      color: var(--spectrum-global-color-gray-900);
+    }
+
+    &.is-current {
+      font-weight: 700;
+      color: var(--spectrum-global-color-gray-900);
+      background: var(--spectrum-global-color-gray-50);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+    }
+  }
+}
+
+.studio-crumbs {
+  display: flex;
+  flex: 0 1 auto;
+  gap: 2px;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  height: 30px;
+  padding: 0;
+  margin: 0 12px;
+  font-size: 13px;
+  white-space: nowrap;
+  background: transparent;
+  border: 0;
+
+  &__track {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    &.is-cut-left {
+      mask-image: linear-gradient(to right, transparent, #000 28px);
+    }
+
+    &.is-cut-right {
+      mask-image: linear-gradient(to left, transparent, #000 28px);
+    }
+
+    &.is-cut-left.is-cut-right {
+      mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+    }
+  }
+
+  &__scroll {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 20px;
+    height: 24px;
+    padding: 0;
+    color: var(--spectrum-global-color-gray-700);
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--spectrum-global-color-gray-200);
+    }
+
+    svg {
+      width: 10px;
+      height: 10px;
+    }
+  }
+
+  &__sep {
+    color: var(--spectrum-global-color-gray-600);
+  }
+
+  &__link {
+    padding: 0;
+    font: inherit;
+    color: var(--spectrum-global-color-gray-800);
+    text-decoration: none;
+    cursor: pointer;
+    background: none;
+    border: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__home {
+    flex: none;
+    margin-right: 2px;
+  }
+
+  &__current {
+    font-weight: 600;
+    color: var(--spectrum-global-color-gray-900);
+  }
+
+  &__copy {
+    flex: none;
+    margin-left: 4px;
+  }
+}
+
+// ------------------------------------------------------------------------------------------ content
+
+// the sidebar (when shown) beside the tabs' views
+.studio-shellbody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+
+  &--sidebar {
+    grid-template-columns: 250px minmax(0, 1fr);
+  }
+
+  // a narrow window has no room for a map beside the view
+  @media (max-width: 720px) {
+    &--sidebar {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .studio-sidebar {
+      display: none;
+    }
+  }
+}
+
+.studio-sidebar {
+  min-height: 0;
+  padding-top: 4px;
+  overflow: auto;
+  background: var(--spectrum-global-color-gray-75);
+  border-right: 1px solid var(--spectrum-global-color-gray-300);
+
+  .studio-tree {
+    font-size: 13px;
+  }
+
+  &__search {
+    padding: 4px 12px 6px;
+  }
+
+  &__results {
+    padding: 0 8px 10px;
+  }
+
+  .studio-tree__row {
+    height: 28px;
+    border-radius: 6px;
+  }
+}
+
+.studio-tab.is-dragging {
+  opacity: 0.4;
+}
+
+.studio-tab.is-over {
+  box-shadow: inset 2px 0 0 var(--spectrum-global-color-blue-500);
+}
+
+.studio-shell-content {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+
+.studio-tabhost {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+
+  // split view: two panes side by side, each a full console, with a handle between them
+  &--split {
+    display: flex;
+  }
+
+  &[hidden] {
+    display: none;
+  }
+
+  // the views were full-window screens; in a tab they fill the content cell instead
+  > .studio-app,
+  > .studio-sites,
+  > .studio-start,
+  > .studio-pp,
+  > .studio-cfc,
+  > .studio-cf,
+  > .studio-wfe,
+  > .studio-assets.studio-assets-console {
+    height: 100%;
+  }
+
+  > .studio-assets--editor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  // a wizard covered the window; in a tab it covers the content cell
+  > .studio-wizard {
+    position: absolute;
+  }
+
+  // the Assets selection / details bar covered the product bar; in a tab it covers the console's own
+  // header, never the shell's bar with the tabs
+  .studio-assets__selectionbar {
+    position: absolute;
+  }
+}
+
+// The controls every document screen ends its top bar with (shell/CloseButton): full screen and ×,
+// pinned to the right end.
+.studio-closebtn {
+  display: inline-flex;
+  flex: none;
+  gap: 2px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.studio-window-control {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--studio-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--studio-radius-sm);
+
+  &:hover:not(:disabled) {
+    color: var(--studio-text);
+    background: var(--studio-surface-hover);
+    border-color: var(--studio-border);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--studio-focus);
+    outline-offset: 1px;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: .45;
+  }
+}
+
+// ------------------------------------------------------------------------------------- screen frame
+// One placement model across Pages, the page editor, Media, asset details, and image editing.
+.studio-screenframe {
+  display: grid;
+  flex: none;
+  grid-template-columns: auto minmax(140px, 1fr) auto auto auto auto;
+  gap: var(--studio-space-4);
+  align-items: center;
+  min-width: 0;
+  height: 56px;
+  padding: 0 var(--studio-space-4);
+  color: var(--studio-bar-text);
+  background: var(--studio-bar-bg);
+  border-bottom: 1px solid var(--studio-bar-border);
+  box-shadow: var(--studio-shadow-1);
+
+  &__navigation,
+  &__identity,
+  &__tools,
+  &__actions,
+  &__primary,
+  &__window {
+    display: flex;
+    gap: var(--studio-space-2);
+    align-items: center;
+    min-width: 0;
+  }
+
+  &__identity {
+    overflow: hidden;
+  }
+
+  &__navigation { grid-column: 1; }
+  &__identity { grid-column: 2; }
+  &:not(:has(> &__navigation)) > &__identity { grid-column: 1 / 3; }
+  &__tools { grid-column: 3; }
+  &__actions { grid-column: 4; }
+  &__primary { grid-column: 5; }
+  &__window { grid-column: 6; }
+
+  &__tools,
+  &__actions,
+  &__primary,
+  &__window {
+    padding-left: var(--studio-space-4);
+    border-left: 1px solid var(--studio-bar-rule);
+  }
+
+  &__window .studio-closebtn {
+    margin-left: 0;
+  }
+
+  h1 {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: var(--studio-type-md);
+    font-weight: 600;
+    line-height: var(--studio-leading-tight);
+    color: var(--studio-bar-text);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  [class*='spectrum-ActionButton'] {
+    color: inherit;
+  }
+
+  // the one accent button keeps its own text colour
+  &__primary [class*='spectrum-Button'] {
+    color: var(--studio-neutral-0);
+  }
+
+  [aria-pressed='false'] {
+    color: inherit;
+    background: transparent;
+    border: 1px solid transparent;
+
+    &:hover {
+      background: var(--studio-bar-hover);
+    }
+  }
+
+  [aria-pressed='true'] {
+    color: var(--studio-text-strong);
+    background: var(--studio-surface-sunken);
+    border: 1px solid var(--studio-border);
+    box-shadow: none;
+  }
+}
+
+.studio-selbar [aria-pressed='false'] {
+  color: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+
+  &:hover {
+    background: var(--studio-surface-hover);
+  }
+}
+
+.studio-selbar [aria-pressed='true'] {
+  color: var(--studio-text-strong);
+  background: var(--studio-surface-sunken);
+  border: 1px solid var(--studio-border);
+  box-shadow: none;
+}
+
+@media (max-width: 1100px) {
+  .studio-screenframe {
+    grid-template-columns: auto minmax(120px, 1fr) auto auto auto auto;
+
+    &__actions {
+      display: none;
+    }
+  }
+}
+
+// A console whose next place is loading keeps the last one on screen, a little faded, instead of a
+// spinner: entering a folder must not look like a page reload.
+.studio-sites__content.is-loading,
+.studio-cfc__content.is-loading,
+.studio-assets__content.is-loading {
+  opacity: 0.6;
+  transition: opacity 0.15s ease 0.1s;
+}
+
+// ------------------------------------------------------------------------------------------ panes
+
+.studio-pane {
+  position: relative;
+  display: flex;
+  flex: 1 1 50%;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+
+  &--only {
+    flex-basis: 100%;
+    height: 100%;
+  }
+
+  > * {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  // the focused pane of a split tab: a thin line at its top (Back, Forward and the URL belong to it)
+  .studio-tabhost--split > &::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 5;
+    height: 2px;
+    pointer-events: none;
+    content: '';
+    background: transparent;
+  }
+
+  .studio-tabhost--split > &.is-focused::after {
+    background: var(--spectrum-global-color-blue-500);
+  }
+}
+
+.studio-splithandle {
+  flex: none;
+  width: 6px;
+  cursor: col-resize;
+  background: var(--spectrum-global-color-gray-200);
+  border-right: 1px solid var(--spectrum-global-color-gray-300);
+  border-left: 1px solid var(--spectrum-global-color-gray-300);
+
+  &:hover {
+    background: var(--spectrum-global-color-gray-300);
+  }
+}
+
+// ------------------------------------------------------------------------------ the selection bar
+// (SelectionBar.tsx; DESIGN.md "Selection bar".) As tall as a console's tool bar, so nothing below
+// moves; neutral, with a stronger bottom edge. The mode is told by the left cluster.
+
+.studio-selbar {
+  display: flex;
+  flex: none;
+  gap: var(--studio-space-5);
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  height: 56px;
+  padding: 0 var(--studio-space-5);
+  background: var(--studio-surface-raised);
+  border-bottom: 1px solid var(--studio-border-strong);
+
+  &__start,
+  &__actions {
+    display: flex;
+    gap: var(--studio-space-3);
+    align-items: center;
+    min-width: 0;
+  }
+
+  &__start {
+    flex: none;
+  }
+
+  // the actions take the rest of the bar and fill it from the right; what does not fit is under More
+  &__actions {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+
+  &__end {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+  }
+
+  // a group (Create ▾, Restore ▾): one button with a menu, looking like the others
+  &__groupwrap {
+    display: inline-flex;
+    flex: none;
+  }
+
+  &__group[class*='spectrum-ActionButton'] {
+    min-width: 0;
+    height: 30px;
+    padding: 0 10px;
+
+  }
+
+  // the caret after a group's name: it opens a menu (not ::after, which is Spectrum's focus ring)
+  &__caret {
+    flex: none;
+    order: 10;
+    width: 0;
+    height: 0;
+    margin-left: 6px;
+    border-top: 5px solid currentColor;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+  }
+
+  &__mode {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+
+  &__label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--studio-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  &__count {
+    font-size: var(--studio-type-md);
+    font-weight: 600;
+    color: var(--studio-text-strong);
+    white-space: nowrap;
+  }
+
+  &__btn {
+    display: inline-flex;
+    flex: none;
+    gap: var(--studio-space-3);
+    align-items: center;
+    height: 30px;
+    padding: 0 10px;
+    font-size: var(--studio-type-md);
+    font-weight: 500;
+    color: var(--studio-text);
+    white-space: nowrap;
+    cursor: default;
+    background: var(--studio-surface-panel);
+    border: 1px solid var(--studio-border);
+    border-radius: var(--studio-radius-sm);
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    kbd {
+      font: inherit;
+      font-size: var(--studio-type-xs);
+      color: var(--studio-text-faint);
+    }
+
+    &:hover:not(:disabled) {
+      background: var(--studio-surface-hover);
+      border-color: var(--studio-border-strong);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--studio-focus-ring);
+    }
+
+    &:disabled {
+      color: var(--studio-text-faint);
+    }
+
+    // the one leading action
+    &.is-leading {
+      font-weight: 600;
+      color: var(--studio-neutral-0);
+      background: var(--studio-accent-700);
+      border-color: var(--studio-accent-700);
+
+      kbd {
+        color: var(--studio-accent-200);
+      }
+
+      &:hover:not(:disabled) {
+        background: var(--studio-accent-800);
+        border-color: var(--studio-accent-800);
+      }
+    }
+  }
+}
+
+// a pill: a fact about the subject, in a word or two (DESIGN.md "Pills and status")
+.studio-pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 1px 8px;
+  overflow: hidden;
+  font-size: var(--studio-type-xs);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--studio-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: var(--studio-surface-sunken);
+  border: 1px solid var(--studio-border);
+  border-radius: var(--studio-radius-pill);
+
+  &--accent,
+  &--info {
+    color: var(--studio-info-strong);
+    background: var(--studio-info-surface);
+    border-color: color-mix(in srgb, var(--studio-info) 30%, transparent);
+  }
+
+  &--published,
+  &--success {
+    color: var(--studio-success-strong);
+    background: var(--studio-success-surface);
+    border-color: color-mix(in srgb, var(--studio-success) 30%, transparent);
+  }
+
+  &--modified,
+  &--warning {
+    color: var(--studio-warning-strong);
+    background: var(--studio-warning-surface);
+    border-color: color-mix(in srgb, var(--studio-warning) 30%, transparent);
+  }
+
+  &--danger {
+    color: var(--studio-danger-strong);
+    background: var(--studio-danger-surface);
+    border-color: color-mix(in srgb, var(--studio-danger) 30%, transparent);
+  }
+}
+
+// ---------------------------------------------------------------------- product-wide standard pieces
+.studio-feedback {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--studio-space-3);
+  min-height: 240px;
+  padding: var(--studio-space-8);
+  text-align: center;
+  color: var(--studio-text-muted);
+
+  &__icon { color: var(--studio-text-faint); }
+  h2 { margin: 0; color: var(--studio-text-strong); font-size: var(--studio-type-xl); }
+  p { max-width: 520px; margin: 0; }
+  &--error .studio-feedback__icon { color: var(--studio-danger); }
+  &--loading { display: flex; min-height: 180px; }
+}
+
+.studio-settings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--studio-space-6); padding: var(--studio-space-7); }
+.studio-settings-card { display: flex; flex-direction: column; gap: var(--studio-space-5); padding: var(--studio-space-6); background: var(--studio-surface-raised); border: 1px solid var(--studio-border); border-radius: var(--studio-radius-md); box-shadow: var(--studio-shadow-1); }
+.studio-settings-card > header { display: flex; justify-content: space-between; gap: var(--studio-space-5); }
+.studio-settings-card h2 { margin: 0; font-size: var(--studio-type-lg); color: var(--studio-text-strong); }
+.studio-settings-card p { margin: var(--studio-space-2) 0 0; color: var(--studio-text-muted); }
+.studio-settings-card > footer { display: flex; gap: var(--studio-space-3); margin-top: auto; padding-top: var(--studio-space-4); border-top: 1px solid var(--studio-border-subtle); }
+.studio-facts { display: grid; gap: 0; margin: 0; }
+.studio-facts > div { display: grid; grid-template-columns: minmax(110px, 36%) 1fr; gap: var(--studio-space-5); padding: var(--studio-space-3) 0; border-bottom: 1px solid var(--studio-border-subtle); }
+.studio-facts dt { color: var(--studio-text-muted); }
+.studio-facts dd { margin: 0; color: var(--studio-text-strong); overflow-wrap: anywhere; }
+
+.studio-inspector-shell { display: flex; flex: none; flex-direction: column; width: 340px; min-height: 0; background: var(--studio-surface-panel); border-left: 1px solid var(--studio-border); }
+.studio-inspector-shell > header { padding: var(--studio-space-5) var(--studio-space-6); border-bottom: 1px solid var(--studio-border); }
+.studio-inspector-shell__top { display: flex; align-items: center; justify-content: space-between; font-size: var(--studio-type-xs); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--studio-text-muted); }
+.studio-inspector-shell h2 { margin: var(--studio-space-2) 0; font-size: var(--studio-type-2xl); color: var(--studio-text-strong); }
+.studio-inspector-shell header p { margin: 0; overflow: hidden; color: var(--studio-text-muted); text-overflow: ellipsis; white-space: nowrap; }
+.studio-inspector-shell__body { flex: 1; min-height: 0; overflow: auto; }
+.studio-inspector-shell__section { padding: var(--studio-space-6); border-bottom: 1px solid var(--studio-border); }
+.studio-inspector-shell__section > h3 { margin: 0 0 var(--studio-space-5); font-size: var(--studio-type-xs); color: var(--studio-text-muted); text-transform: uppercase; letter-spacing: .08em; }
+
+.studio-form-page { display: flex; flex-direction: column; height: 100%; min-height: 0; background: var(--studio-surface-canvas); }
+.studio-form-page .studio-screenframe__identity,
+.studio-wizard .studio-screenframe__identity { padding-left: var(--studio-space-5); }
+.studio-form-page__identity { display: grid; grid-template-columns: minmax(0, auto) auto; gap: var(--studio-space-2) var(--studio-space-4); align-items: center; min-width: 0; }
+.studio-form-page__identity > span { grid-column: 1 / -1; font-size: var(--studio-type-xs); font-weight: 600; color: var(--studio-text-muted); text-transform: uppercase; letter-spacing: .08em; }
+.studio-form-page__identity h1 { grid-column: 1; }
+.studio-form-page__identity em { grid-column: 2; }
+.studio-form-page__path { display: flex; grid-column: 1 / -1; min-width: 0; color: var(--studio-text-muted); white-space: nowrap; }
+.studio-form-page__path > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.studio-form-page__path > span:last-child { flex: none; }
+.studio-form-page__tabs { display: flex; flex: none; gap: var(--studio-space-2); min-height: 44px; padding: 0 var(--studio-space-7); background: var(--studio-surface-panel); border-bottom: 1px solid var(--studio-border); }
+.studio-form-page__tabs button { padding: 0 var(--studio-space-4); font: inherit; color: var(--studio-text-muted); background: none; border: 0; border-bottom: 2px solid transparent; }
+.studio-form-page__tabs button[aria-current] { color: var(--studio-text-strong); border-bottom-color: var(--studio-accent-700); }
+.studio-form-page__layout { display: grid; grid-template-columns: minmax(0, 720px); justify-content: center; flex: 1; min-height: 0; overflow: auto; padding: var(--studio-space-7); }
+.studio-form-page.is-wide .studio-form-page__layout { grid-template-columns: minmax(0, 1040px); }
+// A form page whose body is a workspace (a form beside a live preview): edge to edge, the body fills the height.
+.studio-form-page.is-full .studio-form-page__layout { grid-template-columns: minmax(0, 1fr); padding: 0; overflow: hidden; }
+.studio-form-page.is-full .studio-form-page__layout > main { display: flex; flex-direction: column; min-height: 0; }
+.studio-form-page__layout:has(> aside) { grid-template-columns: 260px minmax(0, 720px); gap: var(--studio-space-7); }
+.studio-form-page__error { padding: var(--studio-space-4) var(--studio-space-7); color: var(--studio-danger-strong); background: var(--studio-danger-surface); border-bottom: 1px solid var(--studio-danger); }
+.studio-form-section { padding: var(--studio-space-6) 0; border-bottom: 1px solid var(--studio-border); }
+.studio-form-section > header h2 { margin: 0; font-size: var(--studio-type-lg); color: var(--studio-text-strong); }
+.studio-form-section > header p { margin: var(--studio-space-2) 0 0; color: var(--studio-text-muted); }
+.studio-form-section > div { display: grid; gap: var(--studio-space-5); margin-top: var(--studio-space-6); }
+
+.studio-data-table { overflow: auto; }
+// :where keeps this at zero specificity, so a table with side margins can set its own width (calc(100% - …))
+:where(.studio-data-table table, table.studio-table) { width: 100%; border-collapse: collapse; }
+.studio-data-table th, table.studio-table th { height: 40px; padding: 0 var(--studio-space-5); font-size: var(--studio-type-xs); font-weight: 600; color: var(--studio-text-muted); text-align: left; text-transform: uppercase; letter-spacing: .06em; background: var(--studio-surface-panel); border-bottom: 1px solid var(--studio-border); }
+.studio-data-table td, table.studio-table td { height: 44px; padding: 0 var(--studio-space-5); border-bottom: 1px solid var(--studio-border-subtle); }
+.studio-data-table tbody tr:hover, table.studio-table tbody tr:hover { background: var(--studio-surface-hover); }
+
+// Fit of the form-page identity in the 56px frame: kind above; subject, state and path on one row.
+.studio-form-page__identity { grid-template-columns: auto auto minmax(0, 1fr); gap: 1px var(--studio-space-4); line-height: 1.25; }
+.studio-form-page__identity > span { line-height: 1.2; }
+.studio-form-page__identity h1 { grid-column: 1; grid-row: 2; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.studio-form-page__identity em { grid-column: 2; grid-row: 2; justify-self: start; font-style: normal; }
+.studio-form-page__path { grid-column: 3; grid-row: 2; font-size: var(--studio-type-sm); }
+.studio-form-page__layout [class*='spectrum-Field']:not([class*='spectrum-InputGroup']) { width: 100%; max-width: 100%; }
+// a combo box is a field with an inner field: the inner one fills the group, or its text has no room
+.studio-form-page__layout [class*='spectrum-InputGroup'] { max-width: 100%; }
+.studio-form-page__layout [class*='spectrum-InputGroup-field'] { flex: 1 1 auto; width: auto; min-width: 0; }
+.studio-form-page__layout [class*='spectrum-InputGroup-field'] [class*='spectrum-Textfield'],
+.studio-form-page__layout [class*='spectrum-InputGroup-field'] input { width: 100%; }
+.studio-form-page__layout [class*='spectrum-FieldLabel'] { width: auto; white-space: nowrap; }
+
+// Facts in a settings card: label column, value wraps; nothing collapses to a letter per line.
+.studio-facts { display: grid; gap: var(--studio-space-3); margin: 0; }
+.studio-facts > div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: var(--studio-space-4); align-items: baseline; }
+.studio-facts dt { font-size: var(--studio-type-sm); color: var(--studio-text-muted); }
+.studio-facts dd { min-width: 0; margin: 0; overflow-wrap: anywhere; color: var(--studio-text); }
+.studio-facts code { font-size: var(--studio-type-sm); overflow-wrap: anywhere; }
+.studio-settings-grid { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
+.studio-settings-card > header > div:first-child { min-width: 0; }
+.studio-settings-card__status { flex: none; font-size: var(--studio-type-sm); color: var(--studio-text-muted); white-space: nowrap; }
+.studio-settings-card > footer { flex-wrap: wrap; }
+.studio-screenframe__identity:has(> .studio-form-page__identity) { padding-left: var(--studio-space-5); }
+
+// The inspector shell fills the column its screen gives it; padding never pushes it wider.
+.studio-inspector-shell { box-sizing: border-box; max-width: 100%; }
+.studio-cf__props.studio-inspector-shell { width: auto; min-width: 0; overflow-x: hidden; }
+.studio-cf__props.studio-inspector-shell [class*='spectrum-Field'] { max-width: 100%; }
+
+// Asset details has the longest bar: from a laptop width up its labels stay whole; the count gives way first.
+@media (min-width: 1240px) {
+  .studio-assets__details > .studio-screenframe {
+    gap: var(--studio-space-2);
+
+    .studio-screenframe__actions,
+    .studio-screenframe__primary,
+    .studio-screenframe__window { min-width: max-content; }
+    .studio-screenframe__actions > * { flex: none; }
+  }
+}
+@media (max-width: 1480px) {
+  .studio-assets__details > .studio-screenframe .studio-assets__count,
+  .studio-assets__details > .studio-screenframe .studio-screenframe__actions em { display: none; }
+}
+.studio-screenframe > .studio-screenframe__identity:first-child { padding-left: var(--studio-space-4); }
+.studio-inspector__toggle [class*='spectrum-ActionButton-label'] { font-size: var(--studio-type-sm); }
+
+// The breadcrumb sits on the bar now (no box of its own), so it reads the bar's colours in every scheme.
+.studio-screenframe .studio-crumbs {
+  .studio-crumbs__link,
+  .studio-crumbs__scroll,
+  .studio-crumbs__copy { color: var(--studio-bar-text); opacity: .82; }
+  .studio-crumbs__link:hover { opacity: 1; background: var(--studio-bar-hover); }
+  .studio-crumbs__sep { color: var(--studio-bar-dim); }
+  .studio-crumbs__current { color: var(--studio-bar-text); opacity: 1; }
+}
+.studio-screenframe .studio-toolcrumbs__more { color: var(--studio-bar-text); }
+.studio-screenframe .studio-form-page__identity > span,
+.studio-screenframe .studio-form-page__path { color: var(--studio-bar-dim); }
+.studio-screenframe .studio-form-page__identity h1 { color: var(--studio-bar-text); }
+
+// Wizard steps: the current number reads on its accent dot; done steps get a quiet tick of colour.
+.studio-wizard__rail li.is-current > span { color: var(--studio-neutral-0); background: var(--studio-accent-700); border-color: var(--studio-accent-700); font-weight: 600; }
+.studio-wizard__rail li.is-done > span { color: var(--studio-accent-700); border-color: var(--studio-accent-700); }
+.studio-wizard__rail li.is-current { font-weight: 600; color: var(--studio-text-strong); }
+
+// A primary built as a menu button (Media's Create) is the same filled action as any other primary.
+.studio-screenframe__primary > [class*='spectrum-ActionButton'],
+.studio-screenframe__primary .studio-assets__create {
+  height: 32px;
+  color: var(--studio-neutral-0);
+  background: var(--studio-accent-700);
+  border: 1px solid var(--studio-accent-700);
+  border-radius: var(--studio-radius-sm);
+  font-weight: 600;
+
+  &:hover:not([disabled]),
+  &[aria-expanded='true'] { color: var(--studio-neutral-0); background: var(--studio-accent-800); border-color: var(--studio-accent-800); }
+  svg { fill: currentColor; }
+  [class*='spectrum-ActionButton-label'] { color: inherit; }
+}
+
+// Column headers stay on one line; a heading in two rows makes every table header a different height.
+.studio-theme [role='columnheader'] { white-space: nowrap; }
+// Links inside our screens read as the product's, not the browser's.
+.studio-theme [class*='spectrum-Link'] { color: var(--studio-accent-700); text-decoration-color: color-mix(in srgb, var(--studio-accent-700) 40%, transparent); text-underline-offset: 2px; }
+.studio-theme [class*='spectrum-Link']:hover { color: var(--studio-accent-800); text-decoration-color: currentColor; }
+
+// In a combo box the chevron is a 32px button and the text field takes the rest. (The rule that
+// widens form fields also matched the chevron — its class is spectrum-FieldButton — and left the text no room.)
+.studio-form-page__layout [class*='spectrum-InputGroup'] > [class*='spectrum-InputGroup-field'] { flex: 1 1 0%; width: auto; }
+.studio-form-page__layout [class*='spectrum-InputGroup'] > button { flex: 0 0 32px; width: 32px; max-width: 32px; }
+.studio-form-page__layout [class*='spectrum-InputGroup-field'] > [class*='spectrum-Textfield'] { width: 100%; min-width: 0; }
+.studio-form-page__layout [class*='spectrum-InputGroup-input'] { width: 100%; }
+
+// The family switch keeps its word; when the bar is tight it is the path that scrolls, not "Tools" that is cut.
+.studio-screenframe .studio-toolcrumbs__more { flex: none; }
+.studio-screenframe .studio-toolcrumbs > .studio-crumbs { flex: 0 1 auto; }
+// Plain links in a screen's content (a source page, a copy) read as the product's.
+.studio-sites :is(main, section, article, p, dd, td) > a:not([class]),
+.studio-sites p a:not([class]) { color: var(--studio-accent-700); text-decoration-color: color-mix(in srgb, var(--studio-accent-700) 40%, transparent); text-underline-offset: 2px; }
+.studio-sites p a:not([class]):hover { color: var(--studio-accent-800); text-decoration-color: currentColor; }
+
+// Narrow windows: a tool's path keeps only where you are. Home (the product bar has it) and the copy-path
+// button give their room to the current title, which would otherwise scroll out of sight.
+@media (max-width: 900px) {
+  .studio-screenframe .studio-toolcrumbs .studio-crumbs > .studio-crumbs__home,
+  .studio-screenframe .studio-toolcrumbs .studio-crumbs > button[class*='spectrum-ActionButton'] { display: none; }
+  .studio-screenframe .studio-toolcrumbs .studio-crumbs__track { min-width: 72px; }
+  .studio-screenframe .studio-toolcrumbs .studio-crumbs__track > .studio-crumbs__sep:first-child { display: none; }
+}
+
+// Phone widths: only where you are, from its start, cut with an ellipsis (the path scrolled under the family
+// switch before, and the two were drawn over each other); the switch keeps its arrow, and a long primary
+// action is cut the same way instead of running under the window controls.
+@media (max-width: 600px) {
+  .studio-screenframe .studio-toolcrumbs { flex: 1 1 auto; }
+  .studio-screenframe .studio-toolcrumbs > .studio-crumbs { flex: 1 1 auto; min-width: 40px; overflow: hidden; }
+  .studio-screenframe .studio-toolcrumbs .studio-crumbs__scroll,
+  .studio-screenframe .studio-toolcrumbs .studio-crumbs__track > .studio-crumbs__link,
+  .studio-screenframe .studio-toolcrumbs .studio-crumbs__track > .studio-crumbs__sep { display: none; }
+  .studio-screenframe .studio-toolcrumbs .studio-crumbs__track { flex: 1 1 auto; min-width: 0; overflow: hidden; -webkit-mask-image: none; mask-image: none; }
+  .studio-screenframe .studio-toolcrumbs .studio-crumbs__current { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .studio-screenframe .studio-toolcrumbs__more { min-width: 28px; padding-inline: 2px; }
+  .studio-screenframe .studio-toolcrumbs__more [class*='spectrum-ActionButton-label'] { display: none; }
+  .studio-screenframe > .studio-screenframe__primary { flex: 0 1 auto; min-width: 0; }
+  .studio-screenframe > .studio-screenframe__primary > button { min-width: 0; max-width: 100%; }
+  .studio-screenframe > .studio-screenframe__primary > button [class*='-label'] { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+// Column view with the details open: the columns take only their own width and the details follow the last
+// column, like a preview column, instead of sitting at the far edge of a wide window. When the columns need
+// more room than there is, they shrink and scroll and the panel is at the edge again.
+.studio-sites__content.is-hugging,
+.studio-assets__content.is-hugging { flex: 0 1 auto; min-width: 0; }
+.studio-sites__content.is-hugging + *,
+.studio-assets__content.is-hugging + * { border-right: 1px solid var(--studio-border); }

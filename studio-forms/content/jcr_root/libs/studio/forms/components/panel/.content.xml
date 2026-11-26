@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0"
+    jcr:primaryType="cq:Component"
+    jcr:title="Panel"
+    jcr:description="A section of the form: a heading over a group of fields. One step when the form has steps."
+    componentGroup="Forms"
+    cq:isContainer="{Boolean}true"
+    sling:resourceSuperType="wcm/foundation/components/responsivegrid"/>

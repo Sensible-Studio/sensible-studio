@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0"
+    jcr:primaryType="cq:Page">
+    <jcr:content
+        cq:template="/conf/global/settings/wcm/templates/form"
+        jcr:primaryType="cq:PageContent"
+        jcr:title="Book a trip"
+        sling:resourceType="studio/forms/components/formpage">
+        <root
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="studio/forms/components/form"
+            layout="responsiveGrid"
+            steps="{Boolean}true"
+            afterSubmit="message"
+            thankYou="Booked — we will confirm by email.">
+            <about jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/panel" title="About you" layout="responsiveGrid">
+                <name jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/textfield" name="name" label="Your name" required="{Boolean}true"/>
+                <email jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/email" name="email" label="Email" required="{Boolean}true"/>
+            </about>
+            <trip jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/panel" title="Your trip" layout="responsiveGrid">
+                <destination jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/dropdown" name="destination" label="Destination" required="{Boolean}true" options="[Mont Blanc,Bali,Yosemite]"/>
+                <travellers jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/number" name="travellers" label="Travellers" min="{Long}1" max="{Long}12"/>
+                <when jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/date" name="when" label="When do you want to go?" required="{Boolean}true"/>
+                <passport jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/fileupload" name="passport" label="A scan of your passport" accept=".pdf,image/*" maxSize="{Long}2"/>
+            </trip>
+            <submit jcr:primaryType="nt:unstructured" sling:resourceType="studio/forms/components/submit" label="Book"/>
+        </root>
+    </jcr:content>
+</jcr:root>

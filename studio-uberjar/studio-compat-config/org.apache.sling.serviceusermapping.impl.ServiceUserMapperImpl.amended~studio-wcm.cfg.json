@@ -1,0 +1,5 @@
+{
+  "user.mapping": [
+    "io.sensible.studio.cq.impl:clientlibs=[studio-wcm-service]"
+  ]
+}

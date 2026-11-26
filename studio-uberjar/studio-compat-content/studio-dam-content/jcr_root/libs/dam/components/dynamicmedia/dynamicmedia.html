@@ -1,0 +1,69 @@
+<!--/* Sensible Studio Responsive Image component: see dynamicmedia.js for the URLs and the image map. */-->
+<sly data-sly-use.dm="dynamicmedia.js"/>
+<!--/* The areas of a picture's map (one layer per breakpoint) and the record cards they open. */-->
+<template data-sly-template.map="${@ layers, cards}">
+    <div data-sly-repeat.layer="${layers}" class="studio-dynamicmedia__areas" data-layer="${layer.index}" data-breakpoint="${layer.name}">
+        <sly data-sly-repeat.area="${layer.areas}">
+            <a data-sly-test="${!area.card}" href="${area.href}" target="${area.target}" rel="${area.rel}"
+               title="${area.alt}" aria-label="${area.alt}" style="${area.style @ context='unsafe'}"></a>
+            <button data-sly-test="${area.card}" type="button" popovertarget="${area.card}"
+                    title="${area.alt}" aria-label="${area.alt}" style="${area.style @ context='unsafe'}"></button>
+        </sly>
+    </div>
+    <div data-sly-repeat.card="${cards}" popover id="${card.id}" class="studio-dynamicmedia__card" aria-label="${card.label}">
+        <img data-sly-test="${card.image}" src="${card.image}" alt="" loading="lazy"/>
+        <h3 data-sly-test="${card.title}">${card.title}</h3>
+        <p data-sly-test="${card.description}">${card.description}</p>
+        <sly data-sly-repeat.t="${card.texts}">
+            <div data-sly-test="${t.html}"><span data-sly-test="${t.label}" class="studio-dynamicmedia__label">${t.label}</span>${t.html @ context='html'}</div>
+            <p data-sly-test="${t.text}"><span data-sly-test="${t.label}" class="studio-dynamicmedia__label">${t.label}</span>${t.text}</p>
+        </sly>
+    </div>
+</template>
+<!--/* The button that opens a picture large, and the large picture (fetched when first opened). */-->
+<template data-sly-template.enlarge="${@ id, src, label, alt}">
+    <button data-sly-test="${id}" type="button" class="studio-dynamicmedia__zoom" popovertarget="${id}" title="${label}" aria-label="${label}">⤢</button>
+    <div data-sly-test="${id}" popover id="${id}" class="studio-dynamicmedia__large"><input type="checkbox" class="studio-dynamicmedia__actual" id="${id}-a" aria-label="Full size"/><label for="${id}-a"><img src="${src}" alt="${alt}" loading="lazy" draggable="false"/></label></div>
+</template>
+<figure class="studio-dynamicmedia" id="${dm.id}" data-sly-test="${dm.src}">
+    <style data-sly-test="${dm.css}">${dm.css @ context='unsafe'}</style>
+    <div data-sly-test="${dm.frames}" class="studio-dynamicmedia__set" data-spin="${dm.spin}" title="${dm.spin ? 'Drag to turn' : ''}">
+        <input data-sly-repeat.f="${dm.frames}" class="studio-dynamicmedia__pick" type="radio" name="${f.group}" id="${f.pick}"
+               checked="${f.first}" aria-label="${f.label}"/>
+        <div class="studio-dynamicmedia__frames">
+            <div data-sly-repeat.f="${dm.frames}" class="studio-dynamicmedia__frame">
+                <label data-sly-test="${f.prev}" for="${f.prev}" class="studio-dynamicmedia__go studio-dynamicmedia__go--prev" title="Previous" aria-hidden="true">‹</label>
+                <label data-sly-test="${f.next}" for="${f.next}" class="studio-dynamicmedia__go studio-dynamicmedia__go--next" title="Next" aria-hidden="true">›</label>
+                <video data-sly-test="${f.video}" controls preload="none" playsinline poster="${f.video.poster}" aria-label="${f.alt}">
+                    <source src="${f.video.src}" type="${f.video.type}"/>
+                </video>
+                <div data-sly-test="${!f.video}" class="studio-dynamicmedia__media">
+                    <picture>
+                        <source data-sly-repeat.s="${f.sources}" media="${s.media}" srcset="${s.srcset}" sizes="100vw" width="${s.width}" height="${s.height}" data-breakpoint="${s.name}" data-crop="${s.crop}"/>
+                        <img src="${f.src}" srcset="${f.srcset}" sizes="100vw" alt="${f.alt}" width="${f.width}" height="${f.height}" loading="${f.loading}" draggable="false"/>
+                    </picture>
+                    <sly data-sly-call="${map @ layers=f.layers, cards=f.cards}"/>
+                    <sly data-sly-call="${enlarge @ id=f.zoom, src=f.large, label=f.zoomLabel, alt=f.alt}"/>
+                </div>
+            </div>
+        </div>
+        <div class="studio-dynamicmedia__thumbs">
+            <label data-sly-repeat.f="${dm.frames}" for="${f.pick}" title="${f.alt}"><img data-sly-test="${f.thumb}" src="${f.thumb}" alt="" loading="lazy" width="96" height="72"/><span data-sly-test="${!f.thumb}">${f.alt}</span></label>
+        </div>
+    </div>
+    <div data-sly-test="${!dm.frames}" class="studio-dynamicmedia__media" data-sly-unwrap="${!dm.css}">
+        <a href="${dm.link}" data-sly-unwrap="${!dm.link}">
+            <picture>
+                <source data-sly-repeat.s="${dm.sources}" media="${s.media}" srcset="${s.srcset}" sizes="100vw" width="${s.width}" height="${s.height}" data-breakpoint="${s.name}" data-crop="${s.crop}"/>
+                <img src="${dm.src}" srcset="${dm.srcset}" sizes="${dm.sizes}" alt="${dm.alt}"
+                     width="${dm.width}" height="${dm.height}" loading="lazy" style="max-width:100%;height:auto"/>
+            </picture>
+        </a>
+        <sly data-sly-call="${map @ layers=dm.layers, cards=dm.cards}"/>
+        <sly data-sly-call="${enlarge @ id=dm.zoom, src=dm.large, label=dm.zoomLabel, alt=dm.alt}"/>
+    </div>
+    <!--/* Turning a spin by dragging, moving and zooming the enlarged picture: one script for the whole page. */-->
+    <script data-sly-test="${dm.viewer}" src="${dm.viewer}" defer></script>
+    <figcaption data-sly-test="${dm.caption}">${dm.caption}</figcaption>
+</figure>
+<div data-sly-test="${!dm.src && wcmmode.edit}" class="cq-placeholder" data-emptytext="Responsive Image: choose an image"></div>

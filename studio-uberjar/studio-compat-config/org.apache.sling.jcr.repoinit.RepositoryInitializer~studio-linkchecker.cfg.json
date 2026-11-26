@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "create path (sling:OrderedFolder) /content\ncreate path (sling:Folder) /var/studio/linkchecker/links\ncreate service user studio-linkchecker-service\nset ACL for studio-linkchecker-service\n    allow jcr:read on /content\n    allow jcr:read,rep:write on /var/studio/linkchecker\nend"
+  ]
+}

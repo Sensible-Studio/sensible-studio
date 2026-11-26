@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Form"
+    sling:resourceType="cq/gui/components/authoring/dialog">
+    <content
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="granite/ui/components/coral/foundation/container">
+        <items jcr:primaryType="nt:unstructured">
+            <tabs
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/tabs"
+                maximized="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                <steps
+                    jcr:primaryType="nt:unstructured"
+                    jcr:title="Steps"
+                    sling:resourceType="granite/ui/components/coral/foundation/container"
+                    margin="{Boolean}true">
+                    <items jcr:primaryType="nt:unstructured">
+                        <steps
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
+                            text="One step per panel"
+                            fieldDescription="The top-level panels become steps with Next and Back; each step is checked before the next."
+                            value="{Boolean}true"
+                            name="./steps"/>
+                    </items>
+                </steps>
+                <submission
+                    jcr:primaryType="nt:unstructured"
+                    jcr:title="After submit"
+                    sling:resourceType="granite/ui/components/coral/foundation/container"
+                    margin="{Boolean}true">
+                    <items jcr:primaryType="nt:unstructured">
+                        <afterSubmit
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/select"
+                            fieldLabel="What happens after a submission"
+                            name="./afterSubmit">
+                        <items jcr:primaryType="nt:unstructured">
+                            <message jcr:primaryType="nt:unstructured" text="Show a message" value="message" selected="{Boolean}true"/>
+                            <redirect jcr:primaryType="nt:unstructured" text="Go to a page" value="redirect"/>
+                        </items>
+                        </afterSubmit>
+                        <thankYou
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                            fieldLabel="Message"
+                            name="./thankYou"
+                            fieldDescription="Shown in place of the form."
+                            value="Thank you — your form was sent."/>
+                        <redirect
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/pathfield"
+                            fieldLabel="Page"
+                            name="./redirect"
+                            rootPath="/content"
+                            fieldDescription="Where to go after a submission, when “Go to a page” is chosen."/>
+                    </items>
+                </submission>
+                <record
+                    jcr:primaryType="nt:unstructured"
+                    jcr:title="Content Fragment"
+                    sling:resourceType="granite/ui/components/coral/foundation/container"
+                    margin="{Boolean}true">
+                    <items jcr:primaryType="nt:unstructured">
+                        <recordModel
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/pathfield"
+                            fieldLabel="Create a content fragment of the model"
+                            name="./recordModel"
+                            rootPath="/conf"
+                            fieldDescription="Every submission also becomes a content fragment of this model (under /conf/…/settings/dam/cfm/models). Empty: no content fragments."/>
+                        <recordFolder
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/pathfield"
+                            fieldLabel="In the folder"
+                            name="./recordFolder"
+                            rootPath="/content/dam"
+                            fieldDescription="Where the content fragments go, under /content/dam. Created when missing."/>
+                        <recordTitle
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                            fieldLabel="Content fragment title"
+                            name="./recordTitle"
+                            fieldDescription="Fields in braces, e.g. {name} — {destination}; also {form} and {date}. Empty: the form title and the time."/>
+                        <recordMapping
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/multifield"
+                            fieldLabel="Fields to elements"
+                            name="./recordMapping"
+                            composite="{Boolean}true"
+                            fieldDescription="A field goes to the element of the same name. Here: other names, or leave Element empty to keep a field out of the content fragment. Files stay with the submission.">
+                        <field
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/container"
+                            name="./recordMapping">
+                            <items jcr:primaryType="nt:unstructured">
+                                <field jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Field" fieldDescription="The form field's name." name="./field" required="{Boolean}true"/>
+                                <element jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Element" fieldDescription="The model element's name; empty leaves the field out." name="./element"/>
+                            </items>
+                        </field>
+                        </recordMapping>
+                    </items>
+                </record>
+                <actions
+                    jcr:primaryType="nt:unstructured"
+                    jcr:title="Actions"
+                    sling:resourceType="granite/ui/components/coral/foundation/container"
+                    margin="{Boolean}true">
+                    <items jcr:primaryType="nt:unstructured">
+                        <notifyTo
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                            fieldLabel="Email the submission to"
+                            name="./notifyTo"
+                            fieldDescription="One or more addresses, separated by commas. Needs a mail server (System › Mail)."/>
+                        <notifySubject
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                            fieldLabel="Subject"
+                            name="./notifySubject"
+                            fieldDescription="Default: “New submission: ” and the form’s title."/>
+                        <flowModel
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/pathfield"
+                            fieldLabel="Start a flow"
+                            name="./flowModel"
+                            rootPath="/var/workflow/models"
+                            fieldDescription="The flow runs on the submission."/>
+                        <webhookUrl
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                            fieldLabel="Send to a web address"
+                            name="./webhookUrl"
+                            fieldDescription="The submission is POSTed there as JSON (https://…)."/>
+                    </items>
+                </actions>
+                </items>
+            </tabs>
+        </items>
+    </content>
+</jcr:root>

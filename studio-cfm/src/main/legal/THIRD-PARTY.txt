@@ -1,0 +1,15 @@
+Sensible Studio Content Fragments (io.sensible.studio.cfm) embeds the following third-party packages:
+
+graphql-java 22.3 (https://github.com/graphql-java/graphql-java)
+  MIT License, Copyright (c) 2015 Andreas Marek and Contributors
+
+java-dataloader 3.3.0 (https://github.com/graphql-java/java-dataloader)
+  Apache License 2.0
+
+Reactive Streams 1.0.3 (https://www.reactive-streams.org)
+  MIT No Attribution (MIT-0)
+
+jsoup 1.18.3 (https://jsoup.org)
+  MIT License, Copyright (c) 2009-2024 Jonathan Hedley
+
+The full license texts are available at the project URLs above.

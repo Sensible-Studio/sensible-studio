@@ -1,0 +1,281 @@
+// The template editor: its banner, the Allowed Components of unlocked containers and the policy dialog, laid out
+// like AEM's template editor.
+
+$unlocked: #e68619;
+
+.studio-tpl-banner {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--spectrum-global-color-gray-800);
+  background: var(--spectrum-global-color-gray-50);
+  border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+
+  &__icon {
+    flex: none;
+    color: $unlocked;
+  }
+
+  strong {
+    flex: none;
+    font-weight: 700;
+  }
+}
+
+// unlocked structure components: orange, like AEM
+.studio-ov-hover.is-unlocked {
+  background: rgba(230, 134, 25, 0.08);
+  border-color: rgba(230, 134, 25, 0.7);
+}
+
+.studio-ov-selected.is-unlocked {
+  border-color: $unlocked;
+}
+
+.studio-ov-hover.is-unlocked .studio-ov-label,
+.studio-ov-selected.is-unlocked .studio-ov-label {
+  background: $unlocked;
+}
+
+.studio-lock-glyph {
+  margin-right: 4px;
+  vertical-align: -1px;
+}
+
+.studio-overlay .studio-ov-panel {
+  pointer-events: auto;
+  border-top: 1px solid $unlocked;
+  border-bottom: 1px solid $unlocked;
+}
+
+.studio-tpl-allowed {
+  padding: 8px 12px 14px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.92);
+
+  &__title {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: $unlocked;
+  }
+
+  &__none {
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    padding: 0 0 0 8px;
+    color: var(--spectrum-global-color-gray-800);
+    background: #fff;
+    border: 1px solid var(--spectrum-global-color-gray-400);
+    border-radius: 4px;
+  }
+
+  &__policy {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 22px;
+    padding: 0;
+    color: var(--spectrum-global-color-gray-700);
+    background: none;
+    border: 0;
+    border-left: 1px solid var(--spectrum-global-color-gray-300);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--spectrum-global-color-blue-600);
+    }
+  }
+}
+
+// ------------------------------------------------------------------------------------------ policy dialog
+
+.studio-policy {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-size: 14px;
+  color: #4b4b4b;
+  background: #f5f5f5;
+
+  &__header {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+    margin: 0 40px;
+    border-bottom: 1px solid #e1e1e1;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 300;
+    color: #2c2c2c;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  &__failure,
+  &__error {
+    margin: 12px 40px 0;
+    padding: 8px 12px;
+    color: #fff;
+    background: #d7373f;
+    border-radius: 4px;
+  }
+
+  &__loading {
+    display: grid;
+    flex: 1;
+    place-items: center;
+  }
+
+  &__body {
+    display: grid;
+    flex: 1;
+    grid-template-columns: minmax(280px, 1fr) minmax(320px, 1fr);
+    gap: 24px;
+    max-width: 1160px;
+    width: 100%;
+    min-height: 0;
+    margin: 0 auto;
+    padding: 32px 40px 64px;
+    overflow-y: auto;
+  }
+
+  &__heading {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c2c2c;
+  }
+
+  &__hint {
+    margin: 0 0 20px;
+    font-size: 12px;
+    color: #6e6e6e;
+  }
+
+  &__label {
+    display: block;
+    margin: 16px 0 6px;
+    font-size: 12px;
+    color: #6e6e6e;
+  }
+
+  &__select {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .studio-g-input {
+      flex: 1;
+    }
+  }
+
+  &__left .studio-g-input {
+    width: 100%;
+  }
+
+  &__description {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  &__used {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #e1e1e1;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px;
+
+      & + li {
+        border-top: 1px solid #e1e1e1;
+      }
+    }
+
+    img,
+    .studio-policy__thumb {
+      width: 48px;
+      height: 36px;
+      object-fit: cover;
+      background: #eaeaea;
+    }
+  }
+
+  &__form {
+    .studio-g-form {
+      padding: 0;
+    }
+  }
+}
+
+.studio-pp-like-btn {
+  height: 32px;
+  padding: 0 14px;
+  font: inherit;
+  font-weight: 700;
+  border-radius: 16px;
+  cursor: pointer;
+
+  &--secondary {
+    color: #4b4b4b;
+    background: transparent;
+    border: 2px solid #4b4b4b;
+  }
+
+  &--primary {
+    color: #fff;
+    background: #1473e6;
+    border: 2px solid #1473e6;
+
+    &:hover {
+      background: #0d66d0;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+// AEM wraps the policy's tabs onto a second centred row instead of scrolling them
+.studio-policy .studio-g-tabs__list {
+  flex-wrap: wrap;
+  justify-content: center;
+  overflow: visible;
+}

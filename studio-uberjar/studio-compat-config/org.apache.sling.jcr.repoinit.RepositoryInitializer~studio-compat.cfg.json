@@ -1,0 +1,14 @@
+{
+  "scripts": [
+    "create path (sling:Folder) /apps\ncreate path (sling:Folder) /libs\nregister namespace (crx) http://www.day.com/crx/1.0",
+    "register namespace (cq) http://www.day.com/jcr/cq/1.0",
+    "register namespace (dam) http://www.day.com/dam/1.0",
+    "register namespace (granite) http://www.adobe.com/jcr/granite/1.0",
+    "register privilege crx:replicate",
+    "register nodetypes\n<<===\n<'cq'='http://www.day.com/jcr/cq/1.0'>\n<'dam'='http://www.day.com/dam/1.0'>\n<'granite'='http://www.adobe.com/jcr/granite/1.0'>\n<'nt'='http://www.jcp.org/jcr/nt/1.0'>\n[cq:Taggable] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n[cq:ReplicationStatus] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n[cq:LiveRelationship] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n[cq:LiveSync] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n[cq:LiveSyncCancelled] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n[cq:PropertyLiveSyncCancelled] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n[dam:Metadata] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n[dam:color] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n[dam:Thumbnails] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n[dam:cfVariationNode] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n[granite:Ranking] mixin\n  - * (undefined) multiple\n  - * (undefined)\n  + * (nt:base) = nt:unstructured\n===>>",
+    "create service user studio-wcm-service\nset ACL for studio-wcm-service\n    allow jcr:read on /apps\n    allow jcr:read on /libs\nend",
+    "create service user clientlibs-service\nset ACL for clientlibs-service\n    allow jcr:read on /apps\n    allow jcr:read on /libs\nend",
+    "create service user sling-scripting\nset ACL for sling-scripting\n    allow jcr:read on /apps\n    allow jcr:read on /libs\nend",
+    "create group studio-compat-groups-root"
+  ]
+}

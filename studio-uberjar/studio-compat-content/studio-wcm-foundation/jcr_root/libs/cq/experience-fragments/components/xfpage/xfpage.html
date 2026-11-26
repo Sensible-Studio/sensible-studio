@@ -1,0 +1,24 @@
+<!--/*
+    Sensible Studio: an experience fragment variation renders as AEM renders it: the page's head (Core Components page v3 head,
+    with the project's custom header libraries), and a body of class "xf-web-container" holding the variation's
+    structure in a "container" wrapper, without the page's skip link. Site styles key on that class (WKND only pads
+    `.root` for its fixed header outside of fragments). The structure's resources are included as resources, not by
+    path, so a locked part (the root container) keeps the template's properties (its responsive grid layout).
+*/-->
+<!DOCTYPE HTML>
+<html data-sly-use.page="com.adobe.cq.wcm.core.components.models.Page" lang="${page.language}"
+      data-sly-use.pwa="com.adobe.cq.wcm.core.components.models.PWA"
+      data-sly-use.head="/apps/core/wcm/components/page/v3/page/head.html"
+      data-sly-use.footer="/apps/core/wcm/components/page/v3/page/footer.html">
+    <head data-sly-call="${head.head @ page = page, pwa = pwa}"></head>
+    <body class="xf-web-container"
+          id="${page.id}"
+          data-cmp-data-layer-enabled="${page.data ? true : false}"
+          data-cmp-data-layer-name="${page.dataLayerName @ context='scriptToken'}">
+        <div class="container" data-sly-use.templatedContainer="com.day.cq.wcm.foundation.TemplatedContainer">
+            <sly data-sly-repeat.child="${templatedContainer.structureResources}"
+                 data-sly-resource="${child @ resourceType=child.resourceType, decorationTagName='div'}"></sly>
+        </div>
+        <sly data-sly-call="${footer.footer @ page = page, pwa = pwa}"></sly>
+    </body>
+</html>

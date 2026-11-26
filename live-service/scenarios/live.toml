@@ -1,0 +1,236 @@
+# The test farm of the scenarios (live-service/scenarios/README.md): a second Live cache on
+# 4521, in front of the same publish instances as the first, with two sites.
+# Sensible Studio Live cache: what reaches the publish, and what is kept.
+# Virtual hosts, rewrites and TLS are Apache's (see ../apache). Check a change with
+#   bin/studio-live check
+
+# Where Apache finds this service.
+listen = "127.0.0.1:4521"
+
+# The cache. The same directory is Apache's DocumentRoot. Relative to where the service is started
+# (bin/studio-live starts it in the repository's root).
+docroot = "instances/live-scenarios/docroot"
+
+# The publish instances, asked in turn. One that does not answer is skipped for a while. Each of
+# them tells the cache what it received (its live_cache flush agent, enabled on every one).
+# On a developer's machine the second is instances/publish2:
+#   PUBLISH_HOME=$PWD/instances/publish2 PUBLISH_PORT=4504 bin/studio-publish start
+# (with the same login.key as the first, and the author's agents publish2 / publish2_reverse).
+publish = ["http://127.0.0.1:4503", "http://127.0.0.1:4504"]
+
+# The publish writes some URLs without /content (/wknd/us/en/…/image.jpeg) and answers both
+# spellings. With this set they are one page: filtered, cached and invalidated at the full path.
+content_prefix = "/content"
+
+# With several publish instances: a visitor who signed in keeps being sent to the same instance, by
+# a cookie of this service's own (studio-route), for as long as that instance answers. A sign-in
+# with the farm's key (studio-auth, cookie studio-login, the same login.key on every instance) is
+# good on all of them, so with it this only keeps a visitor's requests together and may be turned
+# off; a session of Sling's form sign-in is known to one instance, and losing it means signing in
+# again. false: every request goes wherever it is the turn.
+# sticky = true
+
+# What a publication removes besides the published page's own files:
+#   0  every page of the cache. Always right: a page shows titles, navigation and blocks of others.
+#   2  only the pages below the same /content/<site>. Faster refill on a server with many sites,
+#      wrong for a page that shows content of another tree (a block, a template under /conf).
+stat_level = 0
+
+[flush]
+# The password a "Dispatcher flush" target of the Publishing console must send (its transport
+# password; any user name). Leave it out on a developer machine: then only this machine can
+# invalidate. On a server set STUDIO_LIVE_FLUSH_SECRET in the environment instead of writing it here.
+# secret = "…"
+
+[cache]
+# Query parameters that do not change the page. A request with any other parameter goes to the
+# publish every time.
+# "v" is the version stamp of a client library URL (site.css?v=mw39x8hx): the file is kept once.
+# After deploying new code, clear the cache (bin/studio-live clear).
+ignore_query = ["v", "utm_*", "gclid", "gclsrc", "fbclid", "msclkid", "dclid", "mc_cid", "mc_eid"]
+
+# Removed on every publication. Add "*.model.json" for a site that renders from the JSON model.
+invalidate = ["*.html"]
+
+# A visitor carrying one of these cookies is signed in and always gets the publish's own answer:
+# studio-login is the sign-in every publish instance of a farm accepts (studio-auth), the other the
+# sign-in of Sling's form, good on one instance. The web server's configuration names them too
+# (apache/conf.d/studio_live.conf).
+login_cookies = ["studio-login", "sling.formauth.publish"]
+
+# Cookies a publish sets on pages that are the same for everyone (a servlet session opened by a
+# JSP without session="false", for instance). An answer that sets only these is kept, without the
+# cookie; any other cookie means "not for the cache". Better: fix the page so it sets none.
+# ignore_cookies = ["JSESSIONID"]
+
+# Never kept, although the filter lets them through. The last rule that matches decides.
+rules = [
+  { type = "allow", glob = "*" },
+  { type = "deny", glob = "/bin/*" },
+  { type = "deny", glob = "/libs/*" },
+]
+
+# Headers of the publish's answer that are kept with a cached page and sent again with it, besides
+# a Content-Type its extension does not already say. An answer that has one of them is not a plain
+# file Apache can serve: it is kept beside the document root (<docroot>.held) and served by this
+# service, still without asking the publish. Leave out what the virtual host sets itself
+# (Cache-Control, X-Frame-Options, X-Content-Type-Options). The default:
+# headers = ["Content-Disposition", "Content-Language", "Content-Security-Policy", "Link",
+#            "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Access-Control-Expose-Headers"]
+
+# What a publication takes out of the cache is kept (<docroot>.stale) for this long, and served if
+# the publish does not answer or fails when the page is wanted again. A page that was unpublished
+# is never kept. 0: nothing is kept.
+# stale_seconds = 86400
+
+# After a page was published, its own renderings that were in the cache (en.html, en.model.json)
+# are fetched again at once, so that the first visitor does not wait for the publish. The other
+# pages a publication takes out are fetched when someone asks for them. false: all wait.
+# rewarm = true
+
+# max_file_mb = 64     # larger answers are passed on, not kept
+# ttl_seconds = 3600   # also drop files older than this; by default only publications remove files
+
+# ---------------------------------------------------------------------------------------------
+# The filter. Nothing passes unless a rule allows it; the last rule that matches decides.
+# Fields (all that are set must match):
+#   method      request methods
+#   url         glob on the whole path
+#   path        glob on the path before the first dot (Sling's resource path)
+#   extensions  the extension is one of these
+#   selectors   globs; an allow wants every selector of the request to match, a deny any of them
+#   query       glob on the query string
+# Closed whatever is written here: /bin/receive, /bin/outbox, /system/console, /crx,
+# /etc/replication, /var/studio/replication, and the infinity / tidy / sysview / docview / query /
+# numeric selectors on .json and .xml.
+
+# Pages and what they are made of.
+[[filter]]
+type = "allow"
+method = ["GET", "HEAD"]
+path = "/content/*"
+extensions = [
+  "html", "css", "js", "txt", "pdf", "webmanifest",
+  "gif", "ico", "jpeg", "jpg", "png", "svg", "webp", "avif",
+  "mp4", "m4v", "mov", "webm", "mp3",
+  "eot", "ttf", "woff", "woff2",
+]
+
+# Client libraries.
+[[filter]]
+type = "allow"
+method = ["GET", "HEAD"]
+url = "/etc.clientlibs/*"
+
+# The JSON model of a page or a component, and site search.
+[[filter]]
+type = "allow"
+method = ["GET", "HEAD"]
+path = "/content/*"
+selectors = ["model", "searchresults"]
+extensions = ["json"]
+
+# Sitemaps.
+[[filter]]
+type = "allow"
+method = ["GET", "HEAD"]
+path = "/content/*"
+selectors = ["sitemap", "sitemap-index"]
+extensions = ["xml"]
+
+# Who is signed in: the sign-in link of a page asks.
+[[filter]]
+type = "allow"
+method = ["GET"]
+url = "/libs/granite/security/currentuser.json"
+
+# Signed media delivery URLs.
+[[filter]]
+type = "allow"
+method = ["GET", "HEAD"]
+url = "/bin/studio/dam/deliver*"
+
+# Forms and audience tracking: the only things visitors send.
+[[filter]]
+type = "allow"
+method = ["POST"]
+url = "/bin/studio/forms/submit"
+
+[[filter]]
+type = "allow"
+method = ["POST"]
+url = "/bin/studio/targeting/track"
+
+# Signing in and out, for a site with a members' area. Closed until wanted: with it open, anyone
+# can try passwords against the publish.
+# [[filter]]
+# type = "allow"
+# method = ["POST"]
+# url = "*/j_security_check"
+#
+# [[filter]]
+# type = "allow"
+# method = ["GET", "POST"]
+# url = "/system/sling/logout"
+
+# A page under a selector nobody links to (en.foo.html, en.a.b.c.html, en.html.css) is the
+# page again, and every one of them would be one more file in the cache: anyone could fill it.
+# Pages, stylesheets and scripts under /content are asked for without selectors; a site that
+# links to a selector of its own allows it again in a rule further down (or in [[site.filter]]).
+# The selectors of images (image.coreimg.60.jpeg) and of the JSON model are not touched.
+[[filter]]
+type = "deny"
+path = "/content/*"
+extensions = ["html", "css", "js", "txt"]
+selectors = ["*"]
+
+# Renderings of the repository that are for authors.
+[[filter]]
+type = "deny"
+selectors = ["feed", "rss", "pages", "languages", "blueprint", "infinity", "tidy", "sysview", "docview", "query"]
+
+[[filter]]
+type = "deny"
+query = "*debug=*"
+
+[[filter]]
+type = "deny"
+query = "*wcmmode=*"
+
+# ---------------------------------------------------------------------------------------------
+# Two sites, two farms: WKND from both publish instances, brand2 from the second only, and a
+# sign-in through the cache for brand2 alone.
+
+[[site]]
+name = "wknd"
+hosts = ["wknd.localhost"]
+roots = ["/content/wknd"]
+shared = ["/content/experience-fragments/wknd", "/conf/wknd", "/content/dam/wknd", "/content/dam/wknd-shared"]
+# Its redirect map (as AEM's managed rewrite maps): authors publish a text file of rules,
+# "<source> <target> [301|302|307|308]" a line; the vhost's RewriteMap reads what is written from it.
+redirect_map = "/content/dam/wknd/redirectmap.txt"
+
+[[site]]
+name = "brand2"
+hosts = ["brand2.localhost", "*.brand2.localhost"]
+roots = ["/content/brand2"]
+# its pages are built from WKND's templates, header and media
+shared = ["/content/experience-fragments/wknd", "/conf/wknd", "/content/dam/wknd-shared"]
+publish = ["http://127.0.0.1:4504"]
+# the members' club (a closed user group): kept apart, served after the publish says yes
+protected = ["/content/brand2/en/club*"]
+
+[[site.filter]]
+type = "allow"
+method = ["POST"]
+url = "*/j_security_check"
+
+[[site.filter]]
+type = "allow"
+method = ["GET", "POST"]
+url = "/system/sling/logout"
+
+[[site.filter]]
+type = "allow"
+method = ["GET"]
+url = "/libs/granite/core/content/login.html"

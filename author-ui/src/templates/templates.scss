@@ -1,0 +1,222 @@
+// Tools > General > Templates: the console reuses the Sites console's bars, cards and list (sites.scss); the
+// create wizard its wizard; the properties the page properties' layout (pageprops.scss).
+
+.studio-tpls {
+  &__folder {
+    color: var(--spectrum-global-color-gray-600);
+  }
+
+  &__status {
+    min-height: 22px;
+    padding: 0;
+    font-size: 12px;
+  }
+
+  &__usage {
+    max-height: 160px;
+    margin: 12px 0 0;
+    padding-left: 18px;
+    overflow: auto;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+  }
+
+  .studio-card__body .studio-tpls__status {
+    padding: 0 12px;
+  }
+}
+
+.studio-tpl-wizard {
+  &__form {
+    display: flex;
+    justify-content: center;
+  }
+
+  &__desc {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  &__source {
+    align-self: flex-start;
+    margin: 6px 12px 0;
+    padding: 1px 6px;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-700);
+    background: var(--spectrum-global-color-gray-200);
+    border-radius: 3px;
+  }
+}
+
+.studio-tpl-props {
+  .studio-pp-btn--quiet {
+    color: var(--studio-neutral-700);
+    background: transparent;
+    border: 0;
+
+    &:hover:not(:disabled) {
+      background: rgba(0, 0, 0, 0.06);
+    }
+  }
+
+  // as AEM's: the thumbnail on the left, title and description on the right
+  &__body {
+    display: grid;
+    grid-template-columns: minmax(220px, 300px) minmax(0, 480px);
+    gap: 48px;
+    justify-content: center;
+    padding: 28px 40px 96px;
+  }
+
+  &__fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--studio-space-5);
+    min-width: 0;
+  }
+}
+
+.studio-tpl-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+
+  &__preview {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    max-width: 260px;
+    aspect-ratio: 1;
+    overflow: hidden;
+    color: var(--studio-text-faint, var(--studio-neutral-500));
+    background: var(--studio-neutral-0);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--studio-space-3);
+    justify-content: center;
+    width: 320px;
+    max-width: calc(100vw - (2 * var(--studio-space-7)));
+  }
+
+  &__action {
+    min-height: 32px;
+    padding: 4px 12px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--studio-text-strong);
+    cursor: pointer;
+    background: var(--studio-surface-raised);
+    border: 1px solid var(--studio-border);
+    border-radius: var(--studio-radius-sm);
+
+    &:hover:not(:disabled) {
+      background: var(--studio-surface-hover);
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+
+    &--quiet {
+      font-weight: 400;
+      color: var(--studio-neutral-600);
+      background: transparent;
+      border-color: transparent;
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 12px;
+    color: var(--studio-text-muted, var(--studio-neutral-600));
+    text-align: center;
+  }
+}
+
+.studio-tpls {
+  &__state--draft {
+    color: var(--spectrum-global-color-orange-700);
+  }
+
+  &__state--disabled {
+    color: var(--spectrum-global-color-gray-600);
+  }
+
+  &__when,
+  &__who {
+    display: block;
+  }
+
+  &__who {
+    font-size: 12px;
+  }
+}
+
+.studio-tpl-publish {
+  font-size: 14px;
+
+  &__what {
+    margin: 0 0 12px;
+  }
+
+  &__label {
+    margin: 0 0 4px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__list {
+    max-height: 260px;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      padding: 2px 0 6px;
+    }
+  }
+
+  &__meta {
+    margin-left: 28px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__error {
+    margin: 12px 0 0;
+    color: var(--spectrum-global-color-red-700);
+  }
+}
+
+// Properties of several templates
+.studio-bulktemplates {
+  display: grid;
+  gap: 14px;
+
+  &__note {
+    margin: 0;
+    color: var(--studio-text-muted, var(--spectrum-global-color-gray-700));
+    font-size: 12px;
+  }
+
+  &__error {
+    margin: 0;
+    color: var(--spectrum-semantic-negative-color-default, #c9252d);
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "user.mapping": [
+    "io.sensible.studio.workflow:workflow=[studio-workflow-service]"
+  ]
+}

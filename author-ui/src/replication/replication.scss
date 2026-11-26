@@ -1,0 +1,370 @@
+.studio-replication {
+  &__main {
+    padding: 16px 24px;
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  // the unpublished changes span the width, under the agents and the queue
+  &__unpublished {
+    grid-column: 1 / -1;
+  }
+
+  // the caches in front of the published site span the width too
+  &__caches {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    > h3 {
+      margin: 0;
+      font-size: 13px;
+    }
+  }
+
+  &__cache {
+    cursor: default;
+
+    dd ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+  }
+
+  &__agents {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__agent {
+    padding: 14px 16px;
+    cursor: pointer;
+    background: var(--spectrum-global-color-gray-50);
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-radius: 6px;
+
+    &.is-selected {
+      border-color: var(--spectrum-global-color-blue-500);
+    }
+
+    header {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+
+      h2 {
+        margin: 0;
+        font-size: 15px;
+      }
+    }
+
+    dl {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 4px 10px;
+      margin: 10px 0;
+      font-size: 12px;
+
+      dt {
+        color: var(--spectrum-global-color-gray-700);
+      }
+
+      dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+      }
+    }
+  }
+
+  &__kind {
+    padding: 1px 6px;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-800);
+    background: var(--spectrum-global-color-gray-200);
+    border-radius: 3px;
+  }
+
+  &__id,
+  &__muted {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__desc {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+
+    &.is-ok {
+      background: var(--spectrum-global-color-green-500);
+    }
+
+    &.is-busy {
+      background: var(--spectrum-global-color-blue-500);
+    }
+
+    &.is-blocked {
+      background: var(--spectrum-global-color-red-500);
+    }
+
+    &.is-off {
+      background: var(--spectrum-global-color-gray-400);
+    }
+  }
+
+  &__error {
+    color: var(--spectrum-global-color-red-700);
+  }
+
+  &__ok {
+    color: var(--spectrum-global-color-green-700);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__queue {
+    padding: 14px 16px;
+    font-size: 12px;
+    background: var(--spectrum-global-color-gray-50);
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-radius: 6px;
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+    }
+
+    .studio-replication__panehead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 10px;
+    }
+
+    tr.is-failed td {
+      background: var(--spectrum-global-color-red-100);
+    }
+
+    .studio-replication__panehead h3 {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin: 0;
+    }
+
+    .studio-replication__bulk {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .studio-replication__check {
+      width: 32px;
+      padding-right: 0;
+    }
+
+    .studio-replication__linkbtn {
+      padding: 0;
+      font: inherit;
+      color: var(--spectrum-global-color-blue-700);
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: 0;
+    }
+
+    .studio-replication__badge {
+      min-width: 18px;
+      padding: 0 6px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 18px;
+      color: var(--studio-neutral-0);
+      text-align: center;
+      background: var(--spectrum-global-color-blue-600);
+      border-radius: 9px;
+    }
+
+    a {
+      color: var(--spectrum-global-color-blue-700);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 4px 6px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+    }
+
+    th {
+      font-weight: 600;
+      color: var(--spectrum-global-color-gray-700);
+    }
+  }
+
+  code {
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 11px;
+  }
+}
+
+// the Publish dialog of the editor and the Sites console
+.studio-publish {
+  // Publish or Preview: a row of its own above the text
+  &__destination {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  &__refs {
+    margin-top: 12px;
+
+    ul {
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      padding: 6px 0;
+      border-top: 1px solid var(--spectrum-global-color-gray-200);
+    }
+  }
+
+  &__hint {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__title {
+    font-weight: 600;
+  }
+
+  &__meta {
+    margin-left: 8px;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__path {
+    display: block;
+    margin-left: 28px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__error {
+    margin: 8px 0 0;
+    color: var(--spectrum-global-color-red-700);
+  }
+}
+
+// Agent facts are rows of their own (shell: .studio-facts), not the two-column list of the cache card.
+.studio-replication__agent dl.studio-facts {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--studio-space-3);
+  font-size: var(--studio-type-sm);
+}
+
+// The sites behind a cache, in its card.
+.studio-replication__sites {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+
+  li + li {
+    margin-top: var(--studio-space-2);
+  }
+}
+
+.studio-replication__siteaction {
+  margin-top: var(--studio-space-1);
+}
+
+// The redirect map editor.
+.studio-redirectmap__text textarea {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.studio-redirectmap__bad {
+  margin: var(--studio-space-2) 0 0;
+  padding-left: 1.2em;
+  font-size: var(--studio-type-sm);
+}
+
+// The URL tester.
+.studio-urltester__result {
+  margin-top: var(--studio-space-3);
+  padding: var(--studio-space-3);
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 6px;
+  background: var(--spectrum-global-color-gray-50);
+
+  p {
+    margin: 0 0 var(--studio-space-2);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--studio-space-1) var(--studio-space-3);
+    margin: 0;
+    font-size: var(--studio-type-sm);
+  }
+
+  dt {
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.studio-urltester__verdict {
+  &--refused strong {
+    color: var(--spectrum-global-color-red-700);
+  }
+  &--redirect strong {
+    color: var(--spectrum-global-color-blue-700);
+  }
+  &--served strong,
+  &--kept strong {
+    color: var(--spectrum-global-color-green-700);
+  }
+  &--passed strong {
+    color: var(--spectrum-global-color-gray-800);
+  }
+}

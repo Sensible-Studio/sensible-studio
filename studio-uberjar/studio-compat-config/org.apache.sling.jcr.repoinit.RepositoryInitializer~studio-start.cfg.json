@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "set properties on /, /content\n  set sling:resourceType{String} to sling:redirect\n  set sling:target{String} to /studio/start.html\nend"
+  ]
+}

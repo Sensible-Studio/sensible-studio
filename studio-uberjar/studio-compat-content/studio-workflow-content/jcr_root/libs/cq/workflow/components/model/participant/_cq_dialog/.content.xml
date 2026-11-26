@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Step Properties"
+    sling:resourceType="cq/gui/components/authoring/dialog">
+    <content jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/container">
+        <items jcr:primaryType="nt:unstructured">
+            <tabs jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/tabs" maximized="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+            <common jcr:primaryType="nt:unstructured" jcr:title="Common" sling:resourceType="granite/ui/components/coral/foundation/container" margin="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <title jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Title" name="./jcr:title"/>
+                    <description jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textarea" fieldLabel="Description" name="./jcr:description"/>
+                    <stage jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/select" fieldLabel="Workflow Stage" name="./metaData/workflowStage" emptyOption="{Boolean}true" emptyText="None" fieldDescription="The stage of the model this step belongs to (Model Properties lists the stages)."><datasource jcr:primaryType="nt:unstructured" sling:resourceType="studio/workflow/datasources/stages"/></stage>
+                    <timeout jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/select" fieldLabel="Timeout" name="./metaData/timeoutMillis" fieldDescription="How long the step may wait for its participant before the timeout handler acts."><items jcr:primaryType="nt:unstructured"><o0 jcr:primaryType="nt:unstructured" text="Off" value=""/><o1 jcr:primaryType="nt:unstructured" text="Immediate" value="1"/><o2 jcr:primaryType="nt:unstructured" text="1h" value="3600"/><o3 jcr:primaryType="nt:unstructured" text="6h" value="21600"/><o4 jcr:primaryType="nt:unstructured" text="12h" value="43200"/><o5 jcr:primaryType="nt:unstructured" text="24h" value="86400"/></items></timeout><handler jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/select" fieldLabel="Timeout Handler" name="./metaData/timeoutHandler" emptyOption="{Boolean}true" emptyText="None" fieldDescription="Auto Advancer completes the overdue step along its default route."><items jcr:primaryType="nt:unstructured"><auto jcr:primaryType="nt:unstructured" text="Auto Advancer" value="com.adobe.granite.workflow.console.timeout.autoadvance.AutoAdvancer"/></items></handler>
+                </items>
+            </common>
+<user jcr:primaryType="nt:unstructured" jcr:title="User/Group" sling:resourceType="granite/ui/components/coral/foundation/container" margin="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <participant jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/select" fieldLabel="User/Group" name="./metaData/PARTICIPANT" required="{Boolean}true" emptyOption="{Boolean}true" emptyText="Select"><datasource jcr:primaryType="nt:unstructured" sling:resourceType="studio/workflow/datasources/principals"/></participant><notify jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/checkbox" text="Notify user via email" name="./metaData/DO_NOTIFY" value="true" uncheckedValue="false"/>
+                </items>
+            </user>
+                </items>
+            </tabs>
+        </items>
+    </content>
+</jcr:root>

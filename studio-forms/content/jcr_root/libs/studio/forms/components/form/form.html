@@ -1,0 +1,13 @@
+<!--/* The form container: a <form> around a layout grid of fields. Submission and validation: studio.forms (forms.js). */-->
+<form class="studio-form cmp-container" method="post" action="${properties.action || '/bin/studio/forms/submit'}" novalidate
+      data-studio-form="${resource.path}"
+      data-studio-after="${properties.afterSubmit || 'message'}"
+      data-studio-message="${properties.thankYou || 'Thank you — your form was sent.'}"
+      data-studio-redirect="${properties.redirect}"
+      data-sly-attribute.data-studio-steps="${properties.steps ? 'true' : ''}"
+      data-sly-attribute.data-studio-editing="${wcmmode.edit ? 'true' : ''}"
+      data-sly-attribute.data-studio-preview="${wcmmode.edit || wcmmode.preview ? 'true' : ''}">
+    <input type="text" name="studio:website" class="studio-form__trap" tabindex="-1" autocomplete="off" aria-hidden="true"/>
+    <sly data-sly-resource="${resource.path @ resourceType='wcm/foundation/components/responsivegrid'}"></sly>
+    <p class="studio-form__status" data-studio-status aria-live="polite"></p>
+</form>

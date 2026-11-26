@@ -1,0 +1,7 @@
+<!--/*
+    Sensible Studio HTL templates for client libraries: css, js and all, each taking a categories parameter
+    (array or comma separated string). Tags are written by Sensible Studio's HtmlLibraryManager.
+*/-->
+<template data-sly-template.css="${ @ categories }"><sly data-sly-use.libs="${'com.adobe.cq.wcm.core.components.models.ClientLibraries' @ categories=categories}">${libs.cssIncludes @ context='unsafe'}</sly></template>
+<template data-sly-template.js="${ @ categories }"><sly data-sly-use.libs="${'com.adobe.cq.wcm.core.components.models.ClientLibraries' @ categories=categories}">${libs.jsIncludes @ context='unsafe'}</sly></template>
+<template data-sly-template.all="${ @ categories }"><sly data-sly-use.libs="${'com.adobe.cq.wcm.core.components.models.ClientLibraries' @ categories=categories}">${libs.cssIncludes @ context='unsafe'}${libs.jsIncludes @ context='unsafe'}</sly></template>

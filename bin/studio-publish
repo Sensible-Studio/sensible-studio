@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Sensible Studio publish instance: a second quickstart (runmode publish, port 4503) that the author's
+# default replication agent delivers to.
+#   bin/studio-publish setup   - seeds the publish install/ from the author install/ (bundles,
+#                             content packages, configurations) plus the publish-only configurations
+#   bin/studio-publish start   - starts it (setup first if needed); logs in instances/publish/logs
+#   bin/studio-publish stop    - stops it
+#   bin/studio-publish status  - is it running, and does it answer
+#   bin/studio-publish key     - gives this instance the sign-in key of the farm (setup and start do it too)
+# ==============================================================================
+set -e
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+cd "$DIR"
+AUTHOR_HOME="${AUTHOR_HOME:-$DIR/instances/author}"
+PUBLISH_HOME="${PUBLISH_HOME:-$DIR/instances/publish}"
+PORT="${PUBLISH_PORT:-4503}"
+JAR_PATH="$DIR/studio-quickstart/target/studio-quickstart-1.0.0-SNAPSHOT.jar"
+PID_FILE="$PUBLISH_HOME/publish.pid"
+# The sign-in key of the farm (studio-auth signs the studio-login cookie with it): one file, and every
+# publish instance gets a copy, so that a visitor signed in on one is signed in on all of them. Not in
+# git (instances/ is not). STUDIO_LOGIN_KEY says where it is. On a server the deploy puts it in place
+# and the instances read it there (key.file); see live-service/README.md.
+FARM_KEY="${STUDIO_LOGIN_KEY:-$DIR/instances/farm/login.key}"
+
+# the same Java as the author: 21 or newer (the WKND core bundle requires JavaSE 21; on an older JVM it
+# does not resolve and every WKND page fails with "ImageList cannot be resolved to a type")
+if [ -z "$JAVA_HOME" ] || [ "$("$JAVA_HOME/bin/java" -version 2>&1 | head -1 | awk -F '"' '{print $2}' | cut -d'.' -f1)" -lt 21 ]; then
+    if [ -x /usr/libexec/java_home ]; then
+        DETECTED_JAVA="$(/usr/libexec/java_home -v 21 2>/dev/null || /usr/libexec/java_home -v 17 2>/dev/null || true)"
+        [ -n "$DETECTED_JAVA" ] && export JAVA_HOME="$DETECTED_JAVA"
+    fi
+fi
+JAVA_BIN="${JAVA_HOME:+$JAVA_HOME/bin/}java"
+
+# Videos need ffmpeg next to studio-dam (posters, thumbnails, a copy every browser plays). It is not
+# shipped with Sensible Studio (licences, patents, security updates): the machine provides it.
+check_ffmpeg() {
+    if [ -n "$STUDIO_DAM_FFMPEG" ] && [ -x "$STUDIO_DAM_FFMPEG" ]; then return 0; fi
+    command -v ffmpeg >/dev/null 2>&1 && return 0
+    for p in /opt/homebrew/bin/ffmpeg /usr/local/bin/ffmpeg /usr/bin/ffmpeg /opt/local/bin/ffmpeg; do [ -x "$p" ] && return 0; done
+    echo "⚠️  ffmpeg not found: videos get no thumbnail, poster or browser copy (macOS: brew install ffmpeg; Debian/Ubuntu: apt install ffmpeg)"
+}
+
+# Word, Excel, PowerPoint and OpenDocument files get their preview through LibreOffice, which is not
+# shipped either.
+check_office() {
+    if [ -n "$STUDIO_DAM_SOFFICE" ] && [ -x "$STUDIO_DAM_SOFFICE" ]; then return 0; fi
+    command -v soffice >/dev/null 2>&1 && return 0
+    for p in /Applications/LibreOffice.app/Contents/MacOS/soffice /opt/homebrew/bin/soffice /usr/local/bin/soffice /usr/bin/soffice /usr/bin/libreoffice; do [ -x "$p" ] && return 0; done
+    echo "⚠️  LibreOffice not found: Office documents get no preview (macOS: brew install --cask libreoffice; Debian/Ubuntu: apt install libreoffice-core)"
+}
+
+# The farm's key, made once (or taken from the first publish instance, whose visitors then stay signed
+# in), and copied to this instance when it has none or another one. Read again by a running instance
+# within 5 s: a replaced key signs out who was signed in here.
+farm_key() {
+    if [ ! -s "$FARM_KEY" ]; then
+        mkdir -p "$(dirname "$FARM_KEY")"
+        for k in "$DIR/instances/publish/login.key" "$PUBLISH_HOME/login.key"; do
+            if [ -s "$k" ]; then (umask 077; cp "$k" "$FARM_KEY"); break; fi
+        done
+        [ -s "$FARM_KEY" ] || (umask 077; openssl rand -hex 32 > "$FARM_KEY")
+        chmod 600 "$FARM_KEY"
+        echo "🔑 The farm's sign-in key: $FARM_KEY"
+    fi
+    if ! cmp -s "$FARM_KEY" "$PUBLISH_HOME/login.key"; then
+        [ -s "$PUBLISH_HOME/login.key" ] && echo "🔑 $PUBLISH_HOME had another sign-in key: replaced by the farm's (who was signed in there signs in again)"
+        mkdir -p "$PUBLISH_HOME"
+        (umask 077; cp "$FARM_KEY" "$PUBLISH_HOME/login.key")
+        chmod 600 "$PUBLISH_HOME/login.key"
+    fi
+}
+
+setup() {
+    mkdir -p "$PUBLISH_HOME/install" "$PUBLISH_HOME/logs"
+    farm_key
+    # the same bundles, content and configurations as the author, apart from what is author-only
+    for f in "$AUTHOR_HOME"/install/*; do
+        name="$(basename "$f")"
+        case "$name" in
+            *RepositoryInitializer~studio-start*) continue ;;   # /content → author start screen
+            *RepositoryInitializer~studio-author*) continue ;;  # nothing under /content for who is not signed in
+            org.apache.sling.engine.impl.auth.SlingAuthenticator.cfg.json) continue ;;  # ...and a sign-in asked for there
+            *) cp -f "$f" "$PUBLISH_HOME/install/$name" ;;
+        esac
+    done
+    # the repository's initial content as the sources have it now: the copies in the author's install/ can be
+    # older (the author already has the paths), and an old one can stop a new instance's repository from
+    # starting (a "set ACL" on a path no script creates first; 24.11.2026, the preview instance)
+    for f in "$DIR/studio-uberjar/studio-compat-config"/org.apache.sling.jcr.repoinit.RepositoryInitializer~*.cfg.json; do
+        [ -f "$f" ] || continue
+        case "$(basename "$f")" in
+            *RepositoryInitializer~studio-start*|*RepositoryInitializer~studio-author*) continue ;;
+        esac
+        [ -f "$PUBLISH_HOME/install/$(basename "$f")" ] && cp -f "$f" "$PUBLISH_HOME/install/"
+    done
+    # publish-only configurations: anonymous read of the content
+    if [ -d "$DIR/studio-uberjar/studio-compat-config/publish" ]; then
+        cp -f "$DIR/studio-uberjar/studio-compat-config/publish"/*.cfg.json "$PUBLISH_HOME/install/"
+    fi
+    # a further publish instance (publish 2 on 4504, the preview on 4505) gets its own port for its image
+    # service, the instance's port + 8 (4503 → 4511, 4504 → 4512, 4505 → 4513): with the first publish's 4511
+    # copied, theirs could not start ("Address already in use", every minute in error.log; 26.11.2026)
+    if [ "$PORT" != "4503" ]; then
+        printf '{\n  "url": "http://127.0.0.1:%s"\n}\n' "$((PORT + 8))" > "$PUBLISH_HOME/install/io.sensible.studio.dam.impl.DamServiceManager.cfg.json"
+    fi
+    # the image service (studio-dam): the publish runs its own, on its own port (see the publish configuration
+    # of DamServiceManager); without the binary /is/image/... answers 503 there
+    if [ -x "$AUTHOR_HOME/dam/bin/studio-dam" ]; then
+        mkdir -p "$PUBLISH_HOME/dam/bin"
+        cp -f "$AUTHOR_HOME/dam/bin/studio-dam" "$PUBLISH_HOME/dam/bin/studio-dam"
+        chmod 755 "$PUBLISH_HOME/dam/bin/studio-dam"
+    fi
+    # the Sling feature launcher's artifact cache: share the author's download
+    if [ -d "$AUTHOR_HOME/cache" ] && [ ! -d "$PUBLISH_HOME/cache" ]; then
+        cp -R "$AUTHOR_HOME/cache" "$PUBLISH_HOME/cache"
+    fi
+    echo "✅ Publish instance seeded in $PUBLISH_HOME ($(ls "$PUBLISH_HOME/install" | wc -l | tr -d ' ') files in install/)"
+}
+
+start() {
+    [ -f "$JAR_PATH" ] || { echo "Build first: ./bin/studio build"; exit 1; }
+    [ -d "$PUBLISH_HOME/install" ] || setup
+    farm_key
+    check_ffmpeg
+    check_office
+    if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+        echo "Publish already running (pid $(cat "$PID_FILE"))"; exit 0
+    fi
+    echo "🚀 Starting Sensible Studio publish on port $PORT (home $PUBLISH_HOME, $("$JAVA_BIN" -version 2>&1 | head -1))..."
+    nohup "$JAVA_BIN" -jar "$JAR_PATH" -p "$PORT" -r publish -c "$PUBLISH_HOME" > "$PUBLISH_HOME/logs/stdout.log" 2>&1 &
+    echo $! > "$PID_FILE"
+    echo "   pid $(cat "$PID_FILE"); log: $PUBLISH_HOME/logs/stdout.log"
+}
+
+stop() {
+    if [ -f "$PID_FILE" ]; then
+        kill "$(cat "$PID_FILE")" 2>/dev/null && echo "Stopped publish (pid $(cat "$PID_FILE"))" || echo "Publish was not running"
+        rm -f "$PID_FILE"
+    else
+        echo "No pid file at $PID_FILE"
+    fi
+}
+
+status() {
+    if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+        echo "Publish running (pid $(cat "$PID_FILE")), http://localhost:$PORT"
+        curl -s -o /dev/null -w "   /content/wknd.html → HTTP %{http_code}\n" "http://localhost:$PORT/content/wknd.html" || true
+    else
+        echo "Publish not running"
+    fi
+}
+
+case "$1" in
+    setup) setup ;;
+    start) start ;;
+    stop) stop ;;
+    restart) stop; sleep 2; start ;;
+    status) status ;;
+    key) farm_key; echo "🔑 $PUBLISH_HOME has the farm's sign-in key ($FARM_KEY)" ;;
+    *) echo "Usage: bin/studio-publish setup|start|stop|restart|status|key   (PUBLISH_PORT, PUBLISH_HOME, STUDIO_LOGIN_KEY override 4503, ./instances/publish, ./instances/farm/login.key)" ;;
+esac

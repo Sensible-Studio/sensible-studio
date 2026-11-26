@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:granite="http://www.adobe.com/jcr/granite/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="OR Split"
+    extraClientlibs="[studio.workflow.split]"
+    sling:resourceType="cq/gui/components/authoring/dialog">
+    <content jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/container">
+        <items jcr:primaryType="nt:unstructured">
+            <tabs jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/tabs" maximized="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+            <split jcr:primaryType="nt:unstructured" jcr:title="OR Split" sling:resourceType="granite/ui/components/coral/foundation/container" margin="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <title jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Title" name="./jcr:title"/><branches jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/select" fieldLabel="Branches" name="./branches"><items jcr:primaryType="nt:unstructured"><o2 jcr:primaryType="nt:unstructured" text="2" value="2"/><o3 jcr:primaryType="nt:unstructured" text="3" value="3"/><o4 jcr:primaryType="nt:unstructured" text="4" value="4"/><o5 jcr:primaryType="nt:unstructured" text="5" value="5"/></items></branches>
+                </items>
+            </split>
+<branch1 jcr:primaryType="nt:unstructured" jcr:title="Branch 1" sling:resourceType="granite/ui/components/coral/foundation/container" margin="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <default jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/checkbox" text="Default Route" name="./metaData/default1" value="true" uncheckedValue="false" fieldDescription="Taken when no other branch rule holds."/><rule jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Rule" name="./metaData/rule1" fieldDescription="true, false or empty (always). Script rules are not evaluated by Sensible Studio and count as false."/>
+                </items>
+            </branch1>
+<branch2 jcr:primaryType="nt:unstructured" jcr:title="Branch 2" sling:resourceType="granite/ui/components/coral/foundation/container" margin="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <default jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/checkbox" text="Default Route" name="./metaData/default2" value="true" uncheckedValue="false" fieldDescription="Taken when no other branch rule holds."/><rule jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Rule" name="./metaData/rule2" fieldDescription="true, false or empty (always). Script rules are not evaluated by Sensible Studio and count as false."/>
+                </items>
+            </branch2>
+<branch3 jcr:primaryType="nt:unstructured" jcr:title="Branch 3" sling:resourceType="granite/ui/components/coral/foundation/container" margin="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <default jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/checkbox" text="Default Route" name="./metaData/default3" value="true" uncheckedValue="false" fieldDescription="Taken when no other branch rule holds."/><rule jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Rule" name="./metaData/rule3" fieldDescription="true, false or empty (always). Script rules are not evaluated by Sensible Studio and count as false."/>
+                </items>
+            </branch3>
+<branch4 jcr:primaryType="nt:unstructured" jcr:title="Branch 4" sling:resourceType="granite/ui/components/coral/foundation/container" margin="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <default jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/checkbox" text="Default Route" name="./metaData/default4" value="true" uncheckedValue="false" fieldDescription="Taken when no other branch rule holds."/><rule jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Rule" name="./metaData/rule4" fieldDescription="true, false or empty (always). Script rules are not evaluated by Sensible Studio and count as false."/>
+                </items>
+            </branch4>
+<branch5 jcr:primaryType="nt:unstructured" jcr:title="Branch 5" sling:resourceType="granite/ui/components/coral/foundation/container" margin="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <default jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/checkbox" text="Default Route" name="./metaData/default5" value="true" uncheckedValue="false" fieldDescription="Taken when no other branch rule holds."/><rule jcr:primaryType="nt:unstructured" sling:resourceType="granite/ui/components/coral/foundation/form/textfield" fieldLabel="Rule" name="./metaData/rule5" fieldDescription="true, false or empty (always). Script rules are not evaluated by Sensible Studio and count as false."/>
+                </items>
+            </branch5>
+                </items>
+            </tabs>
+        </items>
+    </content>
+</jcr:root>

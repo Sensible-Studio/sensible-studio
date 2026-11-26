@@ -1,0 +1,388 @@
+// Sensible Studio foundations (the design language is described in DESIGN.md). React Spectrum remains
+// the component engine, but every colour, shape and type decision is supplied by Studio's own
+// semantic system. Three schemes, chosen in the user menu (theme/pref.ts): Proof (default), Ledger,
+// Night Desk; each `data-studio-theme` block only restates the values that differ.
+
+.studio-theme.studio-theme {
+  // Type
+  --studio-font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --studio-font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', ui-monospace, monospace;
+  --spectrum-global-font-family-base: var(--studio-font-sans);
+  --spectrum-alias-body-text-font-family: var(--spectrum-global-font-family-base);
+  --spectrum-alias-component-text-font-family: var(--spectrum-global-font-family-base);
+  --spectrum-alias-heading-text-font-family: var(--spectrum-global-font-family-base);
+  --studio-type-xs: 11px;
+  --studio-type-sm: 12px;
+  --studio-type-md: 13px;
+  --studio-type-lg: 14px;
+  --studio-type-xl: 16px;
+  --studio-type-2xl: 20px;
+  --studio-type-3xl: 24px;
+  --studio-leading-tight: 1.25;
+  --studio-leading-normal: 1.45;
+
+  // Space and shape
+  --studio-space-1: 2px;
+  --studio-space-2: 4px;
+  --studio-space-3: 6px;
+  --studio-space-4: 8px;
+  --studio-space-5: 12px;
+  --studio-space-6: 16px;
+  --studio-space-7: 24px;
+  --studio-space-8: 32px;
+  --studio-radius-xs: 2px;
+  --studio-radius-sm: 4px;
+  --studio-radius-md: 6px;
+  --studio-radius-lg: 8px;
+  --studio-radius-pill: 999px;
+  --spectrum-alias-border-radius-xsmall: var(--studio-radius-xs);
+  --spectrum-alias-border-radius-small: var(--studio-radius-sm);
+  --spectrum-alias-border-radius-regular: var(--studio-radius-md);
+  --spectrum-alias-border-radius-medium: var(--studio-radius-md);
+  --spectrum-alias-border-radius-large: var(--studio-radius-lg);
+  --spectrum-button-primary-border-radius: var(--studio-radius-sm);
+  --spectrum-search-border-radius: var(--studio-radius-sm);
+  --spectrum-dialog-border-radius: var(--studio-radius-lg);
+
+  // Proof is the default scheme.
+  --studio-neutral-0: #ffffff;
+  --studio-neutral-50: #fbfcfd;
+  --studio-neutral-100: #f4f6f8;
+  --studio-neutral-200: #e8ebef;
+  --studio-neutral-300: #d6dbe1;
+  --studio-neutral-400: #b7bec7;
+  --studio-neutral-500: #8c96a1;
+  --studio-neutral-600: #66717d;
+  --studio-neutral-700: #46515d;
+  --studio-neutral-800: #28323d;
+  --studio-neutral-900: #151c24;
+  --studio-neutral-950: #0b1016;
+  --studio-accent-50: #f2f4ff;
+  --studio-accent-100: #e3e8ff;
+  --studio-accent-200: #cbd4ff;
+  --studio-accent-300: #a9b8f7;
+  --studio-accent-400: #8297e7;
+  --studio-accent-500: #6179d4;
+  --studio-accent-600: #4962bd;
+  --studio-accent-700: #394fa2;
+  --studio-accent-800: #304487;
+  --studio-accent-900: #293a70;
+  --studio-accent-1000: #23325f;
+  --studio-accent-1100: #1d294f;
+  --studio-accent-1200: #17213f;
+  --studio-accent-1300: #11182f;
+  --studio-accent-1400: #0b101f;
+  --studio-success: #247553;
+  --studio-success-strong: #18563b;
+  --studio-success-surface: #e7f4ed;
+  --studio-warning: #986400;
+  --studio-warning-strong: #6f4900;
+  --studio-warning-surface: #faf0d6;
+  --studio-danger: #b83e46;
+  --studio-danger-strong: #8e2931;
+  --studio-danger-surface: #fae9eb;
+  --studio-info: #4962bd;
+  --studio-info-strong: #304487;
+  --studio-info-surface: #e3e8ff;
+  --studio-surface-selected: #dde1e6;
+  --studio-bar-bg: #eef1f4;
+  --studio-bar-border: #c9cfd6;
+  --studio-bar-text: #28323d;
+  --studio-bar-dim: #7a8590;
+  --studio-bar-hover: #dde2e7;
+  --studio-bar-rule: #c9cfd6;
+  --studio-tab-idle-bg: #e4e8ec;
+  --studio-tab-idle-border: #c5cbd2;
+  --studio-tab-hover-bg: #f0f2f4;
+  --studio-tab-active-bg: #fbfcfd;
+  --studio-tab-active-border: #aeb6bf;
+  --studio-tab-active-text: #0b1016;
+  --studio-mark-bg: #151c24;
+  --studio-mark-text: #fbfcfd;
+  --studio-avatar-bg: #d6dbe1;
+  --studio-avatar-text: #28323d;
+  --studio-bar-focus: #4962bd;
+  --studio-shadow-1: 0 1px 2px rgb(11 16 22 / 10%);
+  --studio-shadow-2: 0 4px 12px rgb(11 16 22 / 14%);
+  --studio-shadow-3: 0 12px 32px rgb(11 16 22 / 18%);
+
+  // Semantic tokens: what the screens' styles should read
+  --studio-surface-canvas: var(--studio-neutral-100);
+  --studio-surface-panel: var(--studio-neutral-50);
+  --studio-surface-raised: var(--studio-neutral-0);
+  --studio-surface-sunken: var(--studio-neutral-200);
+  --studio-surface-hover: var(--studio-neutral-200);
+  --studio-text: var(--studio-neutral-800);
+  --studio-text-strong: var(--studio-neutral-950);
+  --studio-text-muted: var(--studio-neutral-600);
+  --studio-text-faint: var(--studio-neutral-500);
+  --studio-text-inverse: var(--studio-neutral-50);
+  --studio-border-subtle: var(--studio-neutral-200);
+  --studio-border: var(--studio-neutral-300);
+  --studio-border-strong: var(--studio-neutral-500);
+  --studio-focus-color: var(--studio-accent-600);
+  --studio-focus-ring: 0 0 0 2px var(--studio-neutral-0), 0 0 0 4px var(--studio-focus-color);
+
+  // The dialog widgets (granite/styles) and Page Properties were written against their own small set of
+  // tokens; here those names take the scheme's values, so dialogs follow the theme (and never the
+  // system's dark mode on their own). `--studio-focus` is their focus ring, a shadow.
+  --studio-focus: var(--studio-focus-ring);
+  --studio-font: var(--studio-font-sans);
+  --studio-mono: var(--studio-font-mono);
+  --studio-bg: var(--studio-surface-raised);
+  --studio-bg-subtle: var(--studio-surface-panel);
+  --studio-bg-sunken: var(--studio-surface-sunken);
+  --studio-accent: var(--studio-accent-700);
+  --studio-accent-hover: var(--studio-accent-800);
+  --studio-accent-soft: var(--studio-accent-50);
+  --studio-danger-soft: var(--studio-danger-surface);
+  --studio-warning-soft: var(--studio-warning-surface);
+  --studio-radius: var(--studio-radius-md);
+
+  // Spectrum colour contract. "Blue" is Studio's current accent.
+  --spectrum-gray-50: var(--studio-neutral-0);
+  --spectrum-gray-75: var(--studio-neutral-50);
+  --spectrum-gray-100: var(--studio-neutral-100);
+  --spectrum-gray-200: var(--studio-neutral-200);
+  --spectrum-gray-300: var(--studio-neutral-300);
+  --spectrum-gray-400: var(--studio-neutral-400);
+  --spectrum-gray-500: var(--studio-neutral-500);
+  --spectrum-gray-600: var(--studio-neutral-600);
+  --spectrum-gray-700: var(--studio-neutral-700);
+  --spectrum-gray-800: var(--studio-neutral-800);
+  --spectrum-gray-900: var(--studio-neutral-900);
+  --spectrum-blue-100: var(--studio-accent-50);
+  --spectrum-blue-200: var(--studio-accent-100);
+  --spectrum-blue-300: var(--studio-accent-200);
+  --spectrum-blue-400: var(--studio-accent-300);
+  --spectrum-blue-500: var(--studio-accent-400);
+  --spectrum-blue-600: var(--studio-accent-500);
+  --spectrum-blue-700: var(--studio-accent-600);
+  --spectrum-blue-800: var(--studio-accent-700);
+  --spectrum-blue-900: var(--studio-accent-800);
+  --spectrum-blue-1000: var(--studio-accent-900);
+  --spectrum-blue-1100: var(--studio-accent-1000);
+  --spectrum-blue-1200: var(--studio-accent-1100);
+  --spectrum-blue-1300: var(--studio-accent-1200);
+  --spectrum-blue-1400: var(--studio-accent-1400);
+  --spectrum-global-color-gray-50: var(--studio-neutral-0);
+  --spectrum-global-color-gray-75: var(--studio-neutral-50);
+  --spectrum-global-color-gray-100: var(--studio-neutral-100);
+  --spectrum-global-color-gray-200: var(--studio-neutral-200);
+  --spectrum-global-color-gray-300: var(--studio-neutral-300);
+  --spectrum-global-color-gray-400: var(--studio-neutral-400);
+  --spectrum-global-color-gray-500: var(--studio-neutral-500);
+  --spectrum-global-color-gray-600: var(--studio-neutral-600);
+  --spectrum-global-color-gray-700: var(--studio-neutral-700);
+  --spectrum-global-color-gray-800: var(--studio-neutral-800);
+  --spectrum-global-color-gray-900: var(--studio-neutral-900);
+  --spectrum-global-color-blue-400: var(--studio-accent-300);
+  --spectrum-global-color-blue-500: var(--studio-accent-400);
+  --spectrum-global-color-blue-600: var(--studio-accent-500);
+  --spectrum-global-color-blue-700: var(--studio-accent-600);
+  --spectrum-global-color-green-100: var(--studio-success-surface);
+  --spectrum-global-color-green-500: var(--studio-success);
+  --spectrum-global-color-green-600: var(--studio-success);
+  --spectrum-global-color-green-700: var(--studio-success-strong);
+  --spectrum-global-color-orange-500: var(--studio-warning);
+  --spectrum-global-color-orange-600: var(--studio-warning);
+  --spectrum-global-color-orange-700: var(--studio-warning-strong);
+  --spectrum-global-color-red-100: var(--studio-danger-surface);
+  --spectrum-global-color-red-500: var(--studio-danger);
+  --spectrum-global-color-red-600: var(--studio-danger);
+  --spectrum-global-color-red-700: var(--studio-danger-strong);
+
+  font-family: var(--spectrum-global-font-family-base);
+  font-size: var(--studio-type-md);
+  font-feature-settings: 'cv11', 'ss03';
+  color: var(--studio-text);
+}
+
+// Ledger: warmer paper, olive-black chrome, restrained burgundy accent.
+:root[data-studio-theme='ledger'] .studio-theme.studio-theme {
+  --studio-neutral-0: #fffefa;
+  --studio-neutral-50: #fbfaf6;
+  --studio-neutral-100: #f4f2ec;
+  --studio-neutral-200: #e8e4da;
+  --studio-neutral-300: #d6d0c4;
+  --studio-neutral-400: #b8b0a2;
+  --studio-neutral-500: #91887a;
+  --studio-neutral-600: #6d655a;
+  --studio-neutral-700: #4c463e;
+  --studio-neutral-800: #2c2924;
+  --studio-neutral-900: #1b1916;
+  --studio-neutral-950: #100f0d;
+  --studio-accent-50: #fbf2f3;
+  --studio-accent-100: #f5e2e5;
+  --studio-accent-200: #eac8ce;
+  --studio-accent-300: #dca4ae;
+  --studio-accent-400: #c77c8b;
+  --studio-accent-500: #ae5a6b;
+  --studio-accent-600: #934252;
+  --studio-accent-700: #7b3443;
+  --studio-accent-800: #672c39;
+  --studio-accent-900: #562631;
+  --studio-accent-1000: #482029;
+  --studio-accent-1100: #3b1a22;
+  --studio-accent-1200: #2e141a;
+  --studio-accent-1300: #210e13;
+  --studio-accent-1400: #16090c;
+  --studio-success: #4e7149;
+  --studio-success-strong: #365334;
+  --studio-success-surface: #eaf1e5;
+  --studio-warning: #93631b;
+  --studio-warning-strong: #6b4610;
+  --studio-warning-surface: #f8eed9;
+  --studio-danger: #aa4141;
+  --studio-danger-strong: #812d2d;
+  --studio-danger-surface: #f8e9e7;
+  --studio-info: #695e9a;
+  --studio-info-strong: #4c4378;
+  --studio-info-surface: #ece9f5;
+  --studio-surface-selected: #ded9d0;
+  --studio-bar-bg: #ede9df;
+  --studio-bar-border: #ccc5b8;
+  --studio-bar-text: #2c2924;
+  --studio-bar-dim: #7b7367;
+  --studio-bar-hover: #ddd7cc;
+  --studio-bar-rule: #cbc4b7;
+  --studio-tab-idle-bg: #e2ddd2;
+  --studio-tab-idle-border: #c5beb1;
+  --studio-tab-hover-bg: #f3f0e9;
+  --studio-tab-active-bg: #fbfaf6;
+  --studio-tab-active-border: #aaa294;
+  --studio-tab-active-text: #100f0d;
+  --studio-mark-bg: #252a23;
+  --studio-mark-text: #fbfaf6;
+  --studio-avatar-bg: #d6d0c4;
+  --studio-avatar-text: #2c2924;
+  --studio-bar-focus: #934252;
+}
+
+// Night Desk: dark, low-glare chrome around the same legible light working surfaces.
+:root[data-studio-theme='night'] .studio-theme.studio-theme {
+  --studio-neutral-0: #ffffff;
+  --studio-neutral-50: #fafbfc;
+  --studio-neutral-100: #f1f3f5;
+  --studio-neutral-200: #e3e6ea;
+  --studio-neutral-300: #cfd4da;
+  --studio-neutral-400: #adb5bf;
+  --studio-neutral-500: #848e9a;
+  --studio-neutral-600: #616c78;
+  --studio-neutral-700: #424c57;
+  --studio-neutral-800: #272f38;
+  --studio-neutral-900: #171d24;
+  --studio-neutral-950: #0d1116;
+  --studio-accent-50: #f4f2ff;
+  --studio-accent-100: #e9e5ff;
+  --studio-accent-200: #d4ccff;
+  --studio-accent-300: #b7a8fa;
+  --studio-accent-400: #9881e9;
+  --studio-accent-500: #7d63d3;
+  --studio-accent-600: #684eb9;
+  --studio-accent-700: #573f9d;
+  --studio-accent-800: #493683;
+  --studio-accent-900: #3e2f6d;
+  --studio-accent-1000: #34275b;
+  --studio-accent-1100: #2b204b;
+  --studio-accent-1200: #21183b;
+  --studio-accent-1300: #18112b;
+  --studio-accent-1400: #100b1c;
+  --studio-success: #2c7655;
+  --studio-success-strong: #1d573d;
+  --studio-success-surface: #e5f3eb;
+  --studio-warning: #92620b;
+  --studio-warning-strong: #6a4704;
+  --studio-warning-surface: #f8eed5;
+  --studio-danger: #b33f4b;
+  --studio-danger-strong: #892d37;
+  --studio-danger-surface: #f9e8eb;
+  --studio-info: #684eb9;
+  --studio-info-strong: #493683;
+  --studio-info-surface: #e9e5ff;
+  --studio-surface-selected: #d9dde2;
+  --studio-shadow-1: 0 1px 2px rgb(13 17 22 / 12%);
+  --studio-shadow-2: 0 5px 16px rgb(13 17 22 / 18%);
+  --studio-shadow-3: 0 14px 36px rgb(13 17 22 / 24%);
+  --studio-bar-bg: #171a1f;
+  --studio-bar-border: #090b0e;
+  --studio-bar-text: #d8dde3;
+  --studio-bar-dim: #7f8994;
+  --studio-bar-hover: #2b3037;
+  --studio-bar-rule: #373d45;
+  --studio-tab-idle-bg: #20242a;
+  --studio-tab-idle-border: #3a4048;
+  --studio-tab-hover-bg: #2a2f36;
+  --studio-tab-active-bg: #fafbfc;
+  --studio-tab-active-border: #fafbfc;
+  --studio-tab-active-text: #171d24;
+  --studio-mark-bg: #d8dde3;
+  --studio-mark-text: #171a1f;
+  --studio-avatar-bg: #343a42;
+  --studio-avatar-text: #e8ebef;
+  --studio-bar-focus: #b7a8fa;
+}
+
+// The icons of the set are stroked; Spectrum's generic SVG rule fills by default.
+.studio-icon.studio-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  * {
+    fill: none;
+  }
+}
+
+// Spectrum's component styles repeat their own font stack literally (buttons, fields, menus), so the
+// variable alone does not reach them.
+.studio-theme [class*='spectrum-'],
+.studio-theme :where(button, input, textarea, select) {
+  font-family: var(--spectrum-global-font-family-base);
+}
+
+// Shared component finish. These selectors deliberately sit at the theme boundary so portals and
+// dialogs receive the same treatment as screen-local controls.
+.studio-theme {
+  :where(button, input, textarea, select):focus-visible {
+    outline-color: var(--studio-focus-color);
+  }
+
+  [class*='spectrum-Button'],
+  [class*='spectrum-ActionButton'],
+  [class*='spectrum-Textfield-input'],
+  [class*='spectrum-Textfield'],
+  [class*='spectrum-Search-input'] {
+    border-radius: var(--studio-radius-sm);
+  }
+
+  [class*='spectrum-Textfield-input'],
+  [class*='spectrum-Search-input'],
+  textarea,
+  select {
+    color: var(--studio-text);
+    background: var(--studio-surface-raised);
+    border-color: var(--studio-border);
+  }
+
+  [class*='spectrum-Menu-popover'],
+  [class*='spectrum-Popover'],
+  :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] {
+    color: var(--studio-text);
+    background: var(--studio-surface-raised);
+    border-color: var(--studio-border);
+    border-radius: var(--studio-radius-lg);
+    box-shadow: var(--studio-shadow-3);
+  }
+
+  [class*='spectrum-Menu-item'] {
+    border-radius: var(--studio-radius-sm);
+  }
+
+  [class*='spectrum-Dialog-heading'] {
+    color: var(--studio-text-strong);
+    letter-spacing: -0.01em;
+  }
+}

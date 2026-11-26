@@ -1,0 +1,3 @@
+# Generated from the WKND + Core Components packages by studio-adapter (see author-ui/fixtures/README.md).
+# Kept in git so the dialog tests work after a plain clone; collapsed in diffs.
+author-ui/fixtures/** linguist-generated=true

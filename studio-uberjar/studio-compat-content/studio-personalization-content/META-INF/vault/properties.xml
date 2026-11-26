@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="group">io.sensible.studio</entry>
+<entry key="name">studio-personalization-content</entry>
+<entry key="version">0.1.9</entry>
+<entry key="description">Sensible Studio targeting and ContextHub: the Target component (one experience per audience), the segment page component, the ContextHub client script and the built-in personas. Written for Sensible Studio; contains no Adobe content.</entry>
+<entry key="createdBy">Sensible Studio</entry>
+<entry key="packageType">application</entry>
+<entry key="requiresRoot">false</entry>
+</properties>

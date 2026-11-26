@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="cq:Page">
+    <jcr:content
+        jcr:primaryType="nt:unstructured"
+        jcr:title="Request for Review"
+        jcr:description="An administrator reviews the payload and approves it or asks for changes; the decision is written to the payload as studioReviewStatus."
+        cq:template="/libs/cq/workflow/templates/model"
+        sling:resourceType="cq/workflow/components/pages/model">
+        <flow
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="foundation/components/parsys">
+            <participant
+                jcr:primaryType="nt:unstructured"
+                jcr:title="Review content"
+                jcr:description="Approve the content or ask for changes."
+                sling:resourceType="cq/workflow/components/model/participant">
+                <metaData
+                    jcr:primaryType="nt:unstructured"
+                    PARTICIPANT="administrators"/>
+            </participant>
+            <or
+                jcr:primaryType="nt:unstructured"
+                jcr:title="Decision"
+                sling:resourceType="cq/workflow/components/model/or"
+                branches="2"
+                orSplit="true">
+                <metaData
+                    jcr:primaryType="nt:unstructured"
+                    default1="true"
+                    default2="false"/>
+                <_x0031_
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="cq/flow/components/parsys">
+                    <process
+                        jcr:primaryType="nt:unstructured"
+                        jcr:title="Approve"
+                        sling:resourceType="cq/workflow/components/model/process">
+                        <metaData
+                            jcr:primaryType="nt:unstructured"
+                            PROCESS="io.sensible.studio.workflow.impl.BuiltInProcesses$SetProperties"
+                            PROCESS_ARGS="studioReviewStatus=approved"
+                            PROCESS_AUTO_ADVANCE="true"/>
+                    </process>
+                </_x0031_>
+                <_x0032_
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="cq/flow/components/parsys">
+                    <process
+                        jcr:primaryType="nt:unstructured"
+                        jcr:title="Request changes"
+                        sling:resourceType="cq/workflow/components/model/process">
+                        <metaData
+                            jcr:primaryType="nt:unstructured"
+                            PROCESS="io.sensible.studio.workflow.impl.BuiltInProcesses$SetProperties"
+                            PROCESS_ARGS="studioReviewStatus=changes-requested"
+                            PROCESS_AUTO_ADVANCE="true"/>
+                    </process>
+                </_x0032_>
+            </or>
+        </flow>
+    </jcr:content>
+</jcr:root>

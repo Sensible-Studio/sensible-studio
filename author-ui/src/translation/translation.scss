@@ -1,0 +1,245 @@
+// Tools → Cloud Services → Translation (reuses the content fragment console's layout, .studio-cfc)
+.studio-tcs__hint {
+  font-size: var(--spectrum-global-dimension-font-size-75, 12px);
+  color: var(--spectrum-global-color-gray-700);
+  margin-top: calc(-1 * var(--spectrum-global-dimension-size-100, 8px));
+}
+
+.studio-tcs__test {
+  margin-top: var(--spectrum-global-dimension-size-200, 16px);
+}
+
+.studio-tcs__sample {
+  margin-top: var(--spectrum-global-dimension-size-50, 4px);
+  font-style: italic;
+}
+
+.studio-tcs__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spectrum-global-dimension-size-200, 16px);
+}
+
+.studio-tcs__headers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spectrum-global-dimension-size-100, 8px);
+}
+
+.studio-tcs__headers-title {
+  font-size: var(--spectrum-global-dimension-font-size-75, 12px);
+  color: var(--spectrum-global-color-gray-700);
+}
+
+// Sites → Language Copies
+.studio-tr-page__mono {
+  font-family: var(--spectrum-alias-body-text-font-family, monospace);
+  font-size: 12px;
+  color: var(--spectrum-global-color-gray-700);
+  word-break: break-all;
+}
+
+.studio-tr-page__own {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spectrum-global-dimension-size-150, 12px);
+  padding: var(--spectrum-global-dimension-size-150, 12px);
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 4px;
+}
+
+.studio-tr-page__copies,
+.studio-tr-page__results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.studio-tr-page__copies li {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr) auto;
+  align-items: center;
+  gap: var(--spectrum-global-dimension-size-100, 8px);
+  padding: 4px 0;
+  border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+}
+
+.studio-tr-page__results li {
+  padding: 2px 0;
+  word-break: break-all;
+}
+
+.studio-tr-page__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spectrum-global-dimension-size-100, 8px);
+}
+
+.studio-tr-page__heading {
+  margin: 0;
+}
+
+// Tools → Translation Review
+.studio-trr__title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.studio-trr__body {
+  overflow-y: auto;
+}
+
+.studio-trr__review {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spectrum-global-dimension-size-200, 16px);
+}
+
+.studio-trr__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spectrum-global-dimension-size-150, 12px);
+  margin-bottom: var(--spectrum-global-dimension-size-200, 16px);
+}
+
+.studio-trr__segments {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spectrum-global-dimension-size-150, 12px);
+}
+
+.studio-trr__segment {
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-left-width: 4px;
+  border-radius: 4px;
+  padding: var(--spectrum-global-dimension-size-100, 8px) var(--spectrum-global-dimension-size-150, 12px);
+  background: var(--spectrum-global-color-gray-50);
+
+  &.is-failed {
+    border-left-color: var(--spectrum-semantic-negative-color-default, var(--studio-danger));
+  }
+
+  &.is-changed {
+    border-left-color: var(--spectrum-semantic-informative-color-default, var(--spectrum-blue-800));
+  }
+}
+
+.studio-trr__segment-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spectrum-global-dimension-size-100, 8px);
+}
+
+.studio-trr__label {
+  font-weight: 600;
+}
+
+.studio-trr__pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--spectrum-global-dimension-size-150, 12px);
+  align-items: start;
+}
+
+.studio-trr__source {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 13px;
+  color: var(--spectrum-global-color-gray-800);
+  padding: 6px 0;
+}
+
+@media (max-width: 760px) {
+  .studio-trr__pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.studio-trr__changes {
+  flex-basis: 100%;
+}
+
+// Translation Projects (.studio-trp)
+.studio-trp__jobs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--spectrum-global-dimension-size-200);
+}
+
+.studio-trp__body {
+  flex: 1;
+  overflow: auto;
+  padding: var(--spectrum-global-dimension-size-300);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spectrum-global-dimension-size-300);
+
+  h2,
+  h3 {
+    margin: 0;
+  }
+
+  p {
+    margin: var(--spectrum-global-dimension-size-50) 0;
+  }
+}
+
+.studio-trp__jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spectrum-global-dimension-size-200);
+  align-items: start;
+}
+
+.studio-trp__job {
+  background: var(--spectrum-global-color-gray-50);
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 4px;
+  padding: var(--spectrum-global-dimension-size-200);
+}
+
+.studio-trp__job-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spectrum-global-dimension-size-100);
+  margin-bottom: var(--spectrum-global-dimension-size-100);
+}
+
+.studio-trp__add-language {
+  display: flex;
+  align-items: end;
+  gap: var(--spectrum-global-dimension-size-100);
+  padding: var(--spectrum-global-dimension-size-200);
+  border: 1px dashed var(--spectrum-global-color-gray-400);
+  border-radius: 4px;
+}
+
+.studio-trp__list {
+  list-style: none;
+  margin: var(--spectrum-global-dimension-size-100) 0 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spectrum-global-dimension-size-75) 0;
+    border-top: 1px solid var(--spectrum-global-color-gray-200);
+  }
+}
+
+.studio-trp__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spectrum-global-dimension-size-100);
+}
+
+// A job has up to seven actions: the card is wide enough to hold them in two rows.
+.studio-trp__jobs-grid { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }

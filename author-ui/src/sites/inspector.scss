@@ -1,0 +1,146 @@
+// the inspector: a panel at the right of the console for the selection (or the location)
+
+.studio-inspector__toggle {
+  color: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+
+  &:hover:not(.is-on) {
+    background: var(--studio-surface-hover);
+  }
+
+  &.is-on {
+    color: var(--studio-text-strong);
+    background: var(--studio-surface-sunken);
+    border-color: var(--studio-border);
+    box-shadow: none;
+  }
+}
+
+.studio-inspector {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 340px;
+  min-height: 0;
+  background: var(--spectrum-global-color-gray-50);
+  border-left: 1px solid var(--spectrum-global-color-gray-300);
+
+  // what it is, its name large, where it is, its state at a glance
+  &__head {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    min-width: 0;
+    padding: 10px 8px 12px 20px;
+    background: var(--studio-surface-raised);
+  }
+
+  &__top {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__kind {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--spectrum-global-color-gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    color: var(--spectrum-global-color-gray-600);
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__title {
+    padding-right: 12px;
+    margin-top: 2px;
+    overflow: hidden;
+    font-size: var(--studio-type-2xl);
+    font-weight: 600;
+    line-height: var(--studio-leading-tight);
+    color: var(--studio-text-strong);
+    letter-spacing: -0.01em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__path {
+    padding-right: 12px;
+    margin-top: 2px;
+    overflow: hidden;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-600);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-right: 12px;
+    margin-top: 10px;
+  }
+
+  &__tabs {
+    flex: none;
+    padding: 2px 20px 12px;
+    border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+
+    .studio-segmented {
+      display: flex;
+
+      > button {
+        flex: 1 1 0;
+        padding-right: 6px;
+        padding-left: 6px;
+        text-align: center;
+      }
+    }
+  }
+
+  &__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 16px 20px;
+    overflow-y: auto;
+  }
+
+  // the timeline keeps its own scrolling and its comment field at the bottom
+  &--timeline &__body {
+    padding-bottom: 0;
+    overflow: hidden;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+}
+
+// the page on the preview instance (Publish to Preview)
+.studio-inspector__preview-link {
+  display: inline-block;
+  margin: 4px 0 8px;
+  font-size: 13px;
+  color: var(--studio-accent-700, var(--studio-accent));
+  text-underline-offset: 2px;
+}

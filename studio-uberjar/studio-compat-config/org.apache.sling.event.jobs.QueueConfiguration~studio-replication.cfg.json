@@ -1,0 +1,11 @@
+{
+  "queue.name": "Sensible Studio replication {0}",
+  "queue.topics": [
+    "studio/replication/*",
+    "studio/replication"
+  ],
+  "queue.type": "ORDERED",
+  "queue.retries": -1,
+  "queue.retrydelay": 60000,
+  "queue.priority": "NORM"
+}

@@ -1,0 +1,5 @@
+<div class="studio-form__field studio-form__field--text" data-studio-field="${properties.name || resource.name}">
+    <div class="studio-form__text" data-sly-test="${properties.text}">${properties.text @ context='html'}</div>
+    <div class="studio-form__text studio-form__text--empty" data-sly-test="${!properties.text && wcmmode.edit}">Text: open the dialog to write it.</div>
+    <sly data-sly-resource="${'rules' @ resourceType='studio/forms/components/rules'}"></sly>
+</div>

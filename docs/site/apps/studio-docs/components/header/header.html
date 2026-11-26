@@ -1,0 +1,12 @@
+<header class="docs-header">
+    <button class="docs-header__menu" type="button" aria-label="Menu" aria-expanded="false" data-docs-menu>
+        <span></span><span></span><span></span>
+    </button>
+    <a class="docs-header__brand" href="${properties.home @ extension='html'}">
+        <span class="docs-header__mark" aria-hidden="true"></span>
+        <span class="docs-header__name">${properties.brand || 'Sensible Studio'}</span>
+        <span class="docs-header__tag">Docs</span>
+    </a>
+    <div class="docs-header__nav" data-sly-resource="${'topnav' @ resourceType='studio-docs/components/navigation'}"></div>
+    <a class="docs-header__source" data-sly-test="${properties.sourceUrl}" href="${properties.sourceUrl}" rel="noopener">${properties.sourceLabel || 'Source'}</a>
+</header>

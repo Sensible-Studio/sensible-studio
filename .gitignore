@@ -1,0 +1,72 @@
+# Sensible Studio
+# Target & Build directories (not the Target component's folder in a content package)
+target/
+!**/jcr_root/**/target/
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Runtime directories: the author and publish instances live in instances/
+instances/
+repository/
+logs/
+*.log
+
+# Maven & IDEs
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS & Environment
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.env
+.env.local
+
+# Rust (dam-service)
+dam-service/target/
+dam-service/**/*.rs.bk
+Cargo.lock
+
+# Frontend (author-ui)
+author-ui/node_modules/
+author-ui/dist/
+author-ui/dist-assets/
+author-ui/.next/
+author-ui/.svelte-kit/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+/wknd/
+
+# Transfer archives used by Claude sessions to sync files (never source)
+.studio-transfer/
+.studio-sync.tgz
+.dump.tgz
+.fx.tgz
+
+# Publish instance and session transfer files
+.studio-*-transfer/
+_to_delete/
+*.tgz
+*.bak
+
+# An instance started from the repository root by mistake (instances live in instances/)
+/crx-quickstart/

@@ -1,0 +1,693 @@
+// Sensible Studio Content Fragments: console (.studio-cfc) and editor (.studio-cf). Spectrum supplies the controls;
+// this only lays them out, with Spectrum's global colour variables.
+
+.studio-cfc,
+.studio-cf {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  color: var(--spectrum-global-color-gray-800);
+  background: var(--spectrum-global-color-gray-100);
+}
+
+.studio-cf__loading {
+  display: grid;
+  flex: 1;
+  place-items: center;
+}
+
+.studio-cf__failure {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 640px;
+  margin: 32px auto;
+  padding: 12px 16px;
+  font-size: 13px;
+  background: var(--spectrum-global-color-gray-50);
+  border-left: 4px solid var(--spectrum-global-color-red-600);
+  overflow-wrap: anywhere;
+}
+
+.studio-cf-label {
+  display: block;
+  padding-bottom: 4px;
+  font-size: var(--spectrum-global-dimension-font-size-75, 12px);
+  color: var(--spectrum-global-color-gray-700);
+}
+
+.studio-cf-required {
+  color: var(--spectrum-global-color-gray-700);
+}
+
+.studio-cf-help {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--spectrum-global-color-gray-700);
+}
+
+.studio-cf-error {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--spectrum-global-color-red-700);
+}
+
+.studio-cf-mono input,
+.studio-cf-mono textarea {
+  font-family: 'Source Code Pro', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+}
+
+// ------------------------------------------------------------------------------------------ console
+
+.studio-cfc__bar {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 4px 12px;
+  background: var(--spectrum-global-color-gray-50);
+  border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+}
+
+.studio-cfc__crumbs {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.studio-cfc__selection {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 16px;
+  background: var(--spectrum-global-color-blue-100);
+  border-bottom: 1px solid var(--spectrum-global-color-blue-400);
+}
+
+.studio-cfc__content {
+  // the Sites views (columns, cards, list) lay themselves out; this is the same host Sites gives them
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  overflow: auto;
+
+  @media (max-width: 640px) {
+    padding: 0;
+  }
+}
+
+.studio-cfc__cell {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  svg {
+    flex: none;
+    color: var(--spectrum-global-color-gray-700);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ editor
+
+.studio-cf__bar {
+  display: flex;
+  flex: none;
+  gap: 12px;
+  align-items: center;
+  height: 56px;
+  padding: 0 16px 0 8px;
+  background: var(--spectrum-global-color-gray-50);
+  border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+}
+
+.studio-cf__title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.studio-cf__titletext {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.studio-cf__subtitle {
+  font-size: 12px;
+  color: var(--spectrum-global-color-gray-700);
+}
+
+.studio-cf__status {
+  margin-left: auto;
+
+  @media (max-width: 640px) {
+    > * {
+      display: none;
+    }
+  }
+}
+
+.studio-cf__body {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 240px minmax(0, 1fr) 300px;
+  min-height: 0;
+
+  // room for the side panel's four tabs on wide screens
+  @media (min-width: 1280px) {
+    grid-template-columns: 220px minmax(0, 1fr) 380px;
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 220px minmax(0, 1fr);
+
+    // the side panel becomes a drawer, opened from the bar
+    .studio-cf__props {
+      display: none;
+    }
+
+    .studio-cf__props.is-open {
+      position: absolute;
+      top: 56px;
+      right: 0;
+      bottom: 0;
+      z-index: 5;
+      display: block;
+      width: min(360px, 100%);
+      box-shadow: -4px 0 16px rgb(0 0 0 / 15%);
+    }
+  }
+
+  @media (max-width: 760px) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .studio-cf__rail {
+      max-height: 160px;
+      border-right: 0;
+      border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+    }
+  }
+}
+
+.studio-cf__rail,
+.studio-cf__props {
+  min-height: 0;
+  padding: 16px;
+  overflow: auto;
+  background: var(--spectrum-global-color-gray-50);
+}
+
+.studio-cf__rail {
+  border-right: 1px solid var(--spectrum-global-color-gray-300);
+}
+
+.studio-cf__props {
+  border-left: 1px solid var(--spectrum-global-color-gray-300);
+}
+
+.studio-cf__railtitle {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--spectrum-global-color-gray-700);
+}
+
+.studio-cf__main {
+  min-height: 0;
+  padding: 24px;
+  overflow: auto;
+
+  @media (max-width: 640px) {
+    padding: 12px;
+  }
+}
+
+.studio-cf__sheet {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px 32px 32px;
+  background: var(--spectrum-global-color-gray-50);
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 4px;
+
+  @media (max-width: 640px) {
+    padding: 16px;
+  }
+}
+
+.studio-cf__sheethead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.studio-cf__muted {
+  font-size: 13px;
+  color: var(--spectrum-global-color-gray-700);
+}
+
+.studio-cf__form {
+  gap: 0;
+}
+
+.studio-cf__field {
+  padding: 12px 0;
+
+  & + & {
+    border-top: 1px solid var(--spectrum-global-color-gray-200);
+  }
+}
+
+.studio-cf__wrap {
+  overflow-wrap: anywhere;
+}
+
+.studio-cf__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.studio-cf__tag {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  padding: 2px 4px 2px 8px;
+  font-size: 12px;
+  background: var(--spectrum-global-color-gray-200);
+  border-radius: 4px;
+
+  button {
+    padding: 0 4px;
+    font: inherit;
+    color: var(--spectrum-global-color-gray-700);
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+}
+
+.studio-cf-boolean {
+  padding: 4px 0;
+}
+
+.studio-cf-multi {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.studio-cf-ref {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+
+  &__preview {
+    flex: none;
+    width: 96px;
+    height: 64px;
+    overflow: hidden;
+    background: var(--spectrum-global-color-gray-200);
+    border-radius: 4px;
+  }
+}
+
+// ------------------------------------------------------------------------------------------ rich text
+
+.studio-cf-rte {
+  &__box {
+    background: var(--spectrum-global-color-gray-50);
+    border: 1px solid var(--spectrum-global-color-gray-400);
+    border-radius: 4px;
+
+    &:focus-within {
+      border-color: var(--spectrum-global-color-blue-500);
+      box-shadow: 0 0 0 1px var(--spectrum-global-color-blue-500);
+    }
+  }
+
+  &.is-invalid &__box,
+  &.is-invalid &__plain {
+    border-color: var(--spectrum-global-color-red-600);
+  }
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 2px 4px;
+    border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+  }
+
+  &__editor {
+    min-height: 160px;
+    max-height: 480px;
+    padding: 10px 12px;
+    overflow: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    outline: none;
+
+    p {
+      margin: 0 0 8px;
+    }
+
+    a {
+      color: var(--spectrum-global-color-blue-700);
+    }
+  }
+
+  &__plain {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 180px;
+    padding: 10px 12px;
+    font-family: 'Source Code Pro', ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    color: inherit;
+    resize: vertical;
+    background: var(--spectrum-global-color-gray-50);
+    border: 1px solid var(--spectrum-global-color-gray-400);
+    border-radius: 4px;
+
+    &:focus {
+      outline: none;
+      border-color: var(--spectrum-global-color-blue-500);
+      box-shadow: 0 0 0 1px var(--spectrum-global-color-blue-500);
+    }
+  }
+}
+
+// ------------------------------------------------------------------------------------------ references
+
+.studio-cf-refs {
+  &__title {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: var(--spectrum-global-color-gray-800);
+  }
+
+  &__count {
+    margin-left: 4px;
+    padding: 0 6px;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--spectrum-global-color-gray-700);
+    background: var(--spectrum-global-color-gray-200);
+    border-radius: 8px;
+  }
+
+  &__empty {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  &__icon {
+    flex: none;
+    margin-top: 2px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  &__detail {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ model editor
+
+.studio-cfme__body {
+  grid-template-columns: 260px minmax(0, 1fr) 340px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 220px minmax(0, 1fr) 300px;
+
+    .studio-cf__props {
+      display: block;
+    }
+  }
+
+  @media (max-width: 760px) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .studio-cf__rail {
+      max-height: 220px;
+    }
+
+    .studio-cf__props {
+      border-top: 1px solid var(--spectrum-global-color-gray-300);
+      border-left: 0;
+    }
+  }
+}
+
+.studio-cfme__head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.studio-cfme__elements {
+  margin-top: 8px;
+}
+
+.studio-cfme__tab {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.studio-cfme__empty {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 160px;
+  font-size: 13px;
+  color: var(--spectrum-global-color-gray-700);
+  border: 2px dashed var(--spectrum-global-color-gray-300);
+  border-radius: 6px;
+}
+
+.studio-cfme__options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.studio-cfme__optionrows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.studio-cfme__optionrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+}
+
+// ------------------------------------------------------------------------------------------ panel tabs, versions
+
+.studio-cf__paneltabs {
+  margin-top: -8px;
+}
+
+.studio-cf__panelbody {
+  margin-top: 16px;
+}
+
+.studio-cf-versions {
+  &__list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 10px 0;
+
+    & + & {
+      border-top: 1px solid var(--spectrum-global-color-gray-200);
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  &__title {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  &__meta {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__comment {
+    font-size: 13px;
+    color: var(--spectrum-global-color-gray-800);
+  }
+}
+
+.studio-cf-diff {
+  width: 100%;
+  font-size: 13px;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+  }
+
+  thead th {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  tbody th {
+    width: 22%;
+    font-weight: 700;
+  }
+
+  &__old,
+  &__new,
+  &__src {
+    width: 39%;
+    max-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  &__old {
+    background: var(--spectrum-global-color-red-100, #fff0f0);
+  }
+
+  &__new {
+    background: var(--spectrum-global-color-green-100, #effaf2);
+  }
+}
+
+.studio-cf {
+  position: relative;
+}
+
+.studio-cf__paneltoggle {
+  display: none !important;
+
+  @media (max-width: 1100px) {
+    display: inline-flex !important;
+  }
+}
+
+// ------------------------------------------------------------------------------------------ translation
+
+.studio-cf-tr {
+  &__box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-wrap: anywhere;
+  }
+
+  &__status {
+    padding: 0 !important;
+  }
+
+  &__outdated {
+    font-size: 12px;
+    color: var(--spectrum-global-color-orange-700);
+  }
+
+  &__copies {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+
+  &__results {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 180px;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    font-size: 13px;
+    list-style: none;
+  }
+}

@@ -1,0 +1,327 @@
+{
+  "liveCopies": [
+    {
+      "path": "/content/experience-fragments/wknd/ca/en/featured/camping-western-australia",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/experience-fragments/wknd/language-masters/en/featured/camping-western-australia",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/experience-fragments/wknd/ca/en/featured/guide-la-skateparks",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/experience-fragments/wknd/language-masters/en/featured/guide-la-skateparks",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/experience-fragments/wknd/ca/en/site/footer",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/experience-fragments/wknd/language-masters/en/site/footer",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/experience-fragments/wknd/us/en/adventures/adventures-2021/alternate",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/experience-fragments/wknd/us/en/new_adventures/adventures-2021/master",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync"
+      ],
+      "masterExists": false
+    },
+    {
+      "path": "/content/experience-fragments/wknd/us/en/featured/camping-western-australia",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/experience-fragments/wknd/language-masters/en/featured/camping-western-australia",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/experience-fragments/wknd/us/en/featured/guide-la-skateparks",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/experience-fragments/wknd/language-masters/en/featured/guide-la-skateparks",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/ca/en",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/en",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/ca/fr",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/fr",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync",
+        "cq:PropertyLiveSyncCancelled",
+        "mix:versionable"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/ch/de",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/de",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync",
+        "cq:PropertyLiveSyncCancelled",
+        "mix:versionable"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/ch/fr",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/fr",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync",
+        "cq:PropertyLiveSyncCancelled",
+        "mix:versionable"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/ch/it",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/it",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync",
+        "cq:PropertyLiveSyncCancelled",
+        "mix:versionable"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/de/de",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/de",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync",
+        "mix:versionable"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/es/es",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/es",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync",
+        "mix:versionable"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/fr/fr",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/fr",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync",
+        "mix:versionable"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/it/it",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/it",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync",
+        "mix:versionable"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/us/en",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/en",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync"
+      ],
+      "masterExists": true
+    },
+    {
+      "path": "/content/wknd/us/es",
+      "primaryType": "cq:LiveCopy",
+      "master": "/content/wknd/language-masters/es",
+      "isDeep": true,
+      "rolloutConfigs": [
+        "/libs/msm/wcm/rolloutconfigs/default"
+      ],
+      "rootMixins": [
+        "cq:LiveRelationship",
+        "cq:LiveSync",
+        "cq:PropertyLiveSyncCancelled",
+        "mix:versionable"
+      ],
+      "masterExists": true
+    }
+  ],
+  "liveRelationshipNodes": 2345,
+  "cancelledNodes": [
+    {
+      "path": "/content/experience-fragments/wknd/ca/en/featured/camping-western-australia/master/jcr:content/root/container/teaser",
+      "cq:isCancelledForChildren": true
+    },
+    {
+      "path": "/content/experience-fragments/wknd/ca/en/featured/guide-la-skateparks/master/jcr:content/root/container/teaser",
+      "cq:isCancelledForChildren": true
+    },
+    {
+      "path": "/content/experience-fragments/wknd/us/en/adventures/adventures-2021/alternate/jcr:content/root/container/container/teaser",
+      "cq:isCancelledForChildren": true
+    },
+    {
+      "path": "/content/experience-fragments/wknd/us/en/featured/camping-western-australia/master/jcr:content/root/container/teaser",
+      "cq:isCancelledForChildren": true
+    },
+    {
+      "path": "/content/experience-fragments/wknd/us/en/featured/guide-la-skateparks/master/jcr:content/root/container/teaser",
+      "cq:isCancelledForChildren": true
+    }
+  ],
+  "propertyCancelledNodes": [
+    {
+      "path": "/content/wknd/ca/fr/jcr:content",
+      "cq:propertyInheritanceCancelled": [
+        "jcr:language"
+      ]
+    },
+    {
+      "path": "/content/wknd/ch/de/jcr:content",
+      "cq:propertyInheritanceCancelled": [
+        "jcr:language"
+      ]
+    },
+    {
+      "path": "/content/wknd/ch/fr/jcr:content",
+      "cq:propertyInheritanceCancelled": [
+        "jcr:language"
+      ]
+    },
+    {
+      "path": "/content/wknd/ch/it/jcr:content",
+      "cq:propertyInheritanceCancelled": [
+        "jcr:language"
+      ]
+    },
+    {
+      "path": "/content/wknd/us/es/jcr:content",
+      "cq:propertyInheritanceCancelled": [
+        "jcr:language"
+      ]
+    }
+  ],
+  "relationshipMixinOutsideLiveCopy": [
+    "/content/wknd/language-masters/de",
+    "/content/wknd/language-masters/es",
+    "/content/wknd/language-masters/fr",
+    "/content/wknd/language-masters/it"
+  ],
+  "fixtureTrees": [
+    "/content/wknd/language-masters/en",
+    "/content/wknd/language-masters/fr",
+    "/content/wknd/us/en",
+    "/content/wknd/ca/en",
+    "/content/wknd/ch/fr",
+    "/content/wknd/language-masters/es",
+    "/content/experience-fragments/wknd/language-masters/en/featured",
+    "/content/experience-fragments/wknd/us/en"
+  ]
+}

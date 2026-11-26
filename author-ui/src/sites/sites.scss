@@ -1,0 +1,947 @@
+// Sensible Studio Sites console.
+
+$sel: color-mix(in srgb, var(--spectrum-blue-900) 12%, transparent);
+
+.studio-sites {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  color: var(--spectrum-global-color-gray-800);
+  background: var(--spectrum-global-color-gray-100);
+
+  &__content {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  &__loading {
+    display: grid;
+    place-items: center;
+    height: 50%;
+  }
+
+  &__error {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 560px;
+    margin: 32px auto;
+    padding: 12px 16px;
+    font-size: 13px;
+    background: var(--studio-neutral-0);
+    border-left: 4px solid var(--spectrum-global-color-red-600);
+  }
+
+  &__empty {
+    margin: 48px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+}
+
+.studio-lock {
+  margin-left: 6px;
+  color: var(--spectrum-global-color-gray-600);
+  vertical-align: middle;
+}
+
+// ------------------------------------------------------------------------------------------ header and action bar
+
+.studio-consolebar,
+.studio-actionbar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 48px;
+  padding: 0 12px;
+  background: var(--studio-surface-panel);
+  border-bottom: 1px solid var(--studio-border);
+}
+
+.studio-consolebar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+
+  // a breadcrumb instead of a title: it reads from the left, next to the rail selector
+  &--crumbs {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 12px;
+
+    // the box is as wide as the path, not as the column (a grid item stretches by default); it still
+    // shrinks and scrolls when the path is longer than the room
+    > .studio-crumbs {
+      justify-self: start;
+      max-width: 100%;
+    }
+  }
+
+  // a System tool: the tool's own controls (a view switch, a filter) sit in the centre and stay there;
+  // the breadcrumb on the left and the actions on the right share the rest equally, and the breadcrumb
+  // scrolls when the path is longer than its half
+  &--tool {
+    grid-template-columns: minmax(160px, 1fr) auto minmax(max-content, 1fr);
+    overflow: hidden;
+
+    // the breadcrumb and the arrow with the group's other tools, as one piece at the left
+    > .studio-toolcrumbs {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      justify-self: start;
+      max-width: 100%;
+
+      > .studio-crumbs {
+        min-width: 0;
+        margin-right: 0;
+      }
+    }
+  }
+
+  &__start {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  &__title {
+    flex-direction: row-reverse;
+    font-weight: 700;
+  }
+
+  &__end {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
+
+.studio-actionbar {
+  // The consoles that still build their own bar get the look of the shared one (shell/SelectionBar.tsx):
+  // neutral and raised, a stronger bottom edge, the count and the clear button on the left.
+  gap: var(--studio-space-5);
+  justify-content: space-between;
+  background: var(--studio-surface-raised);
+  border-bottom-color: var(--studio-border-strong);
+
+  &__actions,
+  &__end {
+    display: flex;
+    gap: var(--studio-space-3);
+    align-items: center;
+  }
+
+  &__end {
+    flex-direction: row-reverse;
+    order: -1;
+    font-size: var(--studio-type-md);
+    font-weight: 600;
+    color: var(--studio-text-strong);
+    white-space: nowrap;
+  }
+
+  &__actions {
+    min-width: 0;
+
+    button[class*='spectrum-ActionButton'] {
+      height: 30px;
+      min-height: 30px;
+      background: var(--studio-surface-panel);
+      border: 1px solid var(--studio-border);
+
+      &:hover:not([disabled]) {
+        background: var(--studio-surface-hover);
+        border-color: var(--studio-border-strong);
+      }
+    }
+  }
+
+  &__hint {
+    font-weight: 400;
+    color: var(--studio-text-faint);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ column view
+
+.studio-columns {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+}
+
+.studio-column {
+  flex: none;
+  width: 280px;
+  height: 100%;
+  margin: 0;
+  padding: 8px 0;
+  overflow-y: auto;
+  list-style: none;
+  border-right: 1px solid var(--spectrum-global-color-gray-300);
+
+  &__item {
+    display: flex;
+    align-items: center;
+    margin: 1px 6px;
+    border-radius: var(--studio-radius-sm);
+
+    &:hover {
+      background: var(--studio-surface-hover);
+    }
+
+    // on the way to where you are: a quiet grey
+    &.is-active {
+      background: var(--studio-surface-sunken);
+
+      .studio-column__title {
+        font-weight: 600;
+      }
+    }
+
+    // where you are: the accent, as a thin edge and in the text (never as a filled area)
+    &.is-current {
+      background: var(--studio-accent-50);
+      box-shadow: inset 2px 0 0 var(--studio-accent-600);
+
+      .studio-column__title {
+        font-weight: 600;
+        color: var(--studio-accent-800);
+      }
+
+      .studio-column__thumb,
+      .studio-column__more {
+        color: var(--studio-accent-700);
+      }
+    }
+
+    // what is ticked: neutral, so it never reads as "current"
+    &.is-selected {
+      background: var(--studio-surface-selected);
+      box-shadow: inset 2px 0 0 var(--studio-neutral-700);
+
+      .studio-column__title {
+        font-weight: 600;
+        color: var(--studio-text-strong);
+      }
+
+      .studio-column__thumb,
+      .studio-column__more {
+        color: var(--studio-text);
+      }
+    }
+  }
+
+  &__check {
+    display: flex;
+    padding-left: 6px;
+  }
+
+  &__open {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+    align-items: center;
+    min-width: 0;
+    padding: 6px 6px 6px 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  &__thumb {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__title {
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--spectrum-global-color-gray-900);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__name {
+    overflow: hidden;
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-600);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__more {
+    flex: none;
+    color: var(--spectrum-global-color-gray-500);
+  }
+}
+
+.studio-preview {
+  flex: none;
+  width: 320px;
+  padding: 16px 20px;
+  overflow-y: auto;
+
+  &__thumb {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    margin-bottom: 16px;
+    overflow: hidden;
+    color: var(--spectrum-global-color-gray-600);
+    background: var(--spectrum-global-color-gray-200);
+    border-radius: 4px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__meta {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    font-size: 12px;
+
+    div {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 12px;
+    }
+
+    dt {
+      font-weight: 700;
+      text-align: right;
+      color: var(--spectrum-global-color-gray-700);
+    }
+
+    dd {
+      margin: 0;
+      word-break: break-word;
+    }
+  }
+}
+
+// ------------------------------------------------------------------------------------------ list view
+
+.studio-listview {
+  padding: 0 0 24px;
+
+  table {
+    width: 100%;
+    font-size: 13px;
+    border-collapse: collapse;
+  }
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    color: var(--spectrum-global-color-gray-700);
+    background: var(--spectrum-global-color-gray-100);
+    border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+  }
+
+  td {
+    padding: 4px 12px;
+    border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+  }
+
+  tr:hover td {
+    background: var(--spectrum-global-color-gray-200);
+  }
+
+  tr.is-selected td {
+    background: $sel;
+  }
+
+  &__check {
+    width: 32px;
+  }
+
+  &__title {
+    display: inline-flex;
+    gap: 12px;
+    align-items: center;
+    padding: 0;
+    font: inherit;
+    color: var(--spectrum-global-color-gray-900);
+    cursor: pointer;
+    background: none;
+    border: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__thumb {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 36px;
+    overflow: hidden;
+    color: var(--spectrum-global-color-gray-600);
+    background: var(--spectrum-global-color-gray-200);
+    border-radius: 3px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__muted {
+    color: var(--spectrum-global-color-gray-700);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ card view
+
+.studio-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 24px;
+  list-style: none;
+}
+
+.studio-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--spectrum-global-color-gray-50);
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 4px;
+
+  &:hover {
+    border-color: var(--spectrum-global-color-gray-500);
+  }
+
+  &.is-selected {
+    border-color: var(--spectrum-global-color-blue-500);
+    box-shadow: 0 0 0 2px var(--spectrum-global-color-blue-400);
+  }
+
+  &__open {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  &__thumb {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    color: var(--spectrum-global-color-gray-600);
+    background: var(--spectrum-global-color-gray-200);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 12px 12px;
+  }
+
+  &__type {
+    font-size: 11px;
+    color: var(--spectrum-global-color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  &__meta {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__check {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    padding: 0 2px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 4px;
+  }
+}
+
+// ------------------------------------------------------------------------------------------ create page wizard
+
+.studio-wizard {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  background: var(--studio-surface-canvas);
+
+  &__error {
+    padding: var(--studio-space-4) var(--studio-space-7);
+    color: var(--studio-danger-strong);
+    background: var(--studio-danger-surface);
+    border-bottom: 1px solid var(--studio-danger);
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    flex: 1;
+    min-height: 0;
+  }
+
+  &__rail {
+    padding: var(--studio-space-7) var(--studio-space-5);
+    background: var(--studio-surface-panel);
+    border-right: 1px solid var(--studio-border);
+
+    ol { display: grid; gap: var(--studio-space-2); padding: 0; margin: 0; list-style: none; }
+    li { display: flex; gap: var(--studio-space-3); align-items: center; padding: var(--studio-space-3); color: var(--studio-text-muted); border-radius: var(--studio-radius-sm); }
+    li > span { display: grid; place-items: center; width: 24px; height: 24px; font-size: var(--studio-type-xs); border: 1px solid var(--studio-border-strong); border-radius: 50%; }
+    li.is-current { font-weight: 600; color: var(--studio-text-strong); background: var(--studio-surface-selected); }
+    li.is-current > span, li.is-done > span { color: var(--studio-accent-contrast); background: var(--studio-accent-700); border-color: var(--studio-accent-700); }
+  }
+
+  &__body {
+    min-height: 0;
+    padding: var(--studio-space-7);
+    overflow: auto;
+  }
+
+  &__empty {
+    max-width: 640px;
+    color: var(--studio-text-muted);
+  }
+
+  &__context {
+    margin: 0 0 16px;
+    color: var(--studio-text-muted);
+  }
+}
+
+.studio-templates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 260px));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.studio-template {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 0 12px;
+  overflow: hidden;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: var(--spectrum-global-color-gray-50);
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 4px;
+
+  &:hover {
+    border-color: var(--spectrum-global-color-gray-500);
+  }
+
+  &.is-selected {
+    border-color: var(--spectrum-global-color-blue-500);
+    box-shadow: 0 0 0 2px var(--spectrum-global-color-blue-400);
+  }
+
+  &__thumb {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    margin-bottom: 10px;
+    overflow: hidden;
+    color: var(--spectrum-global-color-gray-600);
+    background: var(--spectrum-global-color-gray-200);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__title {
+    padding: 0 12px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  &__desc {
+    padding: 4px 12px 0;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+}
+
+.studio-move__refs,
+.studio-delete__refs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.studio-move__label {
+  font-size: 12px;
+  color: var(--spectrum-global-color-gray-700);
+}
+
+.studio-preview__refs {
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--spectrum-global-color-gray-300);
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--spectrum-global-color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+.studio-refs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__empty {
+    margin: 0;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 220px;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+
+    li {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+  }
+
+  &__icon {
+    flex: none;
+    margin-top: 2px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    font-size: 12px;
+  }
+
+  &__title {
+    font-weight: 700;
+    color: var(--spectrum-global-color-gray-900);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__path {
+    overflow: hidden;
+    color: var(--spectrum-global-color-gray-700);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.studio-preview__msm {
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--spectrum-global-color-gray-300);
+}
+
+.studio-preview__heading {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--spectrum-global-color-gray-700);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+// the Forms console: submissions per form, after the title
+.studio-pubdot {
+  display: inline-block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin: 0 6px;
+  border-radius: 50%;
+
+  &--published {
+    background: var(--spectrum-global-color-green-600);
+  }
+
+  &--modified {
+    background: var(--spectrum-global-color-orange-600);
+  }
+
+  &--unpublished {
+    background: var(--spectrum-global-color-gray-500);
+  }
+}
+
+.studio-submissions-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--spectrum-global-color-gray-800);
+  vertical-align: middle;
+  background: var(--spectrum-global-color-gray-200);
+  border-radius: 999px;
+
+  &.is-new {
+    color: var(--studio-neutral-0);
+    background: var(--spectrum-global-color-blue-600);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ records
+// A record where a thumbnail would be (column preview, Media card): a card of fields, not an image box.
+// Its model as a tag, the title, the description, and three field lines that echo the record icon.
+
+.studio-preview__thumb--record {
+  place-items: stretch;
+  padding: 12px;
+  background: var(--spectrum-global-color-gray-200);
+}
+
+.studio-recordcard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 12px 14px;
+  overflow: hidden;
+  text-align: left;
+  color: var(--spectrum-global-color-gray-800);
+  background: var(--spectrum-global-color-gray-50);
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+
+  &__kind {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--spectrum-global-color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--spectrum-global-color-gray-900);
+  }
+
+  &__desc {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--spectrum-global-color-gray-700);
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  // the record's fields, drawn as in its icon: filled for a record, empty slots for a model
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: auto;
+    padding-top: 6px;
+
+    span {
+      display: block;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--spectrum-global-color-gray-300);
+
+      &:nth-child(1) {
+        width: 80%;
+      }
+
+      &:nth-child(2) {
+        width: 60%;
+      }
+
+      &:nth-child(3) {
+        width: 72%;
+      }
+    }
+  }
+
+  &--model &__fields span {
+    background: none;
+    border: 1.5px dashed var(--spectrum-global-color-gray-400);
+  }
+}
+
+// in the Media console the card fills the media area of the tile
+.studio-assets__card-media > .studio-recordcard {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+// Same height as the screen frame it replaces (so the list does not jump), the mode named on the left,
+// and the first action the one filled button, as in shell/SelectionBar.tsx.
+.studio-actionbar {
+  box-sizing: border-box;
+  height: 56px;
+  min-height: 56px;
+  padding: 0 var(--studio-space-5);
+
+  &__end > button { order: 2; }
+
+  &__end::after {
+    order: 1;
+    font-size: var(--studio-type-xs);
+    font-weight: 600;
+    color: var(--studio-text-muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    content: 'Selection';
+  }
+
+  &__actions > button[class*='spectrum-ActionButton']:first-child {
+    color: var(--studio-neutral-0);
+    background: var(--studio-accent-700);
+    border-color: var(--studio-accent-700);
+
+    &:hover:not([disabled]) { background: var(--studio-accent-800); border-color: var(--studio-accent-800); }
+    svg { fill: currentColor; color: inherit; }
+  }
+}
+
+// Create CSV Report: the two sections side by side when there is room, like AEM's export page
+.studio-csvreport .studio-form-page { height: 100%; }
+.studio-csvreport__body { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--studio-space-7); }
+.studio-csvreport__group { display: flex; flex-direction: column; margin: 0 0 var(--studio-space-5); padding: 0; border: 0; }
+.studio-csvreport__group legend { margin-bottom: var(--studio-space-2); font-size: var(--studio-type-xs); font-weight: 600; color: var(--studio-text-muted); text-transform: uppercase; letter-spacing: .08em; }
+.studio-csvreport__done { margin: 0; color: var(--studio-success-700, var(--studio-text)); }
+
+// Properties and Create ▾ Version of several pages
+.studio-bulkpages {
+  display: grid;
+  gap: 14px;
+
+  &__intro {
+    margin: 0;
+    color: var(--studio-text-muted, var(--spectrum-global-color-gray-700));
+  }
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  &__when {
+    display: grid;
+    gap: 4px;
+    font-size: 12px;
+
+    span {
+      color: var(--spectrum-global-color-gray-700);
+    }
+
+    input {
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid var(--spectrum-global-color-gray-400);
+      border-radius: 4px;
+      background: var(--spectrum-global-color-gray-50);
+      color: inherit;
+      font: inherit;
+    }
+  }
+
+  &__error {
+    margin: 0;
+    color: var(--studio-danger-strong, var(--spectrum-semantic-negative-color-default));
+  }
+}

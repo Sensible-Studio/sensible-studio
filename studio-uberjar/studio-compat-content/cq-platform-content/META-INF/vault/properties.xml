@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="group">day/cq60/product</entry>
+<entry key="name">cq-platform-content</entry>
+<entry key="version">1.3.248</entry>
+<entry key="description">Sensible Studio compatibility marker. Satisfies the package dependency that AEM-targeted content packages declare on the platform. Contains no third-party content; the platform features are provided by Sensible Studio bundles.</entry>
+<entry key="createdBy">Sensible Studio</entry>
+<entry key="packageType">application</entry>
+<entry key="requiresRoot">false</entry>
+</properties>

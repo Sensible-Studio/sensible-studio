@@ -1,0 +1,6 @@
+<fieldset class="studio-form__panel cmp-container" data-studio-panel="${properties.name || resource.name}" data-studio-field="${properties.name || resource.name}" data-studio-title="${properties.title}">
+    <legend class="studio-form__panel-title" data-sly-test="${properties.title}">${properties.title}</legend>
+    <p class="studio-form__panel-text" data-sly-test="${properties.description}">${properties.description}</p>
+    <sly data-sly-resource="${resource.path @ resourceType='wcm/foundation/components/responsivegrid'}"></sly>
+    <sly data-sly-resource="${'rules' @ resourceType='studio/forms/components/rules'}"></sly>
+</fieldset>

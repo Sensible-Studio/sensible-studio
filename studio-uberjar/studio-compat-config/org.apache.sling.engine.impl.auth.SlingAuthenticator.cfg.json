@@ -1,0 +1,3 @@
+{
+  "sling.auth.requirements": ["+/content"]
+}

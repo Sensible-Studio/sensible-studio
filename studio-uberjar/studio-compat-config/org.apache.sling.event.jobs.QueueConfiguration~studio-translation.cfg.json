@@ -1,0 +1,11 @@
+{
+  "queue.name": "Sensible Studio translation projects",
+  "queue.topics": [
+    "studio/translation/project"
+  ],
+  "queue.type": "UNORDERED",
+  "queue.maxparallel": 2,
+  "queue.retries": 3,
+  "queue.retrydelay": 60000,
+  "queue.priority": "NORM"
+}

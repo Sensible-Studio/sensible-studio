@@ -1,0 +1,5 @@
+{
+  "scripts": [
+    "create path (sling:Folder) /content/projects"
+  ]
+}

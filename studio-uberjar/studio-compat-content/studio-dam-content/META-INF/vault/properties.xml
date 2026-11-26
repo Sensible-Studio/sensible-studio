@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="group">io.sensible.studio</entry>
+<entry key="name">studio-dam-content</entry>
+<entry key="version">0.12.0</entry>
+<entry key="description">Sensible Studio's Responsive Image component: an image served through /is/image with a focus crop per breakpoint, presets and the image map drawn in Media. Written for Sensible Studio; contains no Adobe content.</entry>
+<entry key="createdBy">Sensible Studio</entry>
+<entry key="packageType">application</entry>
+<entry key="requiresRoot">false</entry>
+</properties>

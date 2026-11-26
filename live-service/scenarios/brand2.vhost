@@ -1,0 +1,21 @@
+#
+# The second site of the test farm: brand2, its own host names and rewrite rules, the same cache.
+#
+<VirtualHost *:${STUDIO_LIVE_PORT}>
+    ServerName  brand2.localhost
+    ServerAlias *.brand2.localhost
+
+    DocumentRoot "${STUDIO_LIVE_DOCROOT}/brand2"
+
+    <IfModule mod_headers.c>
+        Header always append X-Frame-Options SAMEORIGIN
+        Header always set X-Content-Type-Options nosniff
+    </IfModule>
+
+    RewriteEngine On
+    RewriteRule ^/(dispatcher|_live)(/|$) - [F,L]
+    Include ../scenarios/brand2_rewrite.rules
+
+    ErrorDocument 502 "brand2 is not available at the moment."
+    ErrorDocument 503 "brand2 is not available at the moment."
+</VirtualHost>

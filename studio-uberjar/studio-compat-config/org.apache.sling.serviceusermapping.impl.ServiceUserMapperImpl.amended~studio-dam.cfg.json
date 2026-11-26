@@ -1,0 +1,11 @@
+{
+  "user.mapping": [
+    "io.sensible.studio.dam:dam-processor=[studio-dam-processor]",
+    "io.sensible.studio.dam:linkshare=[studio-dam-linkshare]",
+    "io.sensible.studio.dam:indexer=[studio-dam-indexer]",
+    "io.sensible.studio.dam:reports=[studio-dam-reports]",
+    "io.sensible.studio.dam:downloads=[studio-dam-downloads]",
+    "io.sensible.studio.dam:livecopy=[studio-dam-livecopy]",
+    "io.sensible.studio.dam:notifications=[studio-dam-notifications]"
+  ]
+}

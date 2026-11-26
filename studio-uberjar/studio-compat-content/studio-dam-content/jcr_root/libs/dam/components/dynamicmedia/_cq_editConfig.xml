@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- A picture or an image set dragged from the Media panel of the page editor onto this component becomes its file. -->
+<jcr:root xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="cq:EditConfig">
+    <cq:dropTargets jcr:primaryType="nt:unstructured">
+        <image
+            jcr:primaryType="cq:DropTargetConfig"
+            accept="[image/jpeg,image/png,image/webp,image/gif,image/tiff,image/vnd.studio.set]"
+            groups="[media]"
+            propertyName="./fileReference"/>
+    </cq:dropTargets>
+</jcr:root>

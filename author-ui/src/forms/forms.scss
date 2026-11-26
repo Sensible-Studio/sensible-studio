@@ -1,0 +1,240 @@
+// The Submissions view of a form: a table of submissions, one open on the right.
+
+.studio-submissions {
+  &__tools {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+    overflow: auto;
+  }
+
+  &__empty {
+    padding: 48px 24px;
+    color: var(--spectrum-global-color-gray-700);
+    text-align: center;
+  }
+
+  &__list table {
+    width: 100%;
+  }
+
+  &__list tbody tr {
+    cursor: default;
+
+    &.is-open {
+      background: var(--spectrum-global-color-gray-200);
+    }
+
+    &.is-new td {
+      font-weight: 600;
+    }
+  }
+
+  &__when {
+    white-space: nowrap;
+  }
+
+  &__new {
+    display: inline-block;
+    padding: 0 6px;
+    margin-left: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    color: var(--studio-neutral-0);
+    text-transform: uppercase;
+    background: var(--spectrum-blue-900);
+    border-radius: 8px;
+  }
+
+  &__cell {
+    max-width: 280px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__more {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__detail {
+    flex: 0 0 380px;
+    min-height: 0;
+    padding: 0 20px 24px;
+    overflow: auto;
+    background: var(--spectrum-global-color-gray-50);
+    border-left: 1px solid var(--spectrum-global-color-gray-300);
+  }
+
+  &__detail-head {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+
+    h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+  }
+
+  &__facts {
+    margin: 0 0 16px;
+
+    > div {
+      padding: 8px 0;
+      border-top: 1px solid var(--spectrum-global-color-gray-200);
+    }
+
+    dt {
+      font-size: 12px;
+      color: var(--spectrum-global-color-gray-700);
+    }
+
+    dd {
+      margin: 2px 0 0;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    &--meta dd {
+      font-size: 13px;
+    }
+  }
+
+  &__blank {
+    color: var(--spectrum-global-color-gray-500);
+  }
+
+  &__ua {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__detail-actions {
+    padding-top: 8px;
+  }
+}
+
+.studio-submissions {
+  &__files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+
+    a {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 4px 10px;
+      font-size: 13px;
+      color: var(--spectrum-global-color-gray-900);
+      text-decoration: none;
+      background: var(--spectrum-global-color-gray-100);
+      border: 1px solid var(--spectrum-global-color-gray-300);
+      border-radius: 999px;
+
+      &:hover {
+        background: var(--spectrum-global-color-gray-200);
+      }
+    }
+
+    small {
+      color: var(--spectrum-global-color-gray-700);
+    }
+  }
+
+  &__actions {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: grid;
+      grid-template-columns: 10px auto 1fr;
+      gap: 8px;
+      align-items: baseline;
+      padding: 4px 0;
+      font-size: 13px;
+    }
+
+    i {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--spectrum-global-color-gray-500);
+      border-radius: 50%;
+    }
+
+    .is-done i {
+      background: var(--spectrum-global-color-green-600);
+    }
+
+    .is-failed i {
+      background: var(--spectrum-global-color-red-600);
+    }
+
+    span {
+      overflow-wrap: anywhere;
+      color: var(--spectrum-global-color-gray-700);
+    }
+  }
+
+  &__section {
+    margin: 12px 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--spectrum-global-color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+// System › Mail
+.studio-mail {
+  &__main {
+    padding: 16px 24px 40px;
+    overflow: auto;
+  }
+
+  &__intro {
+    max-width: 60em;
+    margin: 0 0 16px;
+    color: var(--spectrum-global-color-gray-800);
+  }
+
+  &__heading {
+    margin: 32px 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+.studio-submissions__link {
+  padding: 0;
+  font: inherit;
+  color: var(--spectrum-global-color-blue-700);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}

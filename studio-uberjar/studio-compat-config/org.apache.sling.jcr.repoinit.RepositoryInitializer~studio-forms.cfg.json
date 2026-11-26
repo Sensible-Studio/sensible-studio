@@ -1,0 +1,7 @@
+{
+  "scripts": [
+    "create path (sling:OrderedFolder) /content\ncreate path (sling:Folder) /conf\ncreate path (sling:OrderedFolder) /content/dam\ncreate path (sling:Folder) /var/studio\ncreate path (sling:Folder) /var/studio/forms\ncreate path (sling:Folder) /var/studio/forms/submissions\ncreate path (sling:Folder) /var/workflow",
+    "create service user studio-forms-service\nset ACL for studio-forms-service\n    allow jcr:read on /content\n    allow jcr:read on /conf\n    allow jcr:all on /var/studio/forms\n    allow jcr:read on /var/workflow\n    allow jcr:read,rep:write on /content/dam\nend",
+    "create service user studio-workflow-service\nset ACL for studio-workflow-service\n    allow jcr:read,rep:write on /var/studio/forms\nend"
+  ]
+}

@@ -1,0 +1,31 @@
+// Translation Configuration: the contexts and one context's rules.
+
+.studio-trrules__body { padding: var(--studio-space-6) var(--studio-space-7); overflow: auto; }
+.studio-trrules__intro { max-width: 860px; margin: 0 0 var(--studio-space-5); color: var(--studio-text-muted); }
+.studio-trrules__intro code, .studio-trrules code { font-family: var(--studio-font-mono); font-size: 12.5px; }
+.studio-trrules__muted { color: var(--studio-text-muted); font-size: var(--studio-type-sm, 13px); }
+.studio-trrules__link { color: var(--studio-accent-700, var(--studio-accent)); text-underline-offset: 2px; }
+.studio-trrules__tag {
+  margin-left: var(--studio-space-2); padding: 0 6px; font-size: 11px; line-height: 18px; color: var(--studio-text-muted);
+  border: 1px solid var(--studio-border); border-radius: 9px;
+}
+
+.studio-trrules__table {
+  width: 100%; max-width: 1200px; border-collapse: collapse; font-size: var(--studio-type-sm, 13px);
+
+  th {
+    padding: var(--studio-space-2) var(--studio-space-3); text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--studio-text-muted); border-bottom: 1px solid var(--studio-border);
+  }
+  td { padding: var(--studio-space-3); vertical-align: top; border-bottom: 1px solid var(--studio-border-subtle); }
+}
+.studio-trrules__text { max-width: 560px; overflow-wrap: anywhere; }
+
+.studio-trrules__component {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--studio-space-4); align-items: start;
+  margin: 0 0 var(--studio-space-4); padding: var(--studio-space-4); border: 1px solid var(--studio-border-subtle); border-radius: 6px;
+
+  @media (max-width: 900px) { grid-template-columns: minmax(0, 1fr) auto; }
+}
+.studio-trrules__preview-bar { display: flex; flex-wrap: wrap; gap: var(--studio-space-4); align-items: flex-end; }
+.studio-trrules__problems { margin: var(--studio-space-4) 0 0; padding-left: 1.2em; color: var(--studio-danger); }

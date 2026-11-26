@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="group">io.sensible.studio</entry>
+<entry key="name">studio-wcm-foundation</entry>
+<entry key="version">0.1.12</entry>
+<entry key="description">Sensible Studio's own base page component and HTL clientlib templates, at the resource types AEM components inherit from. Written for Sensible Studio; contains no Adobe content.</entry>
+<entry key="createdBy">Sensible Studio</entry>
+<entry key="packageType">application</entry>
+<entry key="requiresRoot">false</entry>
+</properties>

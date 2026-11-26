@@ -1,0 +1,84 @@
+.studio-activity {
+  &__main {
+    padding: 16px 24px;
+    overflow: auto;
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  &__muted {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+
+    code {
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 11px;
+    }
+  }
+
+  &__error {
+    color: var(--spectrum-global-color-red-700);
+  }
+
+  &__table {
+    width: 100%;
+    max-width: 1100px;
+    font-size: 13px;
+    border-collapse: collapse;
+    background: var(--spectrum-global-color-gray-50);
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-radius: 8px;
+
+    th,
+    td {
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+    }
+
+    th {
+      font-size: 11px;
+      color: var(--spectrum-global-color-gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    td:first-child {
+      white-space: nowrap;
+    }
+
+    a {
+      color: var(--spectrum-global-color-blue-700);
+    }
+  }
+
+  &__who {
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-decoration: underline dotted;
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  &__type {
+    font-weight: 600;
+
+    &--published {
+      color: var(--spectrum-global-color-green-700);
+    }
+
+    &--deleted,
+    &--unpublished {
+      color: var(--spectrum-global-color-red-700);
+    }
+  }
+}

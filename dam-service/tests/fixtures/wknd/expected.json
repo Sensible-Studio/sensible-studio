@@ -1,0 +1,319 @@
+[
+ {
+  "file": "adobestock-231698835.jpg",
+  "jcrPath": "/content/dam/wknd-shared/en/adventures/yosemite-backpacking/adobestock-231698835.jpg",
+  "original": {
+   "w": 1600,
+   "h": 886,
+   "mode": "RGB",
+   "fmt": "JPEG"
+  },
+  "metadata": {
+   "dam:sha1": "660c6383c9417dddfa0f58dbe4954abb05b8f09e",
+   "dam:size": "{Long}496684",
+   "dam:MIMEtype": "image/jpeg",
+   "dc:format": "image/jpeg",
+   "tiff:ImageWidth": "{Long}1600",
+   "tiff:ImageLength": "{Long}886",
+   "dam:Fileformat": "JPEG",
+   "dam:Bitsperpixel": "{Long}24",
+   "dam:Progressive": "no",
+   "dam:Physicalwidthindpi": "{Long}72",
+   "dam:Physicalheightindpi": "{Long}72",
+   "tiff:Orientation": "{Long}1"
+  },
+  "renditions": {
+   "cq5dam.thumbnail.140.100.png": {
+    "w": 140,
+    "h": 77,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.thumbnail.319.319.png": {
+    "w": 319,
+    "h": 176,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.thumbnail.48.48.png": {
+    "w": 48,
+    "h": 26,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.web.1280.1280.jpeg": {
+    "w": 1280,
+    "h": 709,
+    "fmt": "JPEG",
+    "mode": "RGB"
+   },
+   "cq5dam.zoom.2048.2048.jpeg": {
+    "w": 1600,
+    "h": 886,
+    "fmt": "JPEG",
+    "mode": "RGB"
+   }
+  }
+ },
+ {
+  "file": "ayo-ogunseinde-237739.jpg",
+  "jcrPath": "/content/dam/wknd-shared/en/contributors/ayo-ogunseinde-237739.jpg",
+  "original": {
+   "w": 2950,
+   "h": 3840,
+   "mode": "RGB",
+   "fmt": "JPEG"
+  },
+  "metadata": {
+   "dam:sha1": "c7aacc294d1e8fb3d41200b649095e395b66112a",
+   "dam:size": "{Long}446258",
+   "dam:MIMEtype": "image/jpeg",
+   "dc:format": "image/jpeg",
+   "tiff:ImageWidth": "{Long}2950",
+   "tiff:ImageLength": "{Long}3840",
+   "dam:Fileformat": "JPEG",
+   "dam:Bitsperpixel": "{Long}24",
+   "dam:Progressive": "yes",
+   "dam:Physicalwidthindpi": "{Long}-1",
+   "dam:Physicalheightindpi": "{Long}-1"
+  },
+  "renditions": {
+   "cq5dam.thumbnail.140.100.png": {
+    "w": 77,
+    "h": 100,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.thumbnail.319.319.png": {
+    "w": 245,
+    "h": 319,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.thumbnail.48.48.png": {
+    "w": 37,
+    "h": 48,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.web.1280.1280.jpeg": {
+    "w": 983,
+    "h": 1280,
+    "fmt": "JPEG",
+    "mode": "RGB"
+   },
+   "cq5dam.zoom.2048.2048.jpeg": {
+    "w": 1573,
+    "h": 2048,
+    "fmt": "JPEG",
+    "mode": "RGB"
+   }
+  }
+ },
+ {
+  "file": "freeride.jpg",
+  "jcrPath": "/content/dam/wknd-shared/en/activities/skiing/freeride.jpg",
+  "original": {
+   "w": 720,
+   "h": 1080,
+   "mode": "RGB",
+   "fmt": "JPEG"
+  },
+  "metadata": {
+   "dam:sha1": "479b58c3531bd476dc73943f58cd5286e1a37952",
+   "dam:size": "{Long}102189",
+   "dam:MIMEtype": "image/jpeg",
+   "dc:format": "image/jpeg",
+   "tiff:ImageWidth": "{Long}720",
+   "tiff:ImageLength": "{Long}1080",
+   "dam:Fileformat": "JPEG",
+   "dam:Bitsperpixel": "{Long}24",
+   "dam:Progressive": "no",
+   "dam:Physicalwidthindpi": "{Long}300",
+   "dam:Physicalheightindpi": "{Long}300",
+   "tiff:Orientation": "{Long}1"
+  },
+  "renditions": {
+   "cq5dam.thumbnail.140.100.png": {
+    "w": 67,
+    "h": 100,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.thumbnail.319.319.png": {
+    "w": 213,
+    "h": 319,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.thumbnail.48.48.png": {
+    "w": 32,
+    "h": 48,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.web.1280.1280.jpeg": {
+    "w": 720,
+    "h": 1080,
+    "fmt": "JPEG",
+    "mode": "RGB"
+   },
+   "cq5dam.zoom.2048.2048.jpeg": {
+    "w": 720,
+    "h": 1080,
+    "fmt": "JPEG",
+    "mode": "RGB"
+   }
+  }
+ },
+ {
+  "file": "adobestock-151584995.jpg",
+  "jcrPath": "/content/dam/wknd-shared/en/adventures/west-coast-cycling/adobestock-151584995.jpg",
+  "original": {
+   "w": 1000,
+   "h": 357,
+   "mode": "RGB",
+   "fmt": "JPEG"
+  },
+  "metadata": {
+   "dam:sha1": "eef56eff6856b79ecd0d88df003962e70332bb0d",
+   "dam:size": "{Long}184086",
+   "dam:MIMEtype": "image/jpeg",
+   "dc:format": "image/jpeg",
+   "tiff:ImageWidth": "{Long}1000",
+   "tiff:ImageLength": "{Long}357",
+   "dam:Fileformat": "JPEG",
+   "dam:Bitsperpixel": "{Long}24",
+   "dam:Progressive": "no",
+   "dam:Physicalwidthindpi": "{Long}-1",
+   "dam:Physicalheightindpi": "{Long}-1"
+  },
+  "renditions": {
+   "cq5dam.thumbnail.140.100.png": {
+    "w": 140,
+    "h": 50,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.thumbnail.319.319.png": {
+    "w": 319,
+    "h": 114,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.thumbnail.48.48.png": {
+    "w": 48,
+    "h": 17,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.web.1280.1280.jpeg": {
+    "w": 1000,
+    "h": 357,
+    "fmt": "JPEG",
+    "mode": "RGB"
+   },
+   "cq5dam.zoom.2048.2048.jpeg": {
+    "w": 1000,
+    "h": 357,
+    "fmt": "JPEG",
+    "mode": "RGB"
+   }
+  }
+ },
+ {
+  "file": "kumar-selvaraj.jpg",
+  "jcrPath": "/content/dam/wknd-shared/en/contributors/kumar-selvaraj.jpg",
+  "original": {
+   "w": 1280,
+   "h": 1280,
+   "mode": "RGB",
+   "fmt": "JPEG"
+  },
+  "metadata": {
+   "dam:sha1": "8279cc9a432a2414d32f922a79e0d6790cbfbd42",
+   "dam:size": "{Long}247187",
+   "dam:MIMEtype": "image/jpeg",
+   "dc:format": "image/jpeg",
+   "tiff:ImageWidth": "{Long}1280",
+   "tiff:ImageLength": "{Long}1280",
+   "dam:Fileformat": "JPEG",
+   "dam:Bitsperpixel": "{Long}24",
+   "dam:Progressive": "no",
+   "dam:Physicalwidthindpi": "{Long}72",
+   "dam:Physicalheightindpi": "{Long}72",
+   "tiff:Orientation": "{Long}1"
+  },
+  "renditions": {
+   "cq5dam.thumbnail.140.100.png": {
+    "w": 100,
+    "h": 100,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.thumbnail.319.319.png": {
+    "w": 319,
+    "h": 319,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.thumbnail.48.48.png": {
+    "w": 48,
+    "h": 48,
+    "fmt": "PNG",
+    "mode": "RGB"
+   },
+   "cq5dam.web.1280.1280.jpeg": {
+    "w": 1280,
+    "h": 1280,
+    "fmt": "JPEG",
+    "mode": "RGB"
+   },
+   "cq5dam.zoom.2048.2048.jpeg": {
+    "w": 1280,
+    "h": 1280,
+    "fmt": "JPEG",
+    "mode": "RGB"
+   }
+  }
+ },
+ {
+  "file": "wknd-logo-dk.png",
+  "jcrPath": "/content/dam/wknd/en/site/wknd-logo-dk.png",
+  "original": {
+   "w": 301,
+   "h": 128,
+   "mode": "RGBA",
+   "fmt": "PNG"
+  },
+  "metadata": {
+   "dam:Bitsperpixel": "{Long}32"
+  },
+  "renditions": {
+   "cq5dam.thumbnail.140.100.png": {
+    "w": 140,
+    "h": 59,
+    "fmt": "PNG",
+    "mode": "RGBA"
+   },
+   "cq5dam.thumbnail.319.319.png": {
+    "w": 301,
+    "h": 128,
+    "fmt": "PNG",
+    "mode": "RGBA"
+   },
+   "cq5dam.thumbnail.48.48.png": {
+    "w": 48,
+    "h": 20,
+    "fmt": "PNG",
+    "mode": "RGBA"
+   },
+   "cq5dam.web.1280.1280.png": {
+    "w": 301,
+    "h": 128,
+    "fmt": "PNG",
+    "mode": "RGBA"
+   }
+  }
+ }
+]

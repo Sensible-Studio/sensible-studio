@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0"
+    jcr:primaryType="cq:Component"
+    jcr:title="New Paragraph"
+    jcr:description="The slot at the end of a container where components are dropped (edit mode). Core's Carousel, Tabs and Accordion include it while they have no items."
+    componentGroup=".hidden"/>

@@ -1,0 +1,4 @@
+{
+  "configRefResourceNames": ["jcr:content", "."],
+  "configRefPropertyNames": ["cq:conf"]
+}

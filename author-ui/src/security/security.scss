@@ -1,0 +1,685 @@
+// Sensible Studio security consoles (users, groups, permissions). Builds on the Sites console styles.
+
+.studio-consolebar__heading {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+// Narrow windows: keep the controls on one line and drop the heading (the nav tab already names the console).
+.studio-security {
+  .studio-consolebar__end,
+  .studio-consolebar__end label,
+  button {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 900px) {
+    .studio-consolebar__heading {
+      display: none;
+    }
+  }
+}
+
+.studio-security__avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--spectrum-global-color-gray-700);
+  background: var(--spectrum-global-color-gray-200);
+  border-radius: 50%;
+}
+
+.studio-security__disabled {
+  font-weight: 700;
+  color: var(--spectrum-global-color-red-700);
+}
+
+.studio-security .studio-listview td {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+a.studio-listview__title {
+  text-decoration: none;
+}
+
+// ------------------------------------------------------------------------------------------ editor page
+
+.studio-editorpage__header {
+  flex: none;
+}
+
+.studio-editorpage {
+  padding: 0 32px 32px;
+
+  &__tabs {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  &__details {
+    display: flex;
+    gap: 48px;
+    padding-top: 24px;
+  }
+
+  &__photo {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 200px;
+    height: 200px;
+    color: var(--spectrum-global-color-gray-600);
+    background: var(--spectrum-global-color-gray-200);
+    border-radius: 4px;
+  }
+
+  &__row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin: 4px 0 8px;
+  }
+
+  &__hint {
+    font-size: 12px;
+    color: var(--spectrum-global-color-red-700);
+  }
+}
+
+.studio-memberships {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+  padding-top: 24px;
+
+  &__label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-radius: 4px;
+
+    li {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 6px 8px 6px 12px;
+      background: var(--spectrum-global-color-gray-50);
+      border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: 13px;
+    color: var(--spectrum-global-color-gray-900);
+  }
+
+  &__id {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+}
+
+// ------------------------------------------------------------------------------------------ permissions
+
+.studio-permissions {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+
+  &__principals {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 8px;
+    width: 300px;
+    padding: 12px;
+    overflow: hidden;
+    background: var(--spectrum-global-color-gray-75);
+    border-right: 1px solid var(--spectrum-global-color-gray-300);
+
+    ul {
+      flex: 1;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto;
+      list-style: none;
+    }
+
+    button {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      padding: 6px 8px;
+      font: inherit;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      background: none;
+      border: 0;
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--spectrum-global-color-gray-200);
+      }
+
+      &.is-current {
+        background: color-mix(in srgb, var(--spectrum-blue-900) 12%, transparent);
+      }
+    }
+  }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+    padding: 20px 24px;
+    overflow: auto;
+  }
+
+  &__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__path {
+    font-family: var(--studio-mono, monospace);
+    font-size: 12px;
+  }
+
+  &__rowactions {
+    width: 80px;
+    white-space: nowrap;
+  }
+}
+
+.studio-privileges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.studio-privilege {
+  padding: 1px 6px;
+  font-family: var(--studio-mono, monospace);
+  font-size: 11px;
+  background: var(--spectrum-global-color-gray-200);
+  border-radius: 3px;
+}
+
+.studio-allow {
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 10px;
+
+  &.is-allow {
+    color: var(--spectrum-global-color-green-700);
+    background: rgba(45, 157, 120, 0.12);
+  }
+
+  &.is-deny {
+    color: var(--spectrum-global-color-red-700);
+    background: rgba(227, 72, 80, 0.12);
+  }
+}
+
+.studio-acedialog {
+  &__privileges {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  &__error {
+    color: var(--spectrum-global-color-red-700);
+  }
+}
+
+.studio-check {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+
+  &__summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 4px;
+
+      &.is-allow {
+        color: var(--spectrum-global-color-green-700);
+        background: rgba(45, 157, 120, 0.12);
+      }
+
+      &.is-deny {
+        color: var(--spectrum-global-color-red-700);
+        background: rgba(227, 72, 80, 0.1);
+      }
+    }
+  }
+}
+
+// ------------------------------------------------------------------------------------------ permission tree
+// The repository as a tree, a box per column; a dot on what is set on the node itself.
+
+.studio-permtree {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  &__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0 12px;
+  }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+
+    > span {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .studio-permtree__dot {
+      position: static;
+    }
+  }
+
+  &__save {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__count {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--spectrum-global-color-orange-700);
+  }
+
+  &__table {
+    table {
+      table-layout: fixed;
+    }
+
+    th:first-child {
+      width: auto;
+    }
+
+    th:last-child {
+      width: 44px;
+    }
+
+    td {
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+  }
+
+  &__colhead {
+    width: 74px;
+    text-align: center !important;
+    white-space: nowrap;
+    cursor: help;
+  }
+
+  &__path {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__twisty {
+    display: inline-grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin-right: 2px;
+    color: var(--spectrum-global-color-gray-700);
+    vertical-align: middle;
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  &__icon {
+    margin-right: 6px;
+    vertical-align: middle;
+    color: var(--spectrum-global-color-gray-600);
+  }
+
+  &__name {
+    vertical-align: middle;
+  }
+
+  &__title {
+    margin-left: 8px;
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-600);
+    vertical-align: middle;
+  }
+
+  &__glob {
+    min-width: 20px !important;
+    height: 20px !important;
+    margin-left: 6px;
+    font-weight: 700;
+  }
+
+  &__cell {
+    position: relative;
+    text-align: center;
+  }
+
+  &__box {
+    margin: 0 !important;
+  }
+
+  // set on the node itself: a dot by the box, green when allowed, red when denied
+  &__dot {
+    position: absolute;
+    top: 50%;
+    left: calc(50% + 12px);
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    background: var(--spectrum-global-color-gray-500);
+  }
+
+  .is-set-allow .studio-permtree__dot {
+    background: var(--spectrum-global-color-green-600);
+  }
+
+  .is-set-deny .studio-permtree__dot {
+    background: var(--spectrum-global-color-red-600);
+  }
+
+  &__cell.is-changed {
+    background: var(--spectrum-global-color-orange-100);
+  }
+
+  tr.is-pending td:first-child {
+    box-shadow: inset 3px 0 0 var(--spectrum-global-color-orange-500);
+  }
+
+  &__rowactions {
+    width: 44px;
+    text-align: right;
+  }
+
+  &__more {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-600);
+  }
+}
+
+// Trust Store
+.studio-truststore__body {
+  padding: var(--studio-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--studio-space-4);
+}
+.studio-truststore__intro,
+.studio-truststore__muted {
+  color: var(--studio-text-muted);
+}
+.studio-truststore__intro {
+  margin: 0;
+  max-width: 70ch;
+}
+.studio-truststore__check {
+  padding: var(--studio-space-4);
+  border: 1px solid var(--studio-border);
+  border-radius: 6px;
+}
+.studio-truststore__result {
+  margin-top: var(--studio-space-3);
+  p {
+    margin: 0 0 var(--studio-space-2);
+  }
+}
+.studio-truststore__chain {
+  margin: 0;
+  padding-left: 1.4em;
+  li + li {
+    margin-top: var(--studio-space-2);
+  }
+}
+.studio-truststore__ok {
+  color: var(--spectrum-global-color-green-700);
+}
+.studio-truststore__error {
+  color: var(--spectrum-global-color-red-700);
+}
+.studio-truststore__tag {
+  margin-left: var(--studio-space-2);
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: var(--studio-type-xs);
+  background: var(--studio-surface-panel);
+  border: 1px solid var(--studio-border);
+}
+.studio-truststore__table td {
+  height: auto;
+  padding-top: var(--studio-space-2);
+  padding-bottom: var(--studio-space-2);
+}
+.studio-truststore__fingerprint {
+  font-size: var(--studio-type-xs);
+}
+.studio-truststore__pem textarea {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+.studio-truststore__inline {
+  margin-left: var(--studio-space-2);
+}
+
+// OAuth
+.studio-oauth__body {
+  padding: var(--studio-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--studio-space-4);
+}
+.studio-oauth__intro,
+.studio-oauth__muted {
+  color: var(--studio-text-muted);
+}
+.studio-oauth__intro {
+  margin: 0;
+  max-width: 70ch;
+}
+.studio-oauth__error {
+  color: var(--spectrum-global-color-red-700);
+}
+.studio-oauth__table td {
+  height: auto;
+  padding-top: var(--studio-space-2);
+  padding-bottom: var(--studio-space-2);
+  vertical-align: top;
+}
+.studio-oauth__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.studio-oauth__actions {
+  white-space: nowrap;
+}
+.studio-oauth__tag {
+  margin-left: var(--studio-space-2);
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: var(--studio-type-xs);
+  border: 1px solid var(--studio-border);
+}
+.studio-oauth__how {
+  font-size: var(--studio-type-sm);
+  color: var(--studio-text-muted);
+  summary {
+    cursor: pointer;
+  }
+  code {
+    overflow-wrap: anywhere;
+  }
+}
+.studio-oauth__secret {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--studio-space-2) var(--studio-space-3);
+  align-items: center;
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+// ------------------------------------------------------------------------------------------ SSL Configuration
+
+.studio-ssl {
+  &__status {
+    display: grid;
+    gap: 16px;
+    max-width: 880px;
+
+    dl {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 8px 24px;
+      align-items: center;
+      margin: 0;
+    }
+
+    dt {
+      font-weight: 700;
+      color: var(--spectrum-global-color-gray-700);
+    }
+
+    dd {
+      margin: 0;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__chain {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 12px 16px 12px 32px;
+    background: var(--spectrum-global-color-gray-75);
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-radius: 4px;
+
+    li {
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__form {
+    display: grid;
+    gap: 16px;
+    max-width: 760px;
+  }
+
+  &__input {
+    display: grid;
+    gap: 6px;
+  }
+
+  &__warnings {
+    margin: 0;
+    padding: 12px 16px 12px 32px;
+    color: var(--studio-warning-strong, var(--spectrum-global-color-orange-700));
+    background: var(--studio-warning-surface, var(--spectrum-global-color-orange-100));
+    border-radius: 4px;
+
+    li + li {
+      margin-top: 6px;
+    }
+  }
+
+  &__done {
+    display: grid;
+    gap: 8px;
+    padding-top: 8px;
+
+    p {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+}

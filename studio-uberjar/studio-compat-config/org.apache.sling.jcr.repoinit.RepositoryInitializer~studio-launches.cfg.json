@@ -1,0 +1,6 @@
+{
+  "scripts": [
+    "create path (sling:Folder) /content/launches",
+    "create service user studio-launches-service\nset ACL for studio-launches-service\n    allow jcr:read on /\n    allow jcr:all on /content\nend"
+  ]
+}

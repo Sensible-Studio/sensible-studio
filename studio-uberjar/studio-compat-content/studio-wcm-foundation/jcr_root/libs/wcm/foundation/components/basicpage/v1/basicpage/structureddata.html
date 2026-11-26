@@ -1,0 +1,2 @@
+<!--/* Sensible Studio: structured data (JSON-LD) for the page. Emits a schema.org WebPage with the page title. */-->
+<script type="application/ld+json" data-sly-test="${currentPage.title || currentPage.name}">{"@context":"https://schema.org","@type":"WebPage","name":"${currentPage.title || currentPage.name @ context='scriptString'}"}</script>
