@@ -105,7 +105,7 @@ export function DeveloperPanel({ tree, content, contentRoot, selected, onSelect,
             )}
             {selected.msm && (
               <>
-                <dt>MSM</dt>
+                <dt>Sync</dt>
                 <dd>{selected.msm}</dd>
               </>
             )}

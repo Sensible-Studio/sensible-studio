@@ -141,7 +141,7 @@ export function CreateLiveCopyWizard({ client, msm, parent, parentTitle, onClose
                 Exclude sub pages (only this page is synchronized)
               </Checkbox>
               <CheckboxGroup
-                label="Sync changes configs"
+                label="Sync rules"
                 value={chosen}
                 onChange={setChosen}
                 description={chosen.length ? undefined : 'None chosen: inherited from the parent linked copy, else the standard sync'}

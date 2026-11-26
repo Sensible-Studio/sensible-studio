@@ -50,7 +50,7 @@ const status = (over: Partial<MsmStatus['relationship']> = {}): MsmStatus => ({
 });
 
 describe('pageInheritance', () => {
-  it('chains only what rollouts synchronise', async () => {
+  it('chains only what syncs synchronise', async () => {
     const calls: Array<[string, boolean]> = [];
     const m = pageInheritance(status(), async (n, c) => void calls.push([n, c]))!;
     expect(m.state('jcr:title')).toBeUndefined(); // excluded by the contentUpdate defaults: the live copy's own

@@ -183,7 +183,7 @@ final class DamLiveCopy {
     static void setPushOnModify(ResourceResolver resolver, Resource item, boolean push) throws PersistenceException {
         Resource root = rootOf(item);
         if (root == null) {
-            throw new IllegalArgumentException(item.getPath() + " is not in a live copy");
+            throw new IllegalArgumentException(item.getPath() + " is not in a linked copy");
         }
         String master = masterOf(root);
         if (push && (master == null || resolver.getResource(master) == null)) {
@@ -192,7 +192,7 @@ final class DamLiveCopy {
         Resource cfg = content(root).getChild(CONFIG);
         ModifiableValueMap mv = cfg.adaptTo(ModifiableValueMap.class);
         if (mv == null) {
-            throw new IllegalStateException("This live copy cannot be changed here");
+            throw new IllegalStateException("This linked copy cannot be changed here");
         }
         Set<String> configs = new LinkedHashSet<>(Arrays.asList(mv.get(PN_ROLLOUT_CONFIGS, new String[0])));
         if (configs.isEmpty()) {
@@ -305,10 +305,10 @@ final class DamLiveCopy {
             throws PersistenceException {
         boolean file = DamItems.isAsset(source);
         if (!(file || DamItems.isFolder(source)) || DamItems.ROOT.equals(source.getPath())) {
-            throw new IllegalArgumentException("A live copy is made of a folder or a file in Media");
+            throw new IllegalArgumentException("A linked copy is made of a folder or a file in Media");
         }
         if (!DamItems.isFolder(parent)) {
-            throw new IllegalArgumentException("A live copy goes into a folder in Media");
+            throw new IllegalArgumentException("A linked copy goes into a folder in Media");
         }
         if (name == null || !(file ? name.matches("^[^/\\[\\]:*|\"]{1,150}$") && !name.startsWith(".")
                 : name.matches("^[a-z0-9][a-z0-9._-]{0,149}$"))) {
@@ -316,10 +316,10 @@ final class DamLiveCopy {
         }
         String target = parent.getPath() + "/" + name;
         if (target.equals(source.getPath()) || target.startsWith(source.getPath() + "/")) {
-            throw new IllegalArgumentException("A live copy cannot be inside its source");
+            throw new IllegalArgumentException("A linked copy cannot be inside its source");
         }
         if (rootOf(source) != null && source.getPath().startsWith(target + "/")) {
-            throw new IllegalArgumentException("A live copy cannot contain its source");
+            throw new IllegalArgumentException("A linked copy cannot contain its source");
         }
         if (parent.getChild(name) != null) {
             throw new IllegalStateException(target + " exists already");
@@ -385,7 +385,7 @@ final class DamLiveCopy {
     static Result synchronize(ResourceResolver resolver, Resource item, boolean reset, boolean force) throws PersistenceException {
         Resource root = rootOf(item);
         if (root == null) {
-            throw new IllegalArgumentException(item.getPath() + " is not in a live copy");
+            throw new IllegalArgumentException(item.getPath() + " is not in a linked copy");
         }
         String src = sourcePathOf(item, root);
         Resource source = resolver.getResource(src);
@@ -447,11 +447,11 @@ final class DamLiveCopy {
     /** Stops (or starts again) following the source for one file or folder. */
     static void suspend(ResourceResolver resolver, Resource item, boolean suspend) throws PersistenceException {
         if (rootOf(item) == null || isRoot(item)) {
-            throw new IllegalArgumentException(isRoot(item) ? "Detach the live copy instead" : item.getPath() + " is not in a live copy");
+            throw new IllegalArgumentException(isRoot(item) ? "Detach the linked copy instead" : item.getPath() + " is not in a linked copy");
         }
         Resource c = content(item);
         if (c == null || !hasMixin(c, MIX_RELATIONSHIP)) {
-            throw new IllegalArgumentException(item.getPath() + " is local to the live copy");
+            throw new IllegalArgumentException(item.getPath() + " is local to the linked copy");
         }
         if (suspend) {
             addMixin(c, MIX_CANCELLED);
@@ -466,7 +466,7 @@ final class DamLiveCopy {
     static void detach(ResourceResolver resolver, Resource item) throws PersistenceException {
         Resource root = rootOf(item);
         if (root == null) {
-            throw new IllegalArgumentException(item.getPath() + " is not in a live copy");
+            throw new IllegalArgumentException(item.getPath() + " is not in a linked copy");
         }
         Resource c = content(root);
         resolver.delete(c.getChild(CONFIG));

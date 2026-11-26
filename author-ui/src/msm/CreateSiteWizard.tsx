@@ -193,7 +193,7 @@ export function CreateSiteWizard({ msm, parent, parentTitle, user, onClose, onCr
                   Live Copy (keep the site synchronized with the blueprint; otherwise plain copies)
                 </Checkbox>
                 <CheckboxGroup
-                  label="Sync changes configs"
+                  label="Sync rules"
                   value={rolloutConfigs}
                   onChange={setRolloutConfigs}
                   isDisabled={!liveCopy}

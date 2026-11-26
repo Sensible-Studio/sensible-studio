@@ -100,7 +100,7 @@ export function BlueprintsConsole({ client }: { client: MsmClient }) {
         ) : (
           <>
             <p className="studio-bp__intro">
-              {`Create Site makes a new site from one of these: a ${VOCAB.linkedCopy.toLowerCase()} of the languages and chapters you choose, which follows the source when it is rolled out.`}
+              {`Create Site makes a new site from one of these: a ${VOCAB.linkedCopy.toLowerCase()} of the languages and chapters you choose, which follows the source when it is synced.`}
             </p>
             <table className="studio-bp__table">
               <thead>
@@ -189,7 +189,7 @@ export function BlueprintsConsole({ client }: { client: MsmClient }) {
           >
             {`You are going to delete ${removing.title}. Create Site no longer offers it. ${
               (removing.sites ?? []).length > 0
-                ? `The ${removing.sites!.length} site${removing.sites!.length === 1 ? '' : 's'} made from it stay ${VOCAB.linkedCopy.toLowerCase()}s of ${removing.sitePath}, and rollouts reach them as before.`
+                ? `The ${removing.sites!.length} site${removing.sites!.length === 1 ? '' : 's'} made from it stay ${VOCAB.linkedCopy.toLowerCase()}s of ${removing.sitePath}, and syncs reach them as before.`
                 : `The pages of ${removing.sitePath} stay as they are.`
             }`}
           </StudioConfirmDialog>

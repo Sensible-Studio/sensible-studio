@@ -142,7 +142,7 @@ export const TOOLS: ToolCategory[] = [
     tools: [
       { title: VOCAB.publishing, description: 'Publishing targets of this author: the live site, queues, tests', icon: 'live', url: '/replication.html' },
       { title: VOCAB.releases, description: 'Future versions of pages, edited apart from the live site and put live when ready', icon: 'release', url: '/launches.html' },
-      { title: 'Site sources', description: 'Blueprints: the sites Create Site makes new sites from, and the sites made from each', icon: 'sites', url: '/libs/wcm/msm/gui/content/blueprintconfig.html' },
+      { title: 'Site sources', description: 'Sources: the sites Create Site makes new sites from, and the sites made from each', icon: 'sites', url: '/libs/wcm/msm/gui/content/blueprintconfig.html' },
       { title: VOCAB.linkChecker, description: 'The links in pages, experience fragments, content fragments and media, and the ones that no longer lead anywhere', icon: 'link', url: '/etc/linkchecker.html' },
     ],
   },
@@ -238,7 +238,7 @@ export const TOOLS: ToolCategory[] = [
     icon: 'code',
     tools: [
       { title: VOCAB.health, description: 'How the instance is, and the nightly maintenance: repository compaction, version purge, what it recovered', icon: 'health', url: '/studio/health.html' },
-      { title: 'Jobs', description: 'The work done in the background (media processing, auto tags, publishing, rollouts, flows) and how each queue runs it', icon: 'jobs', url: '/mnt/overlay/granite/async/content/asyncjobs.html' },
+      { title: 'Jobs', description: 'The work done in the background (media processing, auto tags, publishing, syncs, flows) and how each queue runs it', icon: 'jobs', url: '/mnt/overlay/granite/async/content/asyncjobs.html' },
       { title: 'Components', description: 'Every component, its group, dialog and policies, and the pages that use it', icon: 'components', url: '/libs/wcm/core/content/sites/components.html' },
       { title: 'Repository Browser', description: 'Browse and edit nodes and properties (Composum)', icon: 'repository', url: '/bin/browser.html' },
       { title: 'Site configurations', description: 'The settings a site\'s code reads (context-aware configurations): per site, inherited, with defaults', icon: 'config', url: '/studio/siteconfig.html' },

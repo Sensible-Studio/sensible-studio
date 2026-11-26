@@ -205,6 +205,8 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
   const [loadError, setLoadError] = useState<string | null>(null);
   const [mode, setMode] = useState<EditorMode>('edit');
   const [openAnnotation, setOpenAnnotation] = useState<string | null>(null);
+  /** The note just added with the bar's button: closed without a word, it is taken away again. */
+  const freshAnnotation = useRef<string | null>(null);
   // the notes are shown over the page in Edit mode too (the eye in the top bar hides them; remembered per browser)
   const [annotationsShown, setAnnotationsShown] = useState(() => {
     try {
@@ -431,7 +433,7 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
         id: 'livecopy',
         variant: 'info',
         title: rel.cancelled || rel.status === 'suspended' ? 'This page is a linked copy whose inheritance is suspended.' : 'This page is a linked copy.',
-        text: `Blueprint: ${rel.sourcePath}${rel.lastRolledOut ? `, synced ${relativeTimeOf(rel.lastRolledOut)}` : ''}.`,
+        text: `Source: ${rel.sourcePath}${rel.lastRolledOut ? `, synced ${relativeTimeOf(rel.lastRolledOut)}` : ''}.`,
         actions: [{ label: 'Linked copy Status', onPress: () => setMsmOpen(true) }],
       });
     }
@@ -710,6 +712,7 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
       await client.post(path, createEntries(x, y));
       showAnnotations(true);
       await loadData();
+      freshAnnotation.current = path;
       setOpenAnnotation(path);
     } catch (e) {
       ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 });
@@ -772,6 +775,29 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
     } catch (e) {
       ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 });
     }
+  };
+
+  /**
+   * Opens or closes a note. The one just added with the bar's button and closed without a word is taken
+   * away again (asked of the server a moment later, after the note's own save on blur, so a note typed and
+   * closed at once is kept).
+   */
+  const openNote = (path: string | null) => {
+    const fresh = freshAnnotation.current;
+    if (fresh && path !== fresh) {
+      freshAnnotation.current = null;
+      window.setTimeout(() => {
+        void fetch(`${encodeURI(fresh)}.json`, { credentials: 'same-origin', cache: 'no-store' })
+          .then((r) => (r.ok ? (r.json() as Promise<{ text?: string }>) : null))
+          .then(async (n) => {
+            if (!n || (n.text ?? '').trim()) return;
+            await client.deleteResource(fresh);
+            await loadData();
+          })
+          .catch(() => undefined);
+      }, 900);
+    }
+    setOpenAnnotation(path);
   };
 
   const deleteAnnotation = async (a: Annotation) => {
@@ -1747,7 +1773,7 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
                     onAddArrow={addArrow}
                     onDeleteArrow={deleteArrow}
                     open={openAnnotation}
-                    onOpen={setOpenAnnotation}
+                    onOpen={openNote}
                   />
                 )}
               </Overlay>

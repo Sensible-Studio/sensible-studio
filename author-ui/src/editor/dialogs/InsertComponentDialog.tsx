@@ -1,6 +1,7 @@
 import { Content, Divider, Heading, Item, ListBox, SearchField, Section, Text, useDialogContainer } from '@adobe/react-spectrum';
 import { useMemo, useState } from 'react';
 import type { ComponentInfo } from '../api/StudioClient';
+import { ComponentIcon } from '../panels/ComponentIcon';
 import { abbreviation } from '../panels/ComponentsPanel';
 import { StudioDialog } from '../../shell/StudioDialog';
 
@@ -53,7 +54,7 @@ export function InsertComponentDialog({ components, onPick }: Props) {
                 {(c) => (
                   <Item key={c.resourceType} textValue={c.title}>
                     <Text>
-                      <span className="studio-insert__abbr">{abbreviation(c)}</span> {c.title}
+                      <ComponentIcon component={c} abbreviation={abbreviation(c)} /> {c.title}
                     </Text>
                     {c.description ? <Text slot="description">{c.description}</Text> : null}
                   </Item>

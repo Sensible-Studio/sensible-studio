@@ -59,11 +59,11 @@ export function RolloutDialog({ msm, path, liveCopies, onDone, component }: Prop
         <Text>
           {component ? (
             <>
-              Synchronizes the <strong>{component.title}</strong> component to the live copies you choose, with their rollout configurations.
+              Synchronizes the <strong>{component.title}</strong> component to the linked copies you choose, with their sync rules.
             </>
           ) : (
             <>
-              Synchronizes <strong>{path}</strong> to the live copies you choose, with their rollout configurations.
+              Synchronizes <strong>{path}</strong> to the linked copies you choose, with their sync rules.
             </>
           )}
         </Text>

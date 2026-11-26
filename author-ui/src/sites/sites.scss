@@ -950,3 +950,44 @@ $sel: color-mix(in srgb, var(--spectrum-blue-900) 12%, transparent);
   margin: var(--studio-space-4) 0 0;
   color: var(--studio-text-strong);
 }
+
+// Move: the destination chosen by clicking through the places
+.studio-move__browse {
+  display: grid;
+  gap: var(--studio-space-3);
+  justify-items: start;
+
+  ul {
+    width: 100%;
+    max-height: 180px;
+    margin: 0;
+    padding: var(--studio-space-2);
+    overflow: auto;
+    list-style: none;
+    background: var(--studio-surface-sunken, var(--studio-surface-canvas));
+    border: 1px solid var(--studio-border);
+    border-radius: var(--studio-radius-md);
+  }
+
+  li button {
+    display: block;
+    width: 100%;
+    padding: var(--studio-space-2) var(--studio-space-3);
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-radius: var(--studio-radius-sm);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible { background: var(--studio-surface-raised); }
+    small { color: var(--studio-text-muted); }
+  }
+
+  li.is-empty {
+    padding: var(--studio-space-2) var(--studio-space-3);
+    color: var(--studio-text-muted);
+  }
+}

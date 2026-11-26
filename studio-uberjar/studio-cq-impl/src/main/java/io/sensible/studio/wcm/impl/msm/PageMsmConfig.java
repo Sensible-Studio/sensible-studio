@@ -102,11 +102,11 @@ public final class PageMsmConfig {
         Relationships rels = new Relationships(resolver, manager);
         LiveCopyImpl lc = rels.liveCopyOf(page);
         if (lc == null || !Msm.isPage(resolver.getResource(page))) {
-            throw new WCMException(page + " is not in a live copy");
+            throw new WCMException(page + " is not in a linked copy");
         }
         boolean root = page.equals(lc.getPath());
         if (!root && (deep != null || excluded != null)) {
-            throw new WCMException("Only the root of the live copy (" + lc.getPath() + ") has these settings");
+            throw new WCMException("Only the root of the linked copy (" + lc.getPath() + ") has these settings");
         }
         String[] valid = validConfigs(resolver, manager, configs);
         Resource content = resolver.getResource(page + Msm.CONTENT_SEGMENT);
@@ -190,7 +190,7 @@ public final class PageMsmConfig {
                 continue;
             }
             if (manager != null && manager.getRolloutConfig(resolver, c.trim()) == null) {
-                throw new WCMException("No rollout configuration at " + c);
+                throw new WCMException("No sync rule at " + c);
             }
             out.add(c.trim());
         }

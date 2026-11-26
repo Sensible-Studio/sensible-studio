@@ -463,7 +463,7 @@ public class MsmServlet extends SlingAllMethodsServlet {
     private LiveRelationship relation(ResourceResolver resolver, String path) throws WCMException {
         LiveRelationship rel = relationships.getRelationship(resolver, path);
         if (rel == null) {
-            throw new WCMException(path + " is not in a live copy");
+            throw new WCMException(path + " is not in a linked copy");
         }
         return rel;
     }

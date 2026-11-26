@@ -214,7 +214,7 @@ function LanguagesDialog({
             {!several && info.liveCopy && (
               <InlineAlert variant="info">
                 <Heading>A linked copy</Heading>
-                <Content>Its content comes from its blueprint. Translate the blueprint (e.g. the language master), then roll it out.</Content>
+                <Content>Its content comes from its source. Translate the source (e.g. the language master), then sync it.</Content>
               </InlineAlert>
             )}
             {!several && own && (

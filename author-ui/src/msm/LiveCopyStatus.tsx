@@ -113,7 +113,7 @@ export function LiveCopyStatus({ msm, path, onChanged }: Props) {
               </dd>
             </div>
             <div>
-              <dt>Sync changes configs</dt>
+              <dt>Sync rules</dt>
               <dd>{lc.rolloutConfigs.map((c) => c.title).join(', ') || 'none'}</dd>
             </div>
             {rel.cancelledProperties.length > 0 && (
@@ -160,7 +160,7 @@ export function LiveCopyStatus({ msm, path, onChanged }: Props) {
                     void act('suspend', async () => {
                       const s = await msm.inheritance(path, 'suspend', { deep: false });
                       if (s) setStatus(s);
-                      return 'Linked copy suspended: rollouts leave this page alone';
+                      return 'Linked copy suspended: syncs leave this page alone';
                     })
                   }
                 >
@@ -221,7 +221,7 @@ export function LiveCopyStatus({ msm, path, onChanged }: Props) {
               void act('reset', async () => `Reset: ${describeResult(await msm.sync(path, { deep: false, reset: true }))}`)
             }
           >
-            Every cancelled inheritance on this page is re-enabled and the page is synchronized with the blueprint: the
+            Every cancelled inheritance on this page is re-enabled and the page is synchronized with the source: the
             changes made in the linked copy to inherited content are lost.
           </StudioConfirmDialog>
         )}

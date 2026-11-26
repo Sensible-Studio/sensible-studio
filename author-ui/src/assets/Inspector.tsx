@@ -133,7 +133,7 @@ function PropertiesPane({ client, item, onOpen, onProperties }: { client: DamCli
     ['Tags', tags.length ? tags.join(', ') : ''],
     ['Checked out by', asset?.checkedOutBy ?? ''],
     ['Processing', asset?.state && asset.state !== 'processed' ? asset.state : ''],
-    ['Live copy', liveCopyLabel(item.liveCopy) ? `${item.liveCopy === 'root' ? 'Root' : item.liveCopy === 'suspended' ? 'Suspended' : 'Follows its source'} (see References)` : ''],
+    ['Linked copy', liveCopyLabel(item.liveCopy) ? `${item.liveCopy === 'root' ? 'Root' : item.liveCopy === 'suspended' ? 'Suspended' : 'Follows its source'} (see References)` : ''],
   ];
   return (
     <div className="studio-inspector__props">

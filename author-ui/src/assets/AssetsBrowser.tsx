@@ -1215,7 +1215,7 @@ function CreateMenu({
         >
           <Item key="folder">Folder</Item>
           <Item key="files">Files</Item>
-          <Item key="livecopy">Live Copy</Item>
+          <Item key="livecopy">Linked copy</Item>
         </Menu>
       </MenuTrigger>
       <div ref={fileTrigger} hidden>

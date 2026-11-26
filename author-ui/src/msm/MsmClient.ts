@@ -114,7 +114,7 @@ export class HttpMsmClient implements MsmClient {
   }
 
   async blueprints() {
-    return (await this.get<{ blueprints: BlueprintInfo[] }>({ op: 'blueprints' }, 'Blueprints')).blueprints;
+    return (await this.get<{ blueprints: BlueprintInfo[] }>({ op: 'blueprints' }, 'Sources')).blueprints;
   }
 
   blueprint(path: string) {

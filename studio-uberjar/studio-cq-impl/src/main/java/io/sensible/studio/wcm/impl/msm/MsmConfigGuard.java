@@ -59,7 +59,7 @@ public class MsmConfigGuard implements SlingPostProcessor {
                     }
                     continue;
                 }
-                throw new WCMException("A live copy can only follow a blueprint you can read: " + master);
+                throw new WCMException("A linked copy can only follow a source you can read: " + master);
             }
         }
     }

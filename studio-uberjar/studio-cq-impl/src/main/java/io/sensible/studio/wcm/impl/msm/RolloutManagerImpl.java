@@ -168,11 +168,11 @@ public class RolloutManagerImpl implements RolloutManager {
     @Override
     public void rollout(RolloutParams params) throws WCMException {
         if (params == null || params.master == null) {
-            throw new WCMException("No blueprint page to roll out");
+            throw new WCMException("No source page to sync");
         }
         Resource master = params.master.adaptTo(Resource.class);
         if (master == null) {
-            throw new WCMException("No blueprint page to roll out");
+            throw new WCMException("No source page to sync");
         }
         Options o = Options.of(params.isDeep, params.trigger);
         o.reset = params.reset;
@@ -288,7 +288,7 @@ public class RolloutManagerImpl implements RolloutManager {
             return; // no JCR, no versions
         }
         if (resolver.hasChanges()) {
-            throw new WCMException("Save the pending changes before a rollout that versions its live copies");
+            throw new WCMException("Save the pending changes before a sync that versions its linked copies");
         }
         io.sensible.studio.wcm.impl.PageRevisions revisions = new io.sensible.studio.wcm.impl.PageRevisions(resolver);
         for (String page : pages) {
@@ -315,13 +315,13 @@ public class RolloutManagerImpl implements RolloutManager {
         Relationships rels = new Relationships(resolver, configManager);
         LiveRelationshipImpl rel = rels.relationshipOf(targetPath);
         if (rel == null) {
-            throw new WCMException(targetPath + " is not in a live copy");
+            throw new WCMException(targetPath + " is not in a linked copy");
         }
         Resource existing = resolver.getResource(targetPath);
         Resource marker = existing == null || Msm.isInPageContent(targetPath) ? existing : existing.getChild(Msm.JCR_CONTENT);
         if (existing != null && (marker == null || !Msm.hasMixin(marker, NT_LIVE_RELATIONSHIP))) {
             // local content: synchronising would replace it (or move a local page aside)
-            throw new WCMException(targetPath + " was not rolled out from the blueprint");
+            throw new WCMException(targetPath + " was not synced from the source");
         }
         RolloutResult result = new RolloutResult();
         Options o = Options.of(deep, null);
@@ -373,10 +373,10 @@ public class RolloutManagerImpl implements RolloutManager {
             throw new WCMException(target + " already exists");
         }
         if (Msm.overlaps(target, sourcePage)) {
-            throw new WCMException("A live copy cannot be created inside its own blueprint");
+            throw new WCMException("A linked copy cannot be created inside its own source");
         }
         if (inBlueprintOfAncestor(resolver, target, sourcePage)) {
-            throw new WCMException("The blueprint is itself rolled out from a tree containing " + parent
+            throw new WCMException("The source is itself synced from a tree containing " + parent
                     + ": the live copy would copy itself");
         }
         String[] configs = rolloutConfigs == null ? new String[0] : rolloutConfigs;
@@ -385,7 +385,7 @@ public class RolloutManagerImpl implements RolloutManager {
         for (String c : configs.length == 0 ? new String[] {RolloutConfigManager.DEFAULT_CONFIG} : configs) {
             RolloutConfig rc = configManager == null ? null : configManager.getRolloutConfig(resolver, c);
             if (rc == null && configs.length > 0) {
-                throw new WCMException("No rollout configuration at " + c);
+                throw new WCMException("No sync rule at " + c);
             }
             if (rc != null) {
                 resolved.add(rc);

@@ -1474,18 +1474,18 @@ export class DamHttpClient implements DamClient {
   }
 
   liveCopy(path: string): Promise<LiveCopyInfo> {
-    return this.get({ op: "liveCopy", path }, "Live copy");
+    return this.get({ op: "liveCopy", path }, "Linked copy");
   }
 
   createLiveCopy(source: string, parent: string, title: string, name?: string, push = false): Promise<RolloutResult & { path: string }> {
     const f = new URLSearchParams({ op: "createLiveCopy", source, parent, title });
     if (name) f.set("name", name);
     if (push) f.set("push", "true");
-    return this.post(f, "Create live copy");
+    return this.post(f, "Create linked copy");
   }
 
   async liveCopyPush(path: string, push: boolean): Promise<void> {
-    await this.post(new URLSearchParams({ op: "liveCopyPush", path, push: String(push) }), "Live copy");
+    await this.post(new URLSearchParams({ op: "liveCopyPush", path, push: String(push) }), "Linked copy");
   }
 
   liveCopySync(path: string, reset = false): Promise<RolloutResult> {
@@ -1495,7 +1495,7 @@ export class DamHttpClient implements DamClient {
   }
 
   rollout(path: string): Promise<RolloutResult> {
-    return this.post(new URLSearchParams({ op: "rollout", path }), "Rollout");
+    return this.post(new URLSearchParams({ op: "rollout", path }), "Sync");
   }
 
   async liveCopySuspend(path: string, suspend: boolean): Promise<void> {

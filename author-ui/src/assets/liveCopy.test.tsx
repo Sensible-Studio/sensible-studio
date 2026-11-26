@@ -17,26 +17,26 @@ const show = (dam: MemoryDam, item: AssetItem, onOpen = vi.fn()) =>
     </Provider>,
   );
 
-describe('Live Copy in Media', () => {
-  it('is named in lists and summed up after a rollout', () => {
+describe('Linked copy in Media', () => {
+  it('is named in lists and summed up after a sync', () => {
     expect(liveCopyLabel(undefined)).toBeNull();
-    expect(liveCopyLabel('inherited')).toBe('Live copy');
-    expect(liveCopyLabel('suspended')).toBe('Live copy · suspended');
+    expect(liveCopyLabel('inherited')).toBe('Linked copy');
+    expect(liveCopyLabel('suspended')).toBe('Linked copy · suspended');
     expect(rolloutSummary({ added: 1, updated: 2, removed: 0, skipped: ['/x'] })).toBe('1 added, 2 updated, 1 left as they are');
     expect(rolloutSummary({ added: 0, updated: 0, removed: 0, skipped: [] })).toBe('Already up to date');
   });
 
-  it('offers a live copy of a file outside Live Copy, kept at its name', async () => {
+  it('offers a linked copy of a file outside Linked copy, kept at its name', async () => {
     const dam = new MemoryDam();
     show(dam, file('/content/dam/plain.png'));
-    fireEvent.click(await screen.findByRole('button', { name: 'Create live copy…' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Create linked copy…' }));
     expect(await screen.findByText(/Name: plain\.png/)).toBeTruthy();
     fireEvent.click(screen.getByRole('checkbox', { name: 'Take the source’s changes at once' }));
     fireEvent.click(screen.getByRole('button', { name: 'Create' }));
     await waitFor(() => expect(dam.liveCopyCalls[0]).toMatch(/^create \/content\/dam\/plain\.png \/content\/dam\/plain\.png +push$/));
   });
 
-  it('turns pushing on for a live copy', async () => {
+  it('turns pushing on for a linked copy', async () => {
     const dam = new MemoryDam();
     const root = '/content/dam/markets/de';
     dam.liveCopyInfo[root] = { root, source: '/content/dam/brand', sourceExists: true, status: 'root', pushOnModify: false, liveCopies: [] };
@@ -46,7 +46,7 @@ describe('Live Copy in Media', () => {
     expect(screen.getByRole('button', { name: 'Detach' })).toBeTruthy();
   });
 
-  it('offers what a live copy file can do, and its changed fields', async () => {
+  it('offers what a linked copy file can do, and its changed fields', async () => {
     const dam = new MemoryDam();
     const path = '/content/dam/markets/de/logo.png';
     dam.liveCopyInfo[path] = {
@@ -70,14 +70,14 @@ describe('Live Copy in Media', () => {
     expect(screen.queryByRole('button', { name: 'Detach' })).toBeNull();
   });
 
-  it('lists the live copies of a source and rolls out to them', async () => {
+  it('lists the linked copies of a source and rolls out to them', async () => {
     const dam = new MemoryDam();
     dam.liveCopyInfo['/content/dam/brand'] = {
       liveCopies: [{ root: '/content/dam/markets/de', path: '/content/dam/markets/de', title: 'Brand DE', status: 'root' }],
     };
     show(dam, { type: 'folder', path: '/content/dam/brand', name: 'brand', title: 'Brand' } as never);
     expect(await screen.findByText('/content/dam/markets/de')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Rollout' }));
-    await waitFor(() => expect(dam.liveCopyCalls).toContain('rollout /content/dam/brand'));
+    fireEvent.click(screen.getByRole('button', { name: 'Sync' }));
+    await waitFor(() => expect(dam.liveCopyCalls).toContain('sync /content/dam/brand'));
   });
 });

@@ -150,7 +150,7 @@ describe('page properties', () => {
     fireEvent.click(await screen.findByRole('tab', { name: 'Linked copy' }));
     expect(screen.getByText('/content/wknd/language-masters/en/magazine')).toBeTruthy();
     expect(screen.getByText('Administrator')).toBeTruthy();
-    fireEvent.click(screen.getByRole('checkbox', { name: 'Inherit Sync changes Configs from Parent' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Inherit sync rules from the parent' }));
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Save' }));
     });

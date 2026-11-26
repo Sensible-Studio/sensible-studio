@@ -102,7 +102,7 @@ public final class BlueprintSites {
     public static Map<String, Object> structure(ResourceResolver resolver, String blueprint) throws WCMException {
         Map<String, Object> bp = describe(resolver.getResource(blueprint));
         if (bp == null) {
-            throw new WCMException("No blueprint configuration at " + blueprint);
+            throw new WCMException("No source configuration at " + blueprint);
         }
         return structure(resolver, bp);
     }
@@ -124,7 +124,7 @@ public final class BlueprintSites {
     private static Map<String, Object> structure(ResourceResolver resolver, Map<String, Object> bp) throws WCMException {
         Resource site = resolver.getResource((String) bp.get("sitePath"));
         if (!Msm.isPage(site)) {
-            throw new WCMException("The blueprint site " + bp.get("sitePath") + " does not exist");
+            throw new WCMException("The source site " + bp.get("sitePath") + " does not exist");
         }
         List<Map<String, Object>> languages = new ArrayList<>();
         Map<String, Map<String, Object>> chapters = new LinkedHashMap<>();
@@ -205,11 +205,11 @@ public final class BlueprintSites {
         }
         Map<String, Object> bp = describe(resolver.getResource(req.blueprint));
         if (bp == null) {
-            throw new WCMException("No blueprint configuration at " + req.blueprint);
+            throw new WCMException("No source configuration at " + req.blueprint);
         }
         String sitePath = (String) bp.get("sitePath");
         if (Msm.contentPath(sitePath) == null || !Msm.isPage(resolver.getResource(sitePath))) {
-            throw new WCMException("The blueprint site " + sitePath + " does not exist");
+            throw new WCMException("The source site " + sitePath + " does not exist");
         }
         if (req.title == null || req.title.trim().isEmpty()) {
             throw new WCMException("A title is required");
@@ -379,7 +379,7 @@ public final class BlueprintSites {
             resolver.create(p, Msm.JCR_CONTENT, content);
             return p.getPath();
         } catch (org.apache.sling.api.resource.PersistenceException e) {
-            throw new WCMException("Could not create the blueprint: " + e.getMessage(), e);
+            throw new WCMException("Could not create the source: " + e.getMessage(), e);
         }
     }
 
@@ -391,7 +391,7 @@ public final class BlueprintSites {
     private static Resource editable(ResourceResolver resolver, String path) throws WCMException {
         Resource r = path == null ? null : resolver.getResource(path);
         if (describe(r) == null) {
-            throw new WCMException("No blueprint configuration at " + path);
+            throw new WCMException("No source configuration at " + path);
         }
         if (!isEditable(path)) {
             throw new WCMException(path + " belongs to the product and is not changed here");

@@ -164,13 +164,13 @@ export function TopBar(props: Props) {
               </Section>,
               ...(msm
                 ? [
-                    <Section key="msm" title="Multi Site Manager">
+                    <Section key="msm" title="Sync">
                       {[<Item key="msm">{msm.label}</Item>, ...(msm.sync ? [<Item key="sync">Synchronize Page</Item>] : [])]}
                     </Section>,
                   ]
                 : []),
               <Section key="studio" title="Sensible Studio">
-                <Item key="start">View in Admin</Item>
+                <Item key="start">Show in Pages</Item>
               </Section>,
             ]}
           </Menu>

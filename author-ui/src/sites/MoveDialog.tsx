@@ -23,6 +23,9 @@ export function MoveDialog({ client, item, onMove }: Props) {
   const [dest, setDest] = useState(parentOf(item.path));
   const [destOk, setDestOk] = useState<boolean | null>(true);
   const [destTitle, setDestTitle] = useState<string | null>(null);
+  /** the places below the destination, for choosing it by clicking instead of typing a path */
+  const [below, setBelow] = useState<SiteItem[]>([]);
+  const [browsing, setBrowsing] = useState(false);
   const refs = useReferences(client, [item.path]);
   const [adjust, setAdjust] = useState<Set<string> | null>(null);
   const chosen = adjust ?? new Set((refs.pages ?? []).map((p) => p.page));
@@ -42,6 +45,7 @@ export function MoveDialog({ client, item, onMove }: Props) {
           const insideItself = d === item.path || d.startsWith(`${item.path}/`);
           setDestOk(!insideItself);
           setDestTitle(l.item.title);
+          setBelow(l.children.filter((c) => c.path !== item.path));
         },
         () => !cancelled && setDestOk(false),
       );
@@ -87,6 +91,30 @@ export function MoveDialog({ client, item, onMove }: Props) {
             validationState={destOk === false ? 'invalid' : undefined}
             errorMessage="Choose an existing location below /content, outside the item itself"
           />
+          <div className="studio-move__browse">
+            <Button variant="secondary" style="outline" onPress={() => setBrowsing((v) => !v)} aria-expanded={browsing}>
+              {browsing ? 'Hide the places' : 'Browse…'}
+            </Button>
+            {browsing && (
+              <ul aria-label="Places below the destination">
+                {dest.replace(/\/$/, '') !== '/content' && (
+                  <li>
+                    <button type="button" onClick={() => setDest(parentOf(dest.replace(/\/$/, '')))}>
+                      ↑ Up
+                    </button>
+                  </li>
+                )}
+                {below.map((c) => (
+                  <li key={c.path}>
+                    <button type="button" onClick={() => setDest(c.path)} title={c.path}>
+                      {c.title} <small>{nameOf(c.path)}</small>
+                    </button>
+                  </li>
+                ))}
+                {below.length === 0 && destOk && <li className="is-empty">Nothing below this place.</li>}
+              </ul>
+            )}
+          </div>
           <div className="studio-move__refs">
             <Text UNSAFE_className="studio-move__label">Adjust references</Text>
             <ReferenceList

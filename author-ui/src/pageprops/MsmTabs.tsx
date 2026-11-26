@@ -144,7 +144,7 @@ export function BlueprintTab({ msm, page, status, onChanged }: { msm: MsmClient;
             </ul>
           )}
         </Section>
-        <Section title="Sync changes Configs">
+        <Section title="Sync rules">
           <div className="studio-g-field">
             <label className="studio-g-visually-hidden" htmlFor={id}>
               Sync changes configurations of the linked copies
@@ -270,7 +270,7 @@ export function LiveCopyTab({ msm, page, status, onChanged }: { msm: MsmClient; 
             onPress={() =>
               void act('suspend', async () => {
                 await msm.inheritance(page, 'suspend', { deep: false });
-                return 'Linked copy suspended: rollouts leave this page alone';
+                return 'Linked copy suspended: syncs leave this page alone';
               })
             }
           >
@@ -289,7 +289,7 @@ export function LiveCopyTab({ msm, page, status, onChanged }: { msm: MsmClient; 
           <Link className="studio-pp-link" to={`/sites.html${rel.sourcePath}`}>
             {rel.sourcePath}
           </Link>
-          {!rel.inherited && <p className="studio-pp-muted">This page was created in the live copy; rollouts do not change it.</p>}
+          {!rel.inherited && <p className="studio-pp-muted">This page was created in the linked copy; syncs do not change it.</p>}
         </Section>
         <Section title="Status">
           <dl className="studio-pp-facts">
@@ -343,7 +343,7 @@ export function LiveCopyTab({ msm, page, status, onChanged }: { msm: MsmClient; 
                   }}
                 />
                 <span className="studio-g-checkbox__box" aria-hidden="true" />
-                <span className="studio-g-checkbox__text">Inherit Sync changes Configs from Parent</span>
+                <span className="studio-g-checkbox__text">Inherit sync rules from the parent</span>
               </label>
             </div>
             <div className="studio-g-field">
@@ -392,7 +392,7 @@ export function LiveCopyTab({ msm, page, status, onChanged }: { msm: MsmClient; 
             cancelLabel="Cancel"
             onPrimaryAction={() => void act('reset', async () => `Reset: ${describeResult(await msm.sync(page, { deep: false, reset: true }))}`)}
           >
-            Every cancelled inheritance on this page is re-enabled and the page is synchronized with the blueprint: the changes
+            Every cancelled inheritance on this page is re-enabled and the page is synchronized with the source: the changes
             made in the linked copy to inherited content are lost.
           </StudioConfirmDialog>
         )}

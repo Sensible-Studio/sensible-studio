@@ -145,7 +145,7 @@ public class LiveRelationshipManagerImpl implements LiveRelationshipManager, Res
             throws WCMException {
         Resource marker = marker(resolver, relation);
         if (!Msm.hasMixin(marker, NT_LIVE_RELATIONSHIP)) {
-            throw new WCMException(relation.getTargetPath() + " was not rolled out from the blueprint");
+            throw new WCMException(relation.getTargetPath() + " was not synced from the source");
         }
         Msm.addMixin(marker, NT_LIVE_SYNC_CANCELLED);
         Msm.writable(marker).put(PN_IS_CANCELLED_FOR_CHILDREN, deep);
@@ -158,7 +158,7 @@ public class LiveRelationshipManagerImpl implements LiveRelationshipManager, Res
         Resource marker = marker(resolver, relation);
         if (!Msm.hasMixin(marker, NT_LIVE_RELATIONSHIP)) {
             // local content was never rolled out: re-enabling would let the next rollout replace or delete it
-            throw new WCMException(relation.getTargetPath() + " was not rolled out from the blueprint");
+            throw new WCMException(relation.getTargetPath() + " was not synced from the source");
         }
         Msm.removeMixin(marker, NT_LIVE_SYNC_CANCELLED);
         Msm.writable(marker).remove(PN_IS_CANCELLED_FOR_CHILDREN);
@@ -218,7 +218,7 @@ public class LiveRelationshipManagerImpl implements LiveRelationshipManager, Res
         String target = relation.getTargetPath();
         Resource node = resolver.getResource(target);
         if (node == null) {
-            throw new WCMException("No live copy target at " + target);
+            throw new WCMException("No linked copy target at " + target);
         }
         boolean page = !Msm.isInPageContent(target);
         if (page && target.equals(lc.getPath())) {
@@ -230,7 +230,7 @@ public class LiveRelationshipManagerImpl implements LiveRelationshipManager, Res
         } else if (page) {
             Resource cfg = resolver.getResource(Msm.configPath(lc.getPath()));
             if (cfg == null) {
-                throw new WCMException("Cannot read the live copy configuration of " + lc.getPath());
+                throw new WCMException("Cannot read the linked copy configuration of " + lc.getPath());
             }
             Set<String> excluded = new LinkedHashSet<>(Arrays.asList(Msm.strings(cfg.getValueMap(), PN_EXCLUDED_PATHS)));
             excluded.add(LiveCopyImpl.normalize(target.substring(lc.getPath().length())));
@@ -272,7 +272,7 @@ public class LiveRelationshipManagerImpl implements LiveRelationshipManager, Res
         Resource target = resolver.getResource(relation.getTargetPath());
         Resource marker = Msm.markerNode(target);
         if (marker == null) {
-            throw new WCMException("No live copy target at " + relation.getTargetPath());
+            throw new WCMException("No linked copy target at " + relation.getTargetPath());
         }
         return marker;
     }

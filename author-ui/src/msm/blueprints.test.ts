@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parsePlace, urlOf } from '../shell/places';
 import { blueprintName, blueprintProblems, BLUEPRINTS_URL } from './BlueprintsConsole';
 
-describe('site sources (blueprints)', () => {
+describe('site sources (sources)', () => {
   it('names a configuration after its title, as AEM names wknd_blueprint', () => {
     expect(blueprintName('WKND Site')).toBe('wknd_site_blueprint');
     expect(blueprintName('Brand Blueprint')).toBe('brand_blueprint');

@@ -8,7 +8,7 @@ import { DialogContainer } from '@adobe/react-spectrum';
 /** "Live copy", "Live copy · suspended": for lists and cards; null outside a live copy. */
 export function liveCopyLabel(status: LiveCopyStatus | undefined | null): string | null {
   if (!status) return null;
-  return status === 'suspended' ? 'Live copy · suspended' : 'Live copy';
+  return status === 'suspended' ? 'Linked copy · suspended' : 'Linked copy';
 }
 
 /** One line about what a rollout did. */
@@ -22,10 +22,10 @@ export function rolloutSummary(r: RolloutResult): string {
 }
 
 const STATUS_TEXT: Record<string, string> = {
-  root: 'The live copy itself: it follows the folder below.',
-  inherited: 'Follows its source: rollouts bring the source’s changes.',
+  root: 'The linked copy itself: it follows the folder below.',
+  inherited: 'Follows its source: syncs bring the source’s changes.',
   suspended: 'Suspended: kept as it is here until it is resumed.',
-  local: 'Local to the live copy: rollouts leave it alone.',
+  local: 'Local to the linked copy: syncs leave it alone.',
 };
 
 /**
@@ -81,8 +81,8 @@ export function LiveCopyPane({
   const inCopy = !!info.root;
   const status = info.status ?? 'local';
   return (
-    <section className="studio-assets__livecopy" aria-label="Live Copy">
-      <h3 className="studio-rail__heading">Live Copy</h3>
+    <section className="studio-assets__livecopy" aria-label="Linked copy">
+      <h3 className="studio-rail__heading">Linked copy</h3>
       {inCopy && (
         <div className="studio-assets__livecopy-block">
           <p className="studio-assets__muted">{STATUS_TEXT[status]}</p>
@@ -104,7 +104,7 @@ export function LiveCopyPane({
             </div>
             {info.lastRolledOut && (
               <div>
-                <dt>Last rollout</dt>
+                <dt>Last sync</dt>
                 <dd>
                   {new Date(info.lastRolledOut).toLocaleString()}
                   {info.lastRolledOutBy ? ` · ${info.lastRolledOutBy}` : ''}
@@ -117,7 +117,7 @@ export function LiveCopyPane({
               isSelected={!!info.pushOnModify}
               isDisabled={busy}
               onChange={(on) =>
-                void run(on ? 'The source’s changes now come at once' : 'Changes now come with Rollout or Synchronize', () => client.liveCopyPush(item.path, on))
+                void run(on ? 'The source’s changes now come at once' : 'Changes now come with Sync', () => client.liveCopyPush(item.path, on))
               }
             >
               Take the source’s changes at once
@@ -174,7 +174,7 @@ export function LiveCopyPane({
       )}
       {info.liveCopies.length > 0 && (
         <div className="studio-assets__livecopy-block">
-          <strong>Live copies of this {item.type === 'folder' ? 'folder' : 'file'}</strong>
+          <strong>Linked copies of this {item.type === 'folder' ? 'folder' : 'file'}</strong>
           <ul className="studio-assets__livecopy-list">
             {info.liveCopies.map((c) => (
               <li key={c.path}>
@@ -191,15 +191,15 @@ export function LiveCopyPane({
               </li>
             ))}
           </ul>
-          <Button variant="accent" isDisabled={busy} onPress={() => void run('Rolled out', () => client.rollout(item.path))}>
-            Rollout
+          <Button variant="accent" isDisabled={busy} onPress={() => void run('Synced', () => client.rollout(item.path))}>
+            Sync
           </Button>
         </div>
       )}
       {!inCopy && (
         <div className="studio-assets__livecopy-block">
           <Button variant="secondary" isDisabled={busy} onPress={() => setCopying(true)}>
-            Create live copy…
+            Create linked copy…
           </Button>
         </div>
       )}
@@ -222,14 +222,14 @@ export function LiveCopyPane({
       <DialogContainer onDismiss={() => setDetaching(false)}>
         {detaching && (
           <StudioConfirmDialog
-            title="Detach live copy"
+            title="Detach linked copy"
             variant="destructive"
             primaryActionLabel="Detach"
             cancelLabel="Cancel"
             onPrimaryAction={() => void run('Detached', () => client.liveCopyDetach(item.path))}
             onCancel={() => setDetaching(false)}
           >
-            <strong>{item.title}</strong> and everything in it become ordinary folders and files, kept as they are. Rollouts no longer reach them; this
+            <strong>{item.title}</strong> and everything in it become ordinary folders and files, kept as they are. Syncs no longer reach them; this
             cannot be undone.
           </StudioConfirmDialog>
         )}
@@ -276,7 +276,7 @@ export function CreateLiveCopyDialog({
     setError(null);
     try {
       const r = await client.createLiveCopy(source, target, file ? '' : title.trim() || sourceName, name, push);
-      ToastQueue.positive(`Live copy made: ${rolloutSummary(r)}`, { timeout: 4000 });
+      ToastQueue.positive(`Linked copy made: ${rolloutSummary(r)}`, { timeout: 4000 });
       onDone(r.path);
       close();
     } catch (e) {
@@ -286,16 +286,16 @@ export function CreateLiveCopyDialog({
   };
   return (
     <StudioDialog size="M">
-      <Heading>Create Live Copy</Heading>
+      <Heading>Create Linked copy</Heading>
       <Divider />
       <Content>
         <p className="studio-assets__muted">
           {file ? 'A copy of this file' : 'A folder'} that follows {fixedSource ? `“${sourceTitle ?? sourceName}”` : 'a folder elsewhere in Media'}: it is
-          copied now, and later changes come with Rollout or Synchronize, or at once. Fields changed in the live copy stay as they are changed.
+          copied now, and later changes come with Sync, or at once. Fields changed in the linked copy stay as they are changed.
         </p>
         {fixedSource ? (
           <>
-            <strong>Put the live copy in</strong>
+            <strong>Put the linked copy in</strong>
             <FolderPicker client={client} value={target} onChange={setTarget} exclude={[source]} />
           </>
         ) : (
@@ -311,7 +311,7 @@ export function CreateLiveCopyDialog({
         <Checkbox isSelected={push} onChange={setPush}>
           Take the source’s changes at once
         </Checkbox>
-        {invalid && source !== '/content/dam' && <p className="studio-assets__dialog-error">A live copy cannot be inside its source.</p>}
+        {invalid && source !== '/content/dam' && <p className="studio-assets__dialog-error">A linked copy cannot be inside its source.</p>}
         {error && <p className="studio-assets__dialog-error">{error}</p>}
       </Content>
       <ButtonGroup>

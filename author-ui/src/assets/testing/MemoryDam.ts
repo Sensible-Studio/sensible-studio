@@ -833,7 +833,7 @@ export class MemoryDam implements DamClient {
   }
 
   async rollout(path: string): Promise<RolloutResult> {
-    this.liveCopyCalls.push(`rollout ${path}`);
+    this.liveCopyCalls.push(`sync ${path}`);
     return { added: 1, updated: 2, removed: 0, skipped: [] };
   }
 
