@@ -16,6 +16,8 @@ export function DeleteDialog({ client, items, onDelete }: Props) {
     items.map((i) => i.path),
   );
   const referenced = (refs.pages?.length ?? 0) > 0;
+  // deleting unpublishes: say so, a live page disappearing is the bigger news
+  const live = items.filter((i) => i.publication === 'published' || i.publication === 'modified');
   return (
     <StudioConfirmDialog
       title={referenced ? 'Delete referenced content' : 'Delete'}
@@ -35,6 +37,12 @@ export function DeleteDialog({ client, items, onDelete }: Props) {
           You are going to delete {items.length} items: <strong>{items.map((d) => d.title).join(', ')}</strong>, with the
           pages below them.
         </>
+      )}
+      {live.length > 0 && (
+        <p className="studio-delete__live">
+          {live.length === 1 && items.length === 1 ? 'It is published' : `${live.length} of them ${live.length === 1 ? 'is' : 'are'} published`}: {live.length === 1 ? 'it is' : 'they are'} taken off the live site
+          first. Pages below that are published go with {live.length === 1 ? 'it' : 'them'}.
+        </p>
       )}
       <div className="studio-delete__refs">
         {referenced && <Text>These pages refer to it; their links will break:</Text>}

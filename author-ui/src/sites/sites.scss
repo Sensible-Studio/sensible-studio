@@ -945,3 +945,8 @@ $sel: color-mix(in srgb, var(--spectrum-blue-900) 12%, transparent);
     color: var(--studio-danger-strong, var(--spectrum-semantic-negative-color-default));
   }
 }
+
+.studio-delete__live {
+  margin: var(--studio-space-4) 0 0;
+  color: var(--studio-text-strong);
+}

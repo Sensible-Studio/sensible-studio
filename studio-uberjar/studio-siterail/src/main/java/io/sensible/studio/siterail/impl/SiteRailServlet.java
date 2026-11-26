@@ -15,6 +15,7 @@ import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.resource.LoginException;
 import org.apache.sling.api.resource.PersistenceException;
+import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
@@ -23,6 +24,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.day.cq.replication.ReplicationActionType;
+import com.day.cq.replication.ReplicationException;
+import com.day.cq.replication.Replicator;
 import com.day.cq.wcm.api.WCMException;
 
 /**
@@ -85,6 +89,12 @@ public class SiteRailServlet extends SlingAllMethodsServlet {
     @Reference
     private transient ResourceResolverFactory resolverFactory;
 
+    /** Takes a deleted page off the live site; absent on an instance without replication. */
+    @Reference(cardinality = org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL,
+            policy = org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC,
+            policyOption = org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY)
+    private transient volatile Replicator replicator;
+
     /** The bundle's service resolver, or null before its service user exists (repoinit runs at startup). */
     private ResourceResolver service() {
         try {
@@ -113,7 +123,7 @@ public class SiteRailServlet extends SlingAllMethodsServlet {
         String op = String.valueOf(r.getParameter("op"));
         SiteRail rail = new SiteRail(r.getResourceResolver(), service);
         try {
-            Object out = post ? write(op, r, rail) : read(op, r, rail);
+            Object out = post ? write(op, r, rail, replicator) : read(op, r, rail);
             if (out == null) {
                 send(response, 404, error("Unknown op " + op));
             } else {
@@ -243,7 +253,7 @@ public class SiteRailServlet extends SlingAllMethodsServlet {
         return c;
     }
 
-    private static Object write(String op, SlingHttpServletRequest r, SiteRail rail)
+    private static Object write(String op, SlingHttpServletRequest r, SiteRail rail, Replicator replicatorNow)
             throws WCMException, PersistenceException, RepositoryException {
         switch (op) {
             case "comment":
@@ -294,11 +304,50 @@ public class SiteRailServlet extends SlingAllMethodsServlet {
                 if (paths == null || paths.length == 0) {
                     throw new IllegalArgumentException("Nothing to delete");
                 }
-                return Collections.singletonMap("versioned", versions(r).delete(java.util.Arrays.asList(paths)));
+                // a page that is live goes from the live site first, as AEM's delete does: otherwise it stays
+                // there with nothing on the author to unpublish it from. If that fails nothing is deleted.
+                java.util.List<String> live = new java.util.ArrayList<>();
+                for (String p : paths) {
+                    Resource res = r.getResourceResolver().getResource(p);
+                    if (res != null && hasPublished(res)) {
+                        live.add(p);
+                    }
+                }
+                if (!live.isEmpty()) {
+                    Replicator rep = replicatorNow;
+                    if (rep == null) {
+                        throw new IllegalArgumentException(live.get(0) + " is published and publishing is not available here to take it down; nothing was deleted");
+                    }
+                    try {
+                        for (String p : live) {
+                            rep.replicate(r.getResourceResolver().adaptTo(javax.jcr.Session.class), ReplicationActionType.DEACTIVATE, p);
+                        }
+                    } catch (ReplicationException e) {
+                        throw new IllegalArgumentException(live.get(0) + " is published and could not be unpublished (" + e.getMessage() + "); nothing was deleted");
+                    }
+                }
+                Map<String, Object> out = new LinkedHashMap<>();
+                out.put("versioned", versions(r).delete(java.util.Arrays.asList(paths)));
+                out.put("unpublished", live);
+                return out;
             }
             default:
                 return null;
         }
+    }
+
+    /** Whether the page or any page below it is published now. */
+    static boolean hasPublished(Resource r) {
+        Resource content = r.getChild("jcr:content");
+        if (content != null && "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction", String.class))) {
+            return true;
+        }
+        for (Resource c : r.getChildren()) {
+            if (!"jcr:content".equals(c.getName()) && !c.getName().startsWith("rep:") && hasPublished(c)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String[] values(SlingHttpServletRequest r, String name) {
