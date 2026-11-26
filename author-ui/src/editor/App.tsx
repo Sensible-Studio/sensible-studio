@@ -192,6 +192,9 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
   const tabRef = useRef(tab);
   tabRef.current = tab;
   const go = useNavigate();
+  // loading must not start again because the navigation function is a new one on every render of the shell
+  const goRef = useRef(go);
+  goRef.current = go;
   const tabPage = tab?.place.kind === 'editor' ? tab.place.path : null;
   useEffect(() => {
     if (tabPage !== null && tabPage !== pagePath) setPagePath(tabPage);
@@ -335,7 +338,7 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
       // opens its master variation, as AEM does
       if (d.page.resourceType === XF_HOLDER) {
         const variation = xfVariation(pagePath, await fetch(`${encodeURI(pagePath)}.2.json`, { credentials: 'same-origin', cache: 'no-store' }).then((r) => (r.ok ? r.json() : null), () => null));
-        if (variation) return go({ kind: 'editor', path: variation }, { replace: true });
+        if (variation) return goRef.current({ kind: 'editor', path: variation }, { replace: true });
       }
       setData(d);
       setContent(c);
@@ -344,7 +347,7 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
       setData(null);
       setLoadError(e instanceof Error ? e.message : String(e));
     }
-  }, [client, pagePath, contentRoot, go]);
+  }, [client, pagePath, contentRoot]);
 
   useEffect(() => {
     setSelectionKey(null);
