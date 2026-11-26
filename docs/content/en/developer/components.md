@@ -92,7 +92,7 @@ A broken component makes the whole page answer with *Failed to include script bo
 
 ```
 body.html → root → container → image-list.html:
-com.adobe.aem.guides.wknd.core.models.ImageList cannot be resolved to a type
+io.sensiblestudio.weekender.core.models.ImageList cannot be resolved to a type
 ```
 
 says the Image List component's model class is missing: its bundle is not active. **Web Console › Bundles** says why.

@@ -21,15 +21,15 @@ Every request that changes something must carry the header `X-Studio-CSRF: 1`, h
 Any node answers as JSON: add `.json`, and a number for the depth.
 
 ```
-GET /content/wknd/us/en/magazine.json            the node's own properties
-GET /content/wknd/us/en/magazine.2.json          two levels below
-GET /content/wknd/us/en/magazine.infinity.json   everything below
+GET /content/weekender/us/en/magazine.json            the node's own properties
+GET /content/weekender/us/en/magazine.2.json          two levels below
+GET /content/weekender/us/en/magazine.infinity.json   everything below
 ```
 
 A page also answers with its **model**: the components of the page as the front end needs them, each exported by its Sling Model. This is what a single-page application renders from.
 
 ```
-GET /content/wknd/us/en/magazine.model.json
+GET /content/weekender/us/en/magazine.model.json
 ```
 
 On the live site only what the Live cache's filter allows is reachable: pages, `.model.json`, persisted GraphQL queries, media. The plain `.json` views are an author-side tool.
@@ -101,7 +101,7 @@ An application acts as a user with a token instead of a password. Register it in
 
 ```
 curl -H "Authorization: Bearer sst_…" \
-     http://localhost:4502/content/wknd/us/en.model.json
+     http://localhost:4502/content/weekender/us/en.model.json
 ```
 
 ## The product's own endpoints

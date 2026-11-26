@@ -4,7 +4,7 @@ An open-source content platform that runs projects built for Adobe Experience Ma
 
 Authors create and publish pages, media and structured content. Developers build sites from components, templates and client libraries. Underneath it is Apache Sling and Jackrabbit Oak, with a compatibility layer for the AEM APIs, an authoring interface of its own, and two small Rust services: one for media, one in front of the live site.
 
-- **Runs existing AEM projects.** The OSGi bundles, the HTL components and dialogs, and the content packages of a project install as they are. Adobe's WKND sample site is the reference.
+- **Runs existing AEM projects.** The OSGi bundles, the HTL components and dialogs, and the content packages of a project install as they are. Adobe's WKND sample site is the reference, and [Weekender](https://github.com/Sensible-Studio/weekender), our demo site, is a project in that format.
 - **A fast authoring interface.** Pages, the page editor, templates, media, content and experience fragments, tags, flows, translation, releases, linked copies, personalization, forms.
 - **Media built in.** Renditions, any size by address, focus crops, video, auto tags and search by what a picture shows.
 - **A live site that stays up.** The Live cache does a dispatcher's job: filter, cache, precise invalidation, several sites, CDN purging by tag. It reads an existing dispatcher configuration.
@@ -15,7 +15,7 @@ Authors create and publish pages, media and structured content. Developers build
 **From a release** (you need Java 21, nothing else): download the archive for your system from [Releases](https://github.com/Sensible-Studio/sensible-studio/releases), unpack it, and
 
 ```
-bin/studio setup --wknd     # optional: the WKND sample site
+bin/studio setup --demo     # optional: Weekender, the demo site
 bin/studio start            # the author instance: http://localhost:4502
 ```
 

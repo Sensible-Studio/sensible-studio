@@ -21,7 +21,7 @@ cd sensible-studio-<version>-linux-x64
 bin/studio start
 ```
 
-The first start sets the instance up from the release's own files, and downloads Apache Sling itself from Maven Central (about 100 MB, once). For the WKND sample site, which the examples in this documentation use, run `bin/studio setup --wknd` before the first start.
+The first start sets the instance up from the release's own files, and downloads Apache Sling itself from Maven Central (about 100 MB, once). For Weekender, the demo site the examples in this documentation use, run `bin/studio setup --demo` before the first start.
 
 The archive holds the launcher, the install folder, the media service and the Live cache compiled for that system, the scripts, the Apache configuration and this documentation. `ffmpeg` and LibreOffice are still optional extras of the machine; see the table below.
 
@@ -50,7 +50,7 @@ It runs on macOS and Linux. About 4 GB of free memory and 5 GB of disk are enoug
 ```
 git clone <the repository address> sensible-studio
 cd sensible-studio
-bin/studio setup --wknd
+bin/studio setup --demo
 ```
 
 `setup` does everything a new clone needs:
@@ -63,7 +63,7 @@ bin/studio setup --wknd
 
 The result is `instances/author/install`: the folder the instance installs from when it starts. Nothing in `instances/` is in git, so run `setup` again after you pull new code.
 
-`--wknd` adds the WKND sample site, which the rest of this documentation uses in its examples. Leave it out for an empty instance.
+`--demo` adds [Weekender](https://github.com/Sensible-Studio/weekender), the demo site: a travel magazine with adventures, articles and a language structure, which the rest of this documentation uses in its examples. Leave it out for an empty instance. `--wknd` adds WKND, the sample site Adobe publishes for AEM, as a check that a project built for AEM runs unchanged.
 
 ## Start the author instance
 

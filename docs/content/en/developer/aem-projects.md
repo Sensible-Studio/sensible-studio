@@ -6,7 +6,7 @@ order: 30
 
 A project built for AEM is three things: the OSGi bundles of `core`, the components, dialogs and templates of `ui.apps`, and the content of `ui.content`. Sensible Studio takes all three as they are. The project is not rebuilt, and its source is not changed.
 
-The reference project is WKND, Adobe's own sample site. It is installed by `bin/studio setup --wknd` from the package Adobe publishes.
+Two projects show it. WKND, Adobe's own sample site, is installed by `bin/studio setup --wknd` from the package Adobe publishes, untouched. [Weekender](https://github.com/Sensible-Studio/weekender), the demo site of Sensible Studio, is a project in the same format with the same structure (`core`, `ui.apps`, `ui.content` and the rest), built with Maven and installed by `bin/studio setup --demo`; read its source for a complete example.
 
 ## Check a project before moving it
 

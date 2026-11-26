@@ -4,12 +4,12 @@ description: Create a page from a template in Sensible Studio, edit it in place,
 order: 30
 ---
 
-Ten minutes, from an empty page to a published one. You need a running author instance with the WKND sample site, and a publish instance if you want to see the last step; both are in [Install and run](install.md).
+Ten minutes, from an empty page to a published one. You need a running author instance with the Weekender demo site, and a publish instance if you want to see the last step; both are in [Install and run](install.md).
 
 ## 1. Create the page
 
 1. On **Home**, open **Pages**.
-2. Go to *WKND Site › United States › English › Magazine*. The Content Tree on the left (`Alt+1`) gets you there quickly.
+2. Go to *Weekender Site › United States › English › Magazine*. The Content Tree on the left (`Alt+1`) gets you there quickly.
 3. Click **Create**, then **Page**.
 4. Choose the **Article Page Template**. Only the templates allowed at this place are offered.
 5. Type a **Title**, for example *A weekend by the sea*. The **Name**, which becomes the page's address, is made from the title.
@@ -45,7 +45,7 @@ The dialog lists what the page uses that is not yet published: here, the image y
 A few seconds later the page is on the publish instance:
 
 ```
-http://localhost:4503/content/wknd/us/en/magazine/a-weekend-by-the-sea.html
+http://localhost:4503/content/weekender/us/en/magazine/a-weekend-by-the-sea.html
 ```
 
 Back in the Pages console the page's row now says it is published, by whom and when.

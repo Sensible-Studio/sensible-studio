@@ -43,7 +43,7 @@ An instance is an OSGi container (Apache Felix) running Apache Sling on a Jackra
 
 A visitor asks for `https://www.example.com/us/en/magazine.html`.
 
-1. **Apache** maps the short address to `/content/wknd/us/en/magazine.html` and looks for that file in the site's document root. If it is there, Apache serves it and nothing else is involved.
+1. **Apache** maps the short address to `/content/weekender/us/en/magazine.html` and looks for that file in the site's document root. If it is there, Apache serves it and nothing else is involved.
 2. Otherwise the request goes to **studio-live**. It checks the filter rules, then asks a publish instance.
 3. **Sling** on the publish instance resolves the path to the page's node, reads its `sling:resourceType`, and finds the component's script under `/apps`.
 4. The **page component** renders the template's structure and the page's own components, each with its HTL script and Sling Model.

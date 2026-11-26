@@ -34,10 +34,10 @@ Every image in Media can be requested at any size, format and quality through it
 /is/image/<the file's path below /content/dam>?<parameters>
 ```
 
-For the file `/content/dam/wknd-shared/en/adventures/surf.jpg`, this address gives it 800 pixels wide, as WebP:
+For the file `/content/dam/weekender-shared/en/adventures/surf.jpg`, this address gives it 800 pixels wide, as WebP:
 
 ```
-/is/image/wknd-shared/en/adventures/surf?wid=800&fmt=webp
+/is/image/weekender-shared/en/adventures/surf?wid=800&fmt=webp
 ```
 
 | Parameter | Meaning |
@@ -75,7 +75,7 @@ A site needs the same picture as a wide banner, a square and a tall portrait. A 
 Request a crop by adding its name to the address:
 
 ```
-/is/image/wknd-shared/en/adventures/surf:Story?wid=400&fmt=webp
+/is/image/weekender-shared/en/adventures/surf:Story?wid=400&fmt=webp
 ```
 
 ### Adjust a crop

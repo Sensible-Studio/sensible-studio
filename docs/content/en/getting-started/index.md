@@ -20,7 +20,7 @@ This section takes you from nothing to a published page. It is written for someo
 | **Publish instance** | Where published content is served from. Visitors never sign in to edit there. Port 4503. |
 | **Live** | The public site: the publish instances, usually behind the Live cache. |
 | **Live cache** | The web server and cache in front of the publish instances. It serves most requests from files. |
-| **Page** | A node of the content tree with a title, a template and components. Its address is its path, such as `/content/wknd/us/en`. |
+| **Page** | A node of the content tree with a title, a template and components. Its address is its path, such as `/content/weekender/us/en`. |
 | **Component** | A piece of a page: a title, a text, an image, a list. Each has a dialog where you edit it. |
 | **Template** | What a new page starts from: its fixed parts, the components allowed in it, and their configuration. |
 | **Media** | Images, video and documents, kept under `/content/dam`. |

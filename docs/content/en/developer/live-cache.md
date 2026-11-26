@@ -25,7 +25,7 @@ bin/studio-live start      # 127.0.0.1:4520
 bin/studio-live status
 ```
 
-It answers on its own port, which is enough on a developer's machine: `http://localhost:4520/content/wknd/us/en.html`. The response header `X-Studio-Live` says what happened:
+It answers on its own port, which is enough on a developer's machine: `http://localhost:4520/content/weekender/us/en.html`. The response header `X-Studio-Live` says what happened:
 
 | Value | Meaning |
 |---|---|
@@ -36,7 +36,7 @@ It answers on its own port, which is enough on a developer's machine: `http://lo
 | `denied` | No filter rule allows it. |
 | `error` | No publish instance answered. |
 
-`bin/studio-live explain "/content/wknd/us/en.html?page=2"` says what would happen to a request and which rule decides, without making it.
+`bin/studio-live explain "/content/weekender/us/en.html?page=2"` says what would happen to a request and which rule decides, without making it.
 
 To try it behind Apache without touching the system's: `bin/studio-live apache start` runs one as you, on `http://localhost:8085`.
 
@@ -95,7 +95,7 @@ Three things soften the moment after a publication:
 - **Grace** (`grace_seconds`): for a few seconds a removed page is served as it was, while the new one is fetched in the background.
 - **Stale** (`stale_seconds`): if the publish instance is down or answers with an error, visitors get the page as it was, for up to a day. A page that was unpublished is never served this way.
 
-By hand: `bin/studio-live flush /content/wknd/us/en` invalidates as a publication of that path would; `bin/studio-live clear` forgets everything. Clear after deploying code.
+By hand: `bin/studio-live flush /content/weekender/us/en` invalidates as a publication of that path would; `bin/studio-live clear` forgets everything. Clear after deploying code.
 
 ## Several sites
 
@@ -105,10 +105,10 @@ Once one site is declared, what is not declared is not served. A host name that 
 
 ```
 [[site]]
-name = "wknd"
-hosts = ["www.wknd.example", "wknd.example"]
-roots = ["/content/wknd"]
-shared = ["/content/experience-fragments/wknd", "/conf/wknd", "/content/dam/wknd"]
+name = "weekender"
+hosts = ["www.weekender.example", "weekender.example"]
+roots = ["/content/weekender"]
+shared = ["/content/experience-fragments/weekender", "/conf/weekender", "/content/dam/weekender"]
 ```
 
 Each site's files are in `docroot/<name>`, the `DocumentRoot` of its virtual host.
@@ -116,7 +116,7 @@ Each site's files are in `docroot/<name>`, the `DocumentRoot` of its virtual hos
 Per site you can also have:
 
 - **A redirect map** (`redirect_map`): a text file authors keep in Media and publish, one rule a line, `<source> <target> [301|302|…]`. Apache and the service both answer from it; no reload.
-- **Short addresses**: with `content_prefix = "/content"`, `/wknd/us/en.html` and `/content/wknd/us/en.html` are one page, cached once.
+- **Short addresses**: with `content_prefix = "/content"`, `/weekender/us/en.html` and `/content/weekender/us/en.html` are one page, cached once.
 - **Vanity URLs**: read from the publish instance and let through without a filter rule.
 
 ## Several publish instances

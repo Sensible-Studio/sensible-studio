@@ -11,9 +11,9 @@ Sensible Studio translates content into **language versions**: the same page, fr
 A site keeps each language in a folder named with its code. The folder is the **language root**:
 
 ```
-/content/wknd/language-masters/en     English
-/content/wknd/language-masters/fr     French
-/content/wknd/language-masters/ro     Romanian
+/content/weekender/language-masters/en     English
+/content/weekender/language-masters/fr     French
+/content/weekender/language-masters/ro     Romanian
 ```
 
 A page has the same place in every language: `…/en/magazine/ski-touring` is `…/ro/magazine/ski-touring` in Romanian. Media and content fragments follow the same idea in their own folders.

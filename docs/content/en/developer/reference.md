@@ -10,7 +10,7 @@ order: 120
 
 | Command | What it does |
 |---|---|
-| `setup [--wknd]` | Builds everything and fills `instances/author/install`. First, and after pulling new code. `--wknd` adds the sample site. |
+| `setup [--demo] [--wknd]` | Builds everything and fills `instances/author/install`. First, and after pulling new code. `--demo` adds Weekender, the demo site; `--wknd` adds Adobe's WKND sample site. |
 | `start [-p <port>]` | Starts the author instance in the foreground. Home `instances/author`; `AUTHOR_HOME` overrides. |
 | `stop` | Stops it. |
 | `build` | Compiles and packages the Java modules. |
