@@ -1,4 +1,5 @@
-import { NAVIGATION, TOOLS, type IconName } from '../../start/navigation';
+import { NAVIGATION, type IconName } from '../../start/navigation';
+import { toolsNow } from '../../start/audience';
 import { titleOf, urlOf, type Place } from '../places';
 import type { ShellState } from '../tabs';
 import { placeOf } from '../tabs';
@@ -43,7 +44,7 @@ export function placeCommands(): Command[] {
     if (tile.target.kind !== 'href') continue;
     out.push({ id: `go:${tile.id}`, title: tile.title, hint: tile.section === 'content' ? 'Content' : 'Structure', group: 'go', icon: tile.icon, url: tile.target.url });
   }
-  for (const group of TOOLS) {
+  for (const group of toolsNow()) {
     for (const tool of group.tools) {
       out.push({ id: `go:${tool.url}`, title: tool.title, hint: `${VOCAB.system} › ${group.title}`, group: 'go', icon: tool.icon, url: tool.url, keywords: `${group.title} ${tool.description}` });
     }

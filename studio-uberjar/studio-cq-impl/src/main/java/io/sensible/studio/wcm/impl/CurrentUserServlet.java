@@ -74,6 +74,9 @@ public class CurrentUserServlet extends SlingSafeMethodsServlet {
         }
         out.put("name", name);
         out.put("home", home);
+        // an administrator: admin itself, or whoever has every right on the repository's root (the administrators
+        // group). The interface offers the administrators' tools only to them; each tool still judges for itself.
+        out.put("admin", isAdmin(request));
         out.put("isImpersonated", false);
         String props = request.getParameter("props");
         if (props != null && props.startsWith("profile")) {
@@ -83,6 +86,23 @@ public class CurrentUserServlet extends SlingSafeMethodsServlet {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Cache-Control", "no-store");
         response.getWriter().write(EditorJson.write(out));
+    }
+
+    static boolean isAdmin(SlingHttpServletRequest request) {
+        String user = request.getResourceResolver().getUserID();
+        if ("admin".equals(user)) {
+            return true;
+        }
+        javax.jcr.Session session = request.getResourceResolver().adaptTo(javax.jcr.Session.class);
+        if (session == null || user == null || "anonymous".equals(user)) {
+            return false;
+        }
+        try {
+            javax.jcr.security.AccessControlManager acm = session.getAccessControlManager();
+            return acm.hasPrivileges("/", new javax.jcr.security.Privilege[] {acm.privilegeFromName(javax.jcr.security.Privilege.JCR_ALL)});
+        } catch (RepositoryException | RuntimeException e) {
+            return false;
+        }
     }
 
     private static String first(Authorizable a, String property) throws RepositoryException {

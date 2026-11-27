@@ -7,6 +7,7 @@ import { ProductBar } from '../shell/ProductBar';
 import { Link, useTab } from '../shell/ShellContext';
 import { NavIcon } from './icons';
 import { NAVIGATION, NAV_SECTIONS, TOOLS, type NavTile } from './navigation';
+import { useTools } from './audience';
 import { VOCAB } from '../shell/vocabulary';
 import { WorkRail } from './YourWork';
 import { ScreenFrame } from '../shell/ScreenFrame';
@@ -98,6 +99,7 @@ export function StartPage({ client }: Props) {
 // ------------------------------------------------------------------------------------------ navigation
 
 function Tiles({ onGroup, onTools }: { onGroup(id: string): void; onTools(category?: string): void }) {
+  const tools = useTools();
   return (
     <div className="studio-tilesections">
       <div className="studio-tilesections__inner">
@@ -116,7 +118,7 @@ function Tiles({ onGroup, onTools }: { onGroup(id: string): void; onTools(catego
         <section className="studio-tilesection" aria-label={VOCAB.system}>
           <h2 className="studio-tilesection__heading">{VOCAB.system}</h2>
           <ul className="studio-tiles" aria-label={VOCAB.system}>
-            {TOOLS.map((c) => (
+            {tools.map((c) => (
               <li key={c.id}>
                 <button type="button" className="studio-tile studio-tile--group" onClick={() => onTools(c.id)}>
                   <span className="studio-tile__icon">
@@ -242,6 +244,7 @@ function PageList({
  * and unfolds it if it was folded. The category is part of the place (`#tools/<category>`).
  */
 function ToolsView({ category, onCategory }: { category: string | null; onCategory(id: string): void }) {
+  const tools = useTools();
   const [folded, setFolded] = useState<Set<string>>(() => new Set());
   const [current, setCurrent] = useState<string>(category ?? TOOLS[0].id);
   const body = useRef<HTMLDivElement>(null);
@@ -270,8 +273,8 @@ function ToolsView({ category, onCategory }: { category: string | null; onCatego
     const host = body.current;
     if (!host) return;
     const top = host.getBoundingClientRect().top + 40;
-    let found = TOOLS[0].id;
-    for (const c of TOOLS) {
+    let found = tools[0].id;
+    for (const c of tools) {
       const el = document.getElementById(`studio-tools-${c.id}`);
       if (el && el.getBoundingClientRect().top <= top) found = c.id;
     }
@@ -291,7 +294,7 @@ function ToolsView({ category, onCategory }: { category: string | null; onCatego
       <nav className="studio-tools__rail" aria-label={VOCAB.system}>
         <h2 className="studio-tools__railtitle">{VOCAB.system}</h2>
         <ul>
-          {TOOLS.map((c) => (
+          {tools.map((c) => (
             <li key={c.id}>
               <button
                 type="button"
@@ -310,7 +313,7 @@ function ToolsView({ category, onCategory }: { category: string | null; onCatego
       </nav>
       <div ref={body} className="studio-tools__body" onScroll={onScroll}>
         <div className="studio-tools__accordion">
-          {TOOLS.map((c) => {
+          {tools.map((c) => {
             const isOpen = !folded.has(c.id);
             return (
               <section key={c.id} id={`studio-tools-${c.id}`} className={`studio-tools__section${isOpen ? ' is-open' : ''}`} aria-label={c.title}>

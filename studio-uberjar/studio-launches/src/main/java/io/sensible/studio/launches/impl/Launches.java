@@ -574,11 +574,15 @@ public final class Launches {
     }
 
     static Node mkdirs(Session session, String path, String type) throws RepositoryException {
-        Node n = session.getRootNode();
-        for (String seg : path.substring(1).split("/")) {
-            n = n.hasNode(seg) ? n.getNode(seg) : n.addNode(seg, type);
+        // not from the root: a session that is not an administrator's may not see it ("Root node is not accessible")
+        if (session.nodeExists(path)) {
+            return session.getNode(path);
         }
-        return n;
+        int cut = path.lastIndexOf('/');
+        if (cut <= 0) {
+            throw new javax.jcr.PathNotFoundException(path);
+        }
+        return mkdirs(session, path.substring(0, cut), type).addNode(path.substring(cut + 1), type);
     }
 
     static String str(Node n, String name, String dflt) throws RepositoryException {

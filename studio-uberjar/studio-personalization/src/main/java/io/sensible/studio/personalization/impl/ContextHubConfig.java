@@ -668,22 +668,26 @@ public final class ContextHubConfig {
     }
 
     private static Node create(Session session, String path) throws RepositoryException {
-        Node n = session.getRootNode();
-        String[] segs = path.substring(1).split("/");
-        for (int i = 0; i < segs.length; i++) {
-            String seg = segs[i];
-            if (n.hasNode(seg)) {
-                n = n.getNode(seg);
-                continue;
-            }
-            n = n.addNode(seg, "sling:OrderedFolder");
-            if (i == segs.length - 1) {
-                n.setProperty("jcr:title", "ContextHub Configuration");
-                n.setProperty("sling:resourceType", CONFIG_RT);
-                n.setProperty(CREATED, true);
-            }
+        boolean existed = session.nodeExists(path);
+        Node n = folders(session, path);
+        if (!existed) {
+            n.setProperty("jcr:title", "ContextHub Configuration");
+            n.setProperty("sling:resourceType", CONFIG_RT);
+            n.setProperty(CREATED, true);
         }
         return n;
+    }
+
+    /** The node, made with its missing ancestors; not from the root, which only an administrator's session sees. */
+    private static Node folders(Session session, String path) throws RepositoryException {
+        if (session.nodeExists(path)) {
+            return session.getNode(path);
+        }
+        int cut = path.lastIndexOf('/');
+        if (cut <= 0) {
+            throw new javax.jcr.PathNotFoundException(path);
+        }
+        return folders(session, path.substring(0, cut)).addNode(path.substring(cut + 1), "sling:OrderedFolder");
     }
 
     /** A node's string properties, enough for {@link #configJson}. */
