@@ -30,8 +30,9 @@ export default [
   ] },
   type('Number', 'number'), type('Boolean', 'boolean'), type('Date and time', 'date'), type('Enumeration', 'enumeration'), type('Tags', 'tags'),
   type('Fragment Reference', 'fragment'), type('JSON Object', 'json'), type('Tab Placeholder', 'tab'),
+  // "Before the rewrite" was saved by hand in the Versions tab; a change is typed (not saved) so that the comparison shows one
   { name: 'versions', steps: [
-    { goto: FRAGMENT }, { wait: 4000 }, tab('Versions'), { wait: 1200 }, { click: label('Actions for Before the rewrite') }, { wait: 600 }, { shot: 'fragments-versions', keepPointer: true },
+    { goto: FRAGMENT }, { wait: 4000 }, tab('Versions'), { wait: 1500 }, { click: label('Actions for Before the rewrite') }, { wait: 800 }, { shot: 'fragments-versions', keepPointer: true },
     { click: { text: 'Compare with current', last: true } }, { wait: 2500 }, { shot: 'fragments-compare' },
   ] },
   { name: 'component', steps: [
@@ -43,5 +44,13 @@ export default [
   { name: 'initial-properties', steps: [
     { goto: TEMPLATE }, { wait: 1500 }, select('Article Page Template'), { wait: 900 }, button('Edit'), { wait: 4500 },
     { click: label('Page menu') }, { wait: 500 }, { click: { text: 'Initial Page Properties', last: true } }, { wait: 2500 }, { shot: 'templates-initial-properties' },
+  ] },
+  // needs the picture-search model in the instance's dam/models folder; "Look at them now" indexes the pictures once
+  { name: 'similar', steps: [
+    { goto: '/assetdetails.html/content/dam/weekender-shared/en/magazine/arctic-surfing/arctic-surfing-4.jpg' }, { wait: 3000 }, { click: label('Similar') }, { wait: 2500 },
+    { shot: 'media-similar-before' },
+    { eval: `(() => { const b = [...document.querySelectorAll('button')].find((e) => /Look at them now/.test(e.textContent)); if (b) b.click(); })()` }, { wait: 9000 }, { wait: 9000 }, { wait: 9000 }, { wait: 9000 }, { wait: 9000 }, { wait: 9000 },
+    { goto: '/assetdetails.html/content/dam/weekender-shared/en/magazine/arctic-surfing/arctic-surfing-4.jpg' }, { wait: 3000 }, { click: label('Similar') }, { wait: 4000 },
+    { shot: 'media-file-similar' },
   ] },
 ];

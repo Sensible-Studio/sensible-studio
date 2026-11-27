@@ -190,7 +190,11 @@ An image set keeps the selected files together, in an order, as one file that a 
 
 ### Find similar
 
-**Find Similar**, and the **Similar** panel of a file's page, list the images that look like this one. It needs the model that compares pictures to be installed on the instance; without it, the panel says so.
+**Find Similar**, and the **Similar** panel of a file's page, list the pictures that look like this one, the closest first, each with how alike it is in percent. Click one to open it.
+
+![The Similar panel](../images/media-file-similar.webp)
+
+Two things are needed. The instance must have the model that compares pictures: an administrator installs it in **Home › System › Media**, and without it the panel says so. And a picture can only be compared once it has been looked at: new uploads are looked at by themselves, and for the pictures that were in Media before, the panel says how many are waiting and offers **Look at them now**.
 
 Right-click a file for the same actions as a menu:
 
@@ -240,7 +244,7 @@ The versions of the file and what happened to it. **Save as Version** takes a la
 ![The Related panel](../images/media-file-related.webp)
 
 - **Related**: the files linked to this one. Click one to open it; the button beside it takes the link away. Files are linked with **More › Relate** in the console.
-- **Similar**: images that look like it. See *Find similar* above.
+- **Similar**: pictures that look like it. See *Find similar* above.
 - **References**: the pages and fragments that use the file. Look here before you replace or delete it.
 
 ![The References panel](../images/media-file-references.webp)

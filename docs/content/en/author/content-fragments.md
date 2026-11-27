@@ -108,7 +108,7 @@ The first tab of the panel holds the fragment's **Title**, **Description** and *
 
 ![Comparing a version with the fragment as it is now](../images/fragments-compare.webp)
 
-**Compare with current** lists, variant by variant, the elements whose values differ, or says that nothing changed.
+**Compare with current** lists the elements whose values differ, with the value in the version on the left and the value now on the right, or says that the variant is the same as in the version. **Restore** puts the version's values back; the fragment as it is now is kept as a version first.
 
 ### Languages
 
