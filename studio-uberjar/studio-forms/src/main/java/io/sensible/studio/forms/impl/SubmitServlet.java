@@ -35,7 +35,7 @@ import com.day.cq.replication.Replicator;
 
 /**
  * Where a form posts: {@code POST /bin/studio/forms/submit} with a JSON body
- * {@code {"form": "/content/forms/wknd/contact/jcr:content/root", "data": {...}}} (or the same as form
+ * {@code {"form": "/content/forms/samples/contact/jcr:content/root", "data": {...}}} (or the same as form
  * parameters: {@code form=…&name=…}). The form's own fields decide what is accepted; the honeypot
  * ({@code studio:website}) drops bots; a visitor may send a form at most once every two seconds.
  * The submission is stored with the forms service user, then handed to the author when a publishing

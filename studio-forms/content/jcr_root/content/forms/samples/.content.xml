@@ -3,7 +3,7 @@
     jcr:primaryType="cq:Page">
     <jcr:content
         jcr:primaryType="cq:PageContent"
-        jcr:title="WKND"
+        jcr:title="Sample forms"
         sling:resourceType="wcm/foundation/components/basicpage/v1/basicpage"
         cq:conf="/conf/global"
         cq:allowedTemplates="[/conf/global/settings/wcm/templates/form]"/>

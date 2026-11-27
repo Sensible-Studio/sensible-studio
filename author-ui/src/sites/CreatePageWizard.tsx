@@ -77,7 +77,8 @@ export function CreatePageWizard({ client, parent, parentTitle, onClose, onCreat
 
   return (
     <WizardPage
-      title={WORDS[kind].title}
+      // under Forms a page is a form
+      title={kind === 'page' && (parent === '/content/forms' || parent.startsWith('/content/forms/')) ? 'Create Form' : WORDS[kind].title}
       path={parent}
       steps={['Template', 'Properties']}
       step={step}

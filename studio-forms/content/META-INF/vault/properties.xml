@@ -3,7 +3,7 @@
 <properties>
 <entry key="group">io.sensible.studio</entry>
 <entry key="name">studio-forms-content</entry>
-<entry key="version">0.5.1</entry>
+<entry key="version">0.5.3</entry>
 <entry key="description">Sensible Studio Forms: the Form template, the form and field components with their dialogs, the studio.forms client library, and the Forms root with a sample form. Written for Sensible Studio; contains no Adobe content.</entry>
 <entry key="createdBy">Sensible Studio</entry>
 <entry key="packageType">mixed</entry>
