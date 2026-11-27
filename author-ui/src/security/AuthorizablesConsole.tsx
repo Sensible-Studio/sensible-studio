@@ -9,6 +9,7 @@ import {
   ToastContainer,
   ToastQueue,
 } from '@adobe/react-spectrum';
+import { useIsAdmin } from '../start/audience';
 import { SelectionActions } from '../shell/SelectionBar';
 import Delete from '@spectrum-icons/workflow/Delete';
 import Gears from '@spectrum-icons/workflow/Gears';
@@ -44,6 +45,7 @@ export function AuthorizablesConsole({ kind, user }: Props) {
   const go = useNavigate();
   const tab = useTab();
   const isUsers = kind === 'users';
+  const admin = useIsAdmin();
   const [items, setItems] = useState<AuthorizableSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [q, setQ] = useState('');
@@ -195,7 +197,8 @@ export function AuthorizablesConsole({ kind, user }: Props) {
               <Text>Select All</Text>
             </ActionButton>
           </>}
-          primary={<Button variant="accent" onPress={() => go(isUsers ? securityUrl.user() : securityUrl.group())}>Create {isUsers ? 'user' : 'group'}</Button>}
+          // Who is not an administrator reaches this screen by its address only, and the server refuses the account he would make.
+          primary={admin ? <Button variant="accent" onPress={() => go(isUsers ? securityUrl.user() : securityUrl.group())}>Create {isUsers ? 'user' : 'group'}</Button> : undefined}
         />
       )}
 

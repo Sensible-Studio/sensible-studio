@@ -67,8 +67,8 @@ export function toolsNow(): ToolCategory[] {
   return toolsFor(remembered() ?? true);
 }
 
-/** The tools for the signed-in user; everything until the server has answered, so an administrator sees no flicker. */
-export function useTools(): ToolCategory[] {
+/** Whether the signed-in user is an administrator; taken as one until the server has answered, so an administrator sees no flicker. */
+export function useIsAdmin(): boolean {
   const [admin, setAdmin] = useState<boolean>(() => remembered() ?? true);
   useEffect(() => {
     let live = true;
@@ -77,5 +77,10 @@ export function useTools(): ToolCategory[] {
       live = false;
     };
   }, []);
-  return toolsFor(admin);
+  return admin;
+}
+
+/** The tools for the signed-in user; everything until the server has answered. */
+export function useTools(): ToolCategory[] {
+  return toolsFor(useIsAdmin());
 }

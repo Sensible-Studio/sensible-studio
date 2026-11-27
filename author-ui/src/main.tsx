@@ -5,6 +5,7 @@ import { HttpClient } from './editor/api/HttpClient';
 import { parsePlace } from './shell/places';
 import { installDialogEnter } from './shell/dialogEnter';
 import { installSessionWatch } from './shell/session';
+import { watchOwner } from './shell/owner';
 import { Shell } from './shell/Shell';
 import { applyTheme, readTheme } from './theme/pref';
 import { studioTheme } from './theme/theme';
@@ -28,6 +29,7 @@ import './cf/cf.scss';
  */
 applyTheme(readTheme());
 installSessionWatch();
+watchOwner();
 installDialogEnter();
 
 const client = new HttpClient();
