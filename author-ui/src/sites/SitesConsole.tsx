@@ -660,7 +660,7 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
 
   // ------------------------------------------------------------------------------------------ render
 
-  const canCreate = current?.item.path === '/content' || current?.item.type === 'page' || current?.item.type === 'folder';
+  const canCreate = (current?.item.path === '/content' || current?.item.type === 'page' || current?.item.type === 'folder') && current?.item.canCreate !== false;
   // Create ▾ follows the place: experience fragments are made as fragments (with their master variation), and
   // inside one what is made is a variation; folders go into folders
   const inXf = root.path === '/content/experience-fragments';

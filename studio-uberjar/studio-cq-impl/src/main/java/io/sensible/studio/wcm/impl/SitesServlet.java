@@ -308,6 +308,7 @@ public class SitesServlet extends SlingAllMethodsServlet {
         m.put("path", r.getPath());
         m.put("name", r.getName());
         m.put("title", titleOf(r, pm));
+        m.put("canCreate", mayAddBelow(r.getResourceResolver(), r.getPath()));
         boolean hasChildren = false;
         for (Resource c : r.getChildren()) {
             if (isListed(c)) {
@@ -656,6 +657,8 @@ public class SitesServlet extends SlingAllMethodsServlet {
             javax.jcr.Session session = resolver.adaptTo(javax.jcr.Session.class);
             List<String> live = target.equals(path) || "false".equals(request.getParameter("republish"))
                     ? new ArrayList<>() : published(source, path, target);
+            // what was sent to Preview is at the old address there, and nothing would take it off once the page has moved
+            boolean previewed = !target.equals(path) && !"false".equals(request.getParameter("republish")) && onPreview(source);
             if (!target.equals(path)) {
                 if (session == null) {
                     throw new javax.jcr.RepositoryException("Moving needs a JCR session");
@@ -667,14 +670,16 @@ public class SitesServlet extends SlingAllMethodsServlet {
             Map<String, Object> out = new LinkedHashMap<>();
             out.put("path", target);
             out.put("adjusted", changed);
-            if (!live.isEmpty()) {
+            if (!live.isEmpty() || previewed) {
                 Replicator r = replicator;
                 try {
                     if (r == null) {
                         throw new ReplicationException("Publishing is not available on this instance");
                     }
                     r.replicate(session, ReplicationActionType.DELETE, path);
-                    r.replicate(session, ReplicationActionType.ACTIVATE, live.toArray(new String[0]), new ReplicationOptions());
+                    if (!live.isEmpty()) {
+                        r.replicate(session, ReplicationActionType.ACTIVATE, live.toArray(new String[0]), new ReplicationOptions());
+                    }
                     out.put("republished", live);
                 } catch (ReplicationException e) {
                     out.put("republishError", e.getMessage());
@@ -685,6 +690,20 @@ public class SitesServlet extends SlingAllMethodsServlet {
             resolver.revert();
             send(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, Collections.singletonMap("error", e.getMessage()));
         }
+    }
+
+    /** Whether a page of the subtree is on the preview tier. */
+    static boolean onPreview(Resource r) {
+        Resource content = r.getChild("jcr:content");
+        if (content != null && "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction_preview", String.class))) {
+            return true;
+        }
+        for (Resource c : r.getChildren()) {
+            if (!"jcr:content".equals(c.getName()) && !c.getName().startsWith("rep:") && onPreview(c)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** The pages of a subtree that are published now, as the paths they will have after the move; parents first. */
@@ -816,5 +835,21 @@ public class SitesServlet extends SlingAllMethodsServlet {
             }
         }
         return false;
+    }
+
+    /**
+     * Whether the signed-in user may add something below {@code path}: the consoles offered Create to a reader and
+     * let the refusal say so. Without a JCR session (tests on mocks), or when it cannot be told: yes.
+     */
+    static boolean mayAddBelow(org.apache.sling.api.resource.ResourceResolver resolver, String path) {
+        javax.jcr.Session session = resolver == null ? null : resolver.adaptTo(javax.jcr.Session.class);
+        if (session == null) {
+            return true;
+        }
+        try {
+            return session.hasPermission(path + "/studio-probe", javax.jcr.Session.ACTION_ADD_NODE);
+        } catch (javax.jcr.RepositoryException | RuntimeException e) {
+            return true;
+        }
     }
 }

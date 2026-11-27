@@ -36,4 +36,15 @@ class PageLockFilterTest {
         assertNull(PageLockFilter.lockedBy(rr, "/content/site/nothing/here", "dan"));
         assertNull(PageLockFilter.lockedBy(rr, "/conf/site/en/jcr:content", "dan"));
     }
+
+    @Test
+    void says_who_changed_the_page_since_the_editor_read_it() {
+        java.time.Instant t = java.time.Instant.parse("2026-11-27T10:00:00Z");
+        assertEquals("ana", PageLockFilter.changedBy("2026-11-27T09:00:00Z", t, "ana", "dan"));
+        // my own change, a page read after the change, a page nobody dated, a date that is none
+        assertNull(PageLockFilter.changedBy("2026-11-27T09:00:00Z", t, "dan", "dan"));
+        assertNull(PageLockFilter.changedBy("2026-11-27T10:00:00Z", t, "ana", "dan"));
+        assertNull(PageLockFilter.changedBy("2026-11-27T09:00:00Z", null, null, "dan"));
+        assertNull(PageLockFilter.changedBy("yesterday", t, "ana", "dan"));
+    }
 }

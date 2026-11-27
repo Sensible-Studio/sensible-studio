@@ -75,9 +75,52 @@ public class PageLockFilter implements Filter {
                             + "\",\"error\":\"" + message.replace("\\", "\\\\").replace("\"", "\\\"") + "\"}");
                     return;
                 }
+                tellOfAnotherAuthor(request, (HttpServletResponse) res);
             }
         }
         chain.doFilter(req, res);
+    }
+
+    /** The editor says when it read the page (the page's own date then). */
+    static final String SEEN = "X-Studio-Page-Seen";
+    static final String CHANGED_BY = "X-Studio-Changed-By";
+    static final String CHANGED_AT = "X-Studio-Changed-At";
+
+    /**
+     * Without a lock the last save wins, and the author whose screen is older never learned that somebody else
+     * had been at the page. Nothing is refused: the answer names who changed it since, and when, and the editor
+     * says so.
+     */
+    private static void tellOfAnotherAuthor(SlingHttpServletRequest request, HttpServletResponse response) {
+        String seen = request.getHeader(SEEN);
+        String content = PageModified.contentOf(request.getResource().getPath());
+        if (seen == null || content == null) {
+            return;
+        }
+        ResourceResolver resolver = request.getResourceResolver();
+        Resource page = resolver.getResource(content);
+        if (page == null) {
+            return;
+        }
+        java.util.Calendar modified = page.getValueMap().get("cq:lastModified", java.util.Calendar.class);
+        String by = page.getValueMap().get("cq:lastModifiedBy", String.class);
+        String other = changedBy(seen, modified == null ? null : modified.toInstant(), by, resolver.getUserID());
+        if (other != null) {
+            response.setHeader(CHANGED_BY, other.replaceAll("[^\\p{Alnum}@._ -]", "?"));
+            response.setHeader(CHANGED_AT, modified.toInstant().toString());
+        }
+    }
+
+    /** Who changed the page after {@code seen}, when it was somebody else; null otherwise (and when it cannot be told). */
+    static String changedBy(String seen, java.time.Instant modified, String by, String user) {
+        if (modified == null || by == null || by.equals(user)) {
+            return null;
+        }
+        try {
+            return modified.isAfter(java.time.Instant.parse(seen).plusSeconds(1)) ? by : null;
+        } catch (java.time.format.DateTimeParseException e) {
+            return null;
+        }
     }
 
     /** Who else holds the lock of the page that {@code path} is, or is content of; null when nobody does. */

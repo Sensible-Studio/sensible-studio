@@ -1,4 +1,5 @@
 import { Content, DialogContainer, Divider, Heading, ToastContainer, ToastQueue } from '@adobe/react-spectrum';
+import { CHANGED_ELSEWHERE } from './api/HttpClient';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createDefaultRegistry, type ContentNode, type DialogResponse, type GraniteEnv, type GraniteNode, type PostEntry } from '../granite';
 import { nameOf, type AssetInfo, type ComponentInfo, type EditorPageData, type Placement, type StudioClient } from './api/StudioClient';
@@ -195,6 +196,19 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
   // loading must not start again because the navigation function is a new one on every render of the shell
   const goRef = useRef(go);
   goRef.current = go;
+  // Somebody else saved this page since it was read here: said once, nothing refused (their change is on the page
+  // already, this author's too; what the screen shows of theirs is as old as its last load).
+  useEffect(() => {
+    const onChanged = (e: Event) => {
+      const d = (e as CustomEvent<{ page: string; by: string; at: string }>).detail;
+      if (!d || d.page !== pagePath) return;
+      const at = new Date(d.at);
+      const when = Number.isNaN(at.getTime()) ? '' : ` at ${at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      ToastQueue.info(`${d.by} changed this page${when}, while you had it open. Your change is saved; reload to see theirs.`, { timeout: 12000 });
+    };
+    window.addEventListener(CHANGED_ELSEWHERE, onChanged);
+    return () => window.removeEventListener(CHANGED_ELSEWHERE, onChanged);
+  }, [pagePath]);
   const tabPage = tab?.place.kind === 'editor' ? tab.place.path : null;
   useEffect(() => {
     if (tabPage !== null && tabPage !== pagePath) setPagePath(tabPage);

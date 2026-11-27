@@ -356,7 +356,7 @@ export function CfConsole({ client, initialPath, studio = STUB_STUDIO, dam: damP
           </ActionButton>
           <ViewSwitch view={view} onChange={setView} />
         </Flex>}
-        primary={<Button variant="accent" onPress={() => setDialog('create')} isDisabled={!models.some((m) => m.enabled)}><Add /><Text>Create content fragment</Text></Button>}
+        primary={<Button variant="accent" onPress={() => setDialog('create')} isDisabled={!models.some((m) => m.enabled) || folders.get(path)?.canCreate === false}><Add /><Text>Create content fragment</Text></Button>}
       />
       )}
 

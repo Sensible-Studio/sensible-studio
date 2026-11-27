@@ -90,6 +90,7 @@ final class FragmentStore {
         m.put("title", FragmentModel.valueMap(folder.getChild("jcr:content")).get("jcr:title", folder.getName()));
         m.put("folders", folders);
         m.put("fragments", fragments);
+        m.put("canCreate", mayAddBelow(resolver, folder.getPath()));
         return m;
     }
 
@@ -499,5 +500,21 @@ final class FragmentStore {
         Map<String, Object> m = new HashMap<>();
         m.put(key, value);
         return m;
+    }
+
+    /**
+     * Whether the signed-in user may add something below {@code path}: the consoles offered Create to a reader and
+     * let the refusal say so. Without a JCR session (tests on mocks), or when it cannot be told: yes.
+     */
+    static boolean mayAddBelow(org.apache.sling.api.resource.ResourceResolver resolver, String path) {
+        javax.jcr.Session session = resolver == null ? null : resolver.adaptTo(javax.jcr.Session.class);
+        if (session == null) {
+            return true;
+        }
+        try {
+            return session.hasPermission(path + "/studio-probe", javax.jcr.Session.ACTION_ADD_NODE);
+        } catch (javax.jcr.RepositoryException | RuntimeException e) {
+            return true;
+        }
     }
 }

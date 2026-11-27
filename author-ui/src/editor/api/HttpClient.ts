@@ -28,6 +28,9 @@ const FORM = 'application/x-www-form-urlencoded;charset=UTF-8';
  * through the Sling default GET servlet, writes through the Sling POST servlet. Same origin (the dev
  * server proxies to :4502).
  */
+/** Fired on `window` when a save found that somebody else changed the page since this editor read it. */
+export const CHANGED_ELSEWHERE = 'studio:changed-elsewhere';
+
 export class HttpClient implements StudioClient {
   constructor(private readonly base = '') {}
 
@@ -136,9 +139,14 @@ export class HttpClient implements StudioClient {
     return Object.keys(json).filter((k) => json[k] && typeof json[k] === 'object' && !Array.isArray(json[k]));
   }
 
+  /** When each page was last changed as this client read it: sent with its saves, so the server can say who has been at it since. */
+  private readonly seen = new Map<string, string>();
+
   async getPageData(pagePath: string): Promise<EditorPageData> {
     const qs = new URLSearchParams({ op: 'page', path: pagePath });
-    return this.getJson<EditorPageData>(`/bin/studio/editor.json?${qs}`, `Page ${pagePath}`);
+    const data = await this.getJson<EditorPageData>(`/bin/studio/editor.json?${qs}`, `Page ${pagePath}`);
+    if (data?.page?.lastModified) this.seen.set(pagePath, data.page.lastModified);
+    return data;
   }
 
   async getStyles(path: string): Promise<StylesInfo> {
@@ -380,12 +388,22 @@ export class HttpClient implements StudioClient {
   }
 
   private async slingPost(path: string, entries: PostEntry[]): Promise<Response> {
+    const at = path.indexOf('/jcr:content');
+    const page = at > 0 ? path.slice(0, at) : null;
+    const seen = page ? this.seen.get(page) : undefined;
     const res = await fetch(`${this.base}${encodePath(path)}`, {
       method: 'POST',
       credentials: 'same-origin',
-      headers: { 'Content-Type': FORM, Accept: 'application/json' },
+      headers: { 'Content-Type': FORM, Accept: 'application/json', ...(seen ? { 'X-Studio-Page-Seen': seen } : {}) },
       body: toUrlEncoded(entries),
     });
+    const by = res.headers?.get?.('X-Studio-Changed-By');
+    if (page && by) {
+      // said once per change of theirs: from here on the page is taken as read up to it
+      const when = res.headers.get('X-Studio-Changed-At') ?? new Date().toISOString();
+      this.seen.set(page, when);
+      if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(CHANGED_ELSEWHERE, { detail: { page, by, at: when } }));
+    }
     if (!res.ok) {
       const text = await res.text().catch(() => '');
       throw new StudioHttpError(res.status, `Saving ${path} failed (HTTP ${res.status}). ${extractSlingMessage(text)}`.trim());

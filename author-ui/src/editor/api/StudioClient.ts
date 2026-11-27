@@ -154,6 +154,8 @@ export interface PageListItem {
 
 /** A page or folder in the Sites console. */
 export interface SiteItem {
+  /** Whether the signed-in user may add a page or a folder below it; absent (an older server): offered. */
+  canCreate?: boolean;
   path: string;
   name: string;
   title: string;

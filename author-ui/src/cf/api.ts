@@ -114,6 +114,8 @@ export interface CfFolder {
   title: string;
   folders: CfFolderRef[];
   fragments: CfSummary[];
+  /** Whether the signed-in user may make a fragment here; absent (an older server): offered. */
+  canCreate?: boolean;
 }
 
 export interface CfSearchResult {

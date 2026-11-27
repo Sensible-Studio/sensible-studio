@@ -89,7 +89,7 @@ public class ProjectsServlet extends SlingAllMethodsServlet {
         } else {
             Map<String, Object> out = new LinkedHashMap<>();
             out.put("projects", list(rr, user, LocalDate.now()));
-            out.put("canCreate", rr.getResource(ROOT) != null);
+            out.put("canCreate", rr.getResource(ROOT) != null && SitesServlet.mayAddBelow(rr, ROOT));
             send(response, 200, out);
         }
     }

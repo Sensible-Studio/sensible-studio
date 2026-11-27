@@ -90,7 +90,7 @@ function ProjectList({ client }: { client: ProjectsClient }) {
       <main className="studio-projects__main">
         {error && <ErrorState title="Projects could not be loaded">{error}</ErrorState>}
         {!error && !data && <LoadingState label="Loading projects" />}
-        {data && !data.canCreate && <p className="studio-projects__muted">Projects are kept at /content/projects, which is missing or not readable for you.</p>}
+        {data && !data.canCreate && <p className="studio-projects__muted">You cannot make a project: projects are kept at /content/projects, which is missing or which your account may not write.</p>}
         {data && projects.length === 0 && data.canCreate && <EmptyState title={`No ${show === 'active' && inactive ? 'active ' : ''}projects yet`}>Create one for a piece of work that has a team, a date and things to do.</EmptyState>}
         <ul className="studio-projects__cards">
           {projects.map((p) => (
