@@ -46,6 +46,15 @@ interface Loaded {
 }
 
 /** `ns:a/b` for the tag at `/content/cq:tags/ns/a/b`. */
+/**
+ * What a page without a title is called: its name, except for the page a template keeps for the properties of
+ * new pages, whose name ("initial") says nothing to an author.
+ */
+function nameOf(page: string): string {
+  const template = /\/settings\/wcm\/templates\/([^/]+)\/initial$/.exec(page);
+  return template ? `New pages of ${template[1]}` : page.slice(page.lastIndexOf('/') + 1);
+}
+
 export function tagIdOf(path: string): string {
   const rest = path.slice(TAG_ROOT.length + 1);
   const i = rest.indexOf('/');
@@ -99,7 +108,7 @@ export function PagePropertiesApp({ client, page, msm: msmIn, permissions: perms
       if (!rt) throw new Error(`${page} is not a page with content`);
       const dialog = await client.getDialog(rt, 'cq:dialog', contentPath);
       if (!dialog.root) throw new Error(`${rt} has no page properties dialog. ${dialog.warnings.join(' ')}`.trim());
-      const title = (content['jcr:title'] as string) || page.slice(page.lastIndexOf('/') + 1);
+      const title = (content['jcr:title'] as string) || nameOf(page);
       if (live) setLoaded({ title, dialog: dialog as Loaded['dialog'], content });
     })().catch((e: unknown) => live && setError(e instanceof Error ? e.message : String(e)));
     msm.status(page).then(
@@ -114,7 +123,7 @@ export function PagePropertiesApp({ client, page, msm: msmIn, permissions: perms
   const tabRef = useRef(tab);
   tabRef.current = tab;
   useEffect(() => {
-    const title = loaded?.title ?? page.slice(page.lastIndexOf('/') + 1);
+    const title = loaded?.title ?? nameOf(page);
     if (tabRef.current) tabRef.current.setTitle(`Properties · ${title}`);
     else document.title = `${title} | Sensible Studio Pages | Page Properties`;
   }, [loaded, page]);

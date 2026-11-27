@@ -163,7 +163,7 @@ Initial content is copied into each new page once; changing it later does not ch
 
 ![Initial Page Properties](../images/templates-initial-properties.webp)
 
-**Page › Initial Page Properties** does the same for the properties: what you fill in here is what a new page starts with.
+**Page › Initial Page Properties** does the same for the properties. It opens the form of [page properties](page-properties.md), titled *New pages of* the template: what you fill in here is what a new page starts with.
 
 ### Layout
 
@@ -174,6 +174,18 @@ Initial content is copied into each new page once; changing it later does not ch
 ### Page Configuration
 
 ![Page Configuration](../images/templates-page-configuration.webp)
+
+**Page › Page Configuration** is the configuration of the page itself, in the same form as a container's. Its **Properties** tab holds what the site's developers set once:
+
+| Field | What it is |
+|---|---|
+| **Client Libraries** | The site's CSS and JavaScript, by category, in the order they load. **Add** adds one; the arrows reorder; the bin removes |
+| **Client Libraries JavaScript Page Head** | The ones whose JavaScript must load in the head of the page |
+| **Load JavaScript Libraries asynchronously** | Lets the page show before its scripts finished loading |
+| **Web Resources Client Library** | The category that holds the site's icons and manifest |
+| **Skip to main content element selector** | Where the "skip to main content" link of keyboard users leads |
+
+The **SEO** tab sets what pages tell search engines, and **Styles** the looks a page can have.
 
 ## Which templates are offered where
 

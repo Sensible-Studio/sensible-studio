@@ -46,6 +46,20 @@ Tick a fragment to see it at the right: its model, title, name, when it was modi
 
 **Create** opens the new fragment in the editor.
 
+### Properties, Move, Translate
+
+![The properties of a content fragment](../images/fragments-properties.webp)
+
+**Properties** changes the **Title**, the **Description** and the **Tags** without opening the fragment.
+
+![Move or rename a content fragment](../images/fragments-move.webp)
+
+**Move** takes a new **Name**, a **Destination** chosen by clicking through the folders, and lists under **Adjust references** the pages that show the fragment, each with the property that names it. Leave them ticked, and they keep showing it.
+
+![Translate a content fragment](../images/fragments-translate.webp)
+
+**Translate** asks for the **Language** to translate into, as a code such as `de` or `pt_br`, and who translates. **Also translate the content fragments they reference** takes the author of an article along; **Translate everything again** also redoes texts that did not change since the last translation.
+
 ## The content fragment editor
 
 ![The content fragment editor with its parts numbered](../images/fragments-editor.webp)
@@ -90,7 +104,11 @@ The first tab of the panel holds the fragment's **Title**, **Description** and *
 
 ![The Versions tab](../images/fragments-versions.webp)
 
-**Create version** keeps the fragment as it is now, with a label and a comment. Each version then offers **Compare with current** and **Restore**.
+**Create version** keeps the fragment as it is now, with a label and a comment. Each version is listed with its label, when it was made and by whom, and its number; the `⋯` beside it offers **Compare with current** and **Restore**.
+
+![Comparing a version with the fragment as it is now](../images/fragments-compare.webp)
+
+**Compare with current** lists, variant by variant, the elements whose values differ, or says that nothing changed.
 
 ### Languages
 
@@ -156,9 +174,32 @@ Click an element for its settings at the right. Every element has:
 | **Property name** | The name the value is stored under, and the name applications use. Change it only before fragments exist |
 | **Description** | Help shown under the field |
 | **Required** | The fragment cannot be saved without it |
-| **Multiple values** | The field holds a list |
+| **Multiple values** | The field holds a list. Offered for texts, numbers and references |
 
-The rest depends on the data type. A content reference has a **Root path**, where the picker starts, and **Accept only images**. A text has its default format and may have a **Maximum length** or a **Validation pattern** with the **Error message** to show:
+The property name follows the label until you change it yourself. The rest depends on the data type:
+
+| Data type | Its own settings |
+|---|---|
+| **Single line text**, **Multi line text** | The default format of a multi line text, a **Maximum length**, a **Validation pattern** with the **Error message** to show |
+| **Number** | A **Placeholder**, the **Type** (integer or fraction) and a **Default value** |
+| **Boolean** | **Checked by default**. It has no Required and no Multiple values |
+| **Date and time** | The **Type**: a date, a date and time, or a time |
+| **Enumeration** | The **Options**, each with a value and a label; **Add option** adds one, the bin removes one. **Show as** a dropdown (one value) or checkboxes (several), and the **Default value** |
+| **Tags** | The **Root path**: where in the tag library the picker starts |
+| **Content Reference** | The **Root path**, where the picker starts, and **Accept only images** |
+| **Fragment Reference** | **Allowed models**: which kinds of fragment may be chosen. None ticked means any model |
+| **JSON Object** | Nothing more: the value is checked to be valid JSON |
+| **Tab Placeholder** | Only a label: the elements after it are on a tab of that name |
+
+![The settings of an enumeration](../images/models-type-enumeration.webp)
+
+![The settings of a number](../images/models-type-number.webp)
+
+![The settings of a date and time](../images/models-type-date.webp)
+
+![The settings of a fragment reference](../images/models-type-fragment.webp)
+
+A text:
 
 ![The settings of a multi line text](../images/models-field-text.webp)
 
@@ -172,7 +213,19 @@ With no element selected, or after **Model properties**, the panel shows the **M
 
 ## Use a fragment on a page
 
-Drag the **Content Fragment** component onto a page and choose the fragment. Choose whether to show one element or several, and which variant. The **Content Fragment List** component shows every fragment of a model, optionally filtered by tags and sorted by an element.
+Drag the **Content Fragment** component onto a page and open its dialog:
+
+![The dialog of the Content Fragment component](../images/fragments-component.webp)
+
+| Field | What it is |
+|---|---|
+| **Content Fragment** | The fragment to show. The folder button chooses one |
+| **Display Mode** | **Single Text Element** shows one text, in paragraphs you can put other components between. **Multiple Elements** shows several elements. **Visual Content Fragment** shows the fragment as a whole |
+| **Element** | Which element, or which elements |
+| **Variation** | Which variant: Master, or one you made |
+| **ID** | An HTML id, for the site's styles and links |
+
+The **Paragraph Control** tab limits which paragraphs of a text are shown; **Styles** chooses a look. The **Content Fragment List** component shows every fragment of a model, optionally filtered by tags and sorted by an element.
 
 When the fragment changes and is published, every page that shows it shows the new content.
 
@@ -180,4 +233,24 @@ When the fragment changes and is published, every page that shows it shows the n
 
 Every model is available over GraphQL: an application asks for exactly the elements it needs and gets JSON back. Fragment references are followed, so an article arrives with its author in one request.
 
-A developer writes the query once and saves it under a name as a **persisted query**; applications then call it by that name. Try queries in **Home › System › Developer**. See [APIs](../developer/apis.md).
+A developer writes the query once and saves it under a name as a **persisted query**; applications then call it by that name.
+
+**Home › System › Developer › GraphQL** lists the endpoints: one per configuration, each with its address, a button that copies it, and its persisted queries.
+
+![The GraphQL endpoints](../images/graphql-endpoints.webp)
+
+**Create endpoint** makes one for a configuration that has none. **Open in Query Editor** opens the editor on an endpoint:
+
+![The GraphQL Query Editor](../images/graphql-editor.webp)
+
+| Part | What it does |
+|---|---|
+| **Persisted queries** | The saved queries of the endpoint, each with whether it is published. Click one to load it; the `+` starts a new one; the bin deletes |
+| **Query**, **Query variables** | The query you write, and the values for its variables |
+| **Result** | What the endpoint answers |
+| **Schema** | What can be asked: every query and type of the endpoint, with a filter. Click a field to add it to the query |
+| **Prettify** | Lays the query out |
+| **Save as persisted query** | Saves it under a name |
+| **Run** | Runs it (`Cmd+Enter`) |
+
+See [APIs](../developer/apis.md).

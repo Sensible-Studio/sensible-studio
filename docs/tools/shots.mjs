@@ -80,6 +80,11 @@ let lastId = 0;
 const waiting = new Map();
 socket.onmessage = (event) => {
   const message = JSON.parse(event.data);
+  // "leave this page?" and the like would stop everything: a scene that leaves unsaved changes behind means to
+  if (message.method === 'Page.javascriptDialogOpening') {
+    socket.send(JSON.stringify({ id: ++lastId, method: 'Page.handleJavaScriptDialog', params: { accept: true }, sessionId: message.sessionId }));
+    return;
+  }
   const entry = waiting.get(message.id);
   if (!entry) return;
   waiting.delete(message.id);

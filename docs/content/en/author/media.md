@@ -196,7 +196,22 @@ Right-click a file for the same actions as a menu:
 
 ![The right-click menu of a file](../images/media-context-menu.webp)
 
-On a ZIP file, **Extract Archive** unpacks it into a new folder or beside the archive. **Relate**, on a file's page, links files to each other, such as a photo and the release form signed for it.
+### Extract an archive
+
+![Extract Archive](../images/media-extract-archive.webp)
+
+A ZIP file has **Extract Archive** in its bar.
+
+| Option | What it does |
+|---|---|
+| **Extract to** | **A new folder** named after the archive, or **This folder** |
+| **When a file name exists** | **Skip it**, **Keep both** (the new file gets a numbered name) or **Replace** |
+
+Only the file types that can be uploaded are extracted.
+
+### Relate files
+
+Select two or more files and choose **More › Relate** to link them to each other, such as a photo and the release form signed for it. The console confirms how many files were related, and each of them then lists the others in the **Related** panel of its page.
 
 ## A file's page
 
@@ -224,7 +239,7 @@ The versions of the file and what happened to it. **Save as Version** takes a la
 
 ![The Related panel](../images/media-file-related.webp)
 
-- **Related**: the files linked to this one, and **Relate** to link another.
+- **Related**: the files linked to this one. Click one to open it; the button beside it takes the link away. Files are linked with **More › Relate** in the console.
 - **Similar**: images that look like it. See *Find similar* above.
 - **References**: the pages and fragments that use the file. Look here before you replace or delete it.
 
@@ -267,7 +282,7 @@ Facts about the file that you cannot change here: its name and path, type, size,
 
 ### Camera Data, All Metadata, References
 
-- **Camera Data**: what the camera wrote into a photo: maker and model, lens, exposure, date, position.
+- **Camera Data**: what the camera wrote into a photo, in words: camera maker and model, lens, exposure time, aperture, ISO, when it was taken, its size in pixels, its colour space, and the position if the camera recorded one. A picture that went through an editor or a website often has none left; the tab then says so.
 - **All Metadata**: every property stored with the file, with its technical name.
 - **References**: the pages that use the file.
 
@@ -283,7 +298,20 @@ Select several files and choose **Properties** to change them together. Fields w
 
 ### Edit metadata in a spreadsheet
 
-**Metadata › Export Metadata (CSV)** gives you a file with one row per file and one column per property. Edit it in a spreadsheet, then **Import Metadata (CSV)**. The result lists what was written and which rows failed.
+**Metadata › Export Metadata (CSV)** gives you a file with one row per file and one column per property.
+
+![Export Metadata](../images/media-export-metadata.webp)
+
+| Option | What it does |
+|---|---|
+| **Include subfolders** | Also the files of the folders below |
+| **Properties** | Leave empty for all of them, or list some, such as `dc:title, dc:description, cq:tags` |
+
+Edit the file in a spreadsheet, then bring it back with **Metadata › Import Metadata (CSV)**:
+
+![Import Metadata](../images/media-import-metadata.webp)
+
+The first column is `assetPath`; the others are properties, named as in the export, such as `dc:title {{String}}` or `dc:subject {{String: multi}}`, where several values are separated by `|`. Empty cells leave the values as they are. **Choose CSV File**, then **Import**; the result says how many files were updated, and lists the rows that failed.
 
 An administrator can design the properties form: which tabs and fields it has, which are required, which are dropdowns. That is a **metadata schema**, set per folder. See **Home › System › Media**.
 

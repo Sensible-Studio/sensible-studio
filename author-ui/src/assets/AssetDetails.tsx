@@ -97,6 +97,41 @@ interface Props {
 }
 
 /** `/assetdetails.html/<asset>`: the asset large, its renditions, and (with #properties) its metadata. */
+/** What the camera's own property names mean; a name that is not listed is shown in words made from it. */
+const CAMERA_LABELS: Record<string, string> = {
+  'tiff:Make': 'Camera maker',
+  'tiff:Model': 'Camera model',
+  'tiff:Orientation': 'Orientation',
+  'tiff:Software': 'Software',
+  'exif:DateTimeOriginal': 'Taken',
+  'exif:ExposureTime': 'Exposure time',
+  'exif:FNumber': 'Aperture',
+  'exif:ISOSpeedRatings': 'ISO',
+  'exif:FocalLength': 'Focal length',
+  'exif:FocalLengthIn35mmFilm': 'Focal length (35 mm)',
+  'exif:Flash': 'Flash',
+  'exif:WhiteBalance': 'White balance',
+  'exif:ExposureProgram': 'Exposure program',
+  'exif:ExposureBiasValue': 'Exposure compensation',
+  'exif:MeteringMode': 'Metering',
+  'exif:ColorSpace': 'Colour space',
+  'exif:PixelXDimension': 'Width in pixels',
+  'exif:PixelYDimension': 'Height in pixels',
+  'exif:GPSLatitude': 'Latitude',
+  'exif:GPSLongitude': 'Longitude',
+  'exif:GPSAltitude': 'Altitude',
+  'exifEX:LensModel': 'Lens',
+  'exifEX:LensMake': 'Lens maker',
+  'psAux:Lens': 'Lens',
+};
+
+function cameraLabel(property: string): string {
+  const known = CAMERA_LABELS[property];
+  if (known) return known;
+  const name = property.slice(property.indexOf(':') + 1).replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase();
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
 export function AssetDetails({ client, path, properties, similar, annotate, timeline, navigate }: Props) {
   const [asset, setAsset] = useState<Details | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -1072,7 +1107,7 @@ function PropertiesPage({
         return camera.length === 0 ? (
           <p className="studio-assets__muted">No camera data in this file.</p>
         ) : (
-          <Facts rows={camera.map(([k, v]) => [k, str(v)])} />
+          <Facts rows={camera.map(([k, v]) => [cameraLabel(k), str(v)])} />
         );
       case "all":
         return (

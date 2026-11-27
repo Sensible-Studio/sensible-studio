@@ -17,7 +17,7 @@ export function ExportMetadataDialog({ path, title, close }: { path: string; tit
       <Divider />
       <Content>
         <p>
-          A CSV file with the metadata of the assets in <strong>{title}</strong>. Edit it in a spreadsheet and bring it back with Import Metadata.
+          A CSV file with the metadata of the files in <strong>{title}</strong>. Edit it in a spreadsheet and bring it back with Import Metadata.
         </p>
         <Checkbox isSelected={recursive} onChange={setRecursive}>
           Include subfolders
