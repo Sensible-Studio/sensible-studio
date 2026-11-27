@@ -11,7 +11,8 @@
 //   { click: 'css selector' }             a real mouse click in the middle of the element
 //   { click: { text: 'Pages' } }          ... of the smallest visible element with exactly this text (last: true takes
 //                                         the last one in the document instead, which is where menus are)
-//   { rightClick: ... } { hover: ... } { dblClick: ... }      the same targets ({ clickAt: [x, y] } for a point)
+//   { rightClick: ... } { hover: ... } { dblClick: ... }      the same targets ({ clickAt: [x, y] } for a point,
+//                                         { scroll: [x, y, pixels] } for the wheel there)
 //   { key: 'Alt+T' }                      a key with its modifiers (Alt, Ctrl, Meta, Shift)
 //   { type: 'some text' }                 text into the focused field
 //   { wait: 400 } { waitFor: 'selector' } { waitFor: { text: '...' } }
@@ -248,6 +249,10 @@ async function run(step) {
     await send('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: step.button || 'left', clickCount: 1 });
     await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: step.button || 'left', clickCount: 1 });
     await quiet(step.settle ?? 3000);
+  } else if (step.scroll !== undefined) {
+    const [x, y, deltaY] = step.scroll;
+    await send('Input.dispatchMouseEvent', { type: 'mouseWheel', x, y, deltaX: 0, deltaY });
+    await sleep(step.settle ?? 700);
   } else if (step.dblClick !== undefined) {
     await mouse(step.dblClick, 'left', 2);
     await quiet(step.settle ?? 4000);

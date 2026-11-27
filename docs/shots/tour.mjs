@@ -52,6 +52,6 @@ export default [
   ] },
   { name: 'rail', steps: [{ goto: PAGES }, { wait: 700 }, { key: 'Alt+1' }, { wait: 900 }, { shot: 'tour-rail-tree' },
     { key: 'Alt+2' }, { wait: 900 }, { shot: 'tour-rail-filter' }] },
-  { name: 'inspector', steps: [{ goto: PAGES }, { wait: 700 }, select('Magazine'), { key: 'Alt+3' }, { wait: 900 }, { shot: 'tour-inspector' },
-    { key: 'Alt+4' }, { wait: 900 }, { shot: 'tour-inspector-timeline' }, { key: 'Alt+5' }, { wait: 900 }, { shot: 'tour-inspector-references' }] },
+  { name: 'inspector', steps: [{ goto: PAGES }, { wait: 700 }, select('Magazine'), { key: 'Alt+3' }, { wait: 900 },
+    { key: 'Alt+4' }, { wait: 900 }, { shot: 'tour-inspector-timeline' }, ] },
 ];
