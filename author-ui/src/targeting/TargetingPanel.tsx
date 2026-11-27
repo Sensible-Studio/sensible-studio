@@ -409,7 +409,7 @@ function GoalSection({ client, target, onChanged }: { client: TargetingClient; t
     <section className="studio-targeting__section" aria-label="Goal & Settings">
       <h3>Goal &amp; Settings</h3>
       <div className="studio-targeting__form">
-        <TextField label="Activity name" value={activity} onChange={setActivity} placeholder={target.path.split('/').pop()} description="How the report names this personalized component." width="100%" />
+        <TextField label="Name in reports" value={activity} onChange={setActivity} placeholder={target.path.split('/').pop()} description="How the report names this personalized component." width="100%" />
         <Picker label="Goal" selectedKey={type} onSelectionChange={(k) => setType(k as GoalType)} description={info?.hint} width="100%">
           {GOAL_TYPES.map((g) => (
             <Item key={g.id}>{g.label}</Item>

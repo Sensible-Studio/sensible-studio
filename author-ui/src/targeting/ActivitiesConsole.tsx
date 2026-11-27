@@ -99,15 +99,15 @@ export function ActivitiesConsole({ client, studio, initialRoot }: Props) {
         </>}
       />
       <main className="studio-sites__content">
-        {error && <ErrorState title="Could not load activities">{error}</ErrorState>}
-        {!rows && !error && <LoadingState label="Loading activities" />}
-        {rows && rows.length === 0 && <EmptyState title="No activities">No personalized components exist under {root}. In the page editor, select a component and use Personalize.</EmptyState>}
+        {error && <ErrorState title="Could not load the reports">{error}</ErrorState>}
+        {!rows && !error && <LoadingState label="Loading the reports" />}
+        {rows && rows.length === 0 && <EmptyState title="Nothing is personalized yet">No personalized components exist under {root}. In the page editor, select a component and use Personalize.</EmptyState>}
         {rows && rows.length > 0 && counted && <p className={`studio-targeting__hint studio-activities__counted${counted.warn ? ' studio-targeting__hint--problem' : ''}`}>{counted.text}</p>}
         {rows && rows.length > 0 && (
           <table className="studio-audiences__table studio-activities__table studio-table">
             <thead>
               <tr>
-                <th>Activity</th>
+                <th>Component</th>
                 <th>Page</th>
                 <th>Goal</th>
                 <th>Experiences</th>
