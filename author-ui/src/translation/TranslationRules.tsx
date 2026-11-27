@@ -88,7 +88,7 @@ export function TranslationContexts({ client }: { client: TranslationRulesClient
           <>
             <p className="studio-trrules__intro">
               A page is translated with the rules of the most specific context above it: <code>/content/my-site</code> for the pages of
-              WKND, <code>/content</code> for the others.
+              that site, <code>/content</code> for the others.
             </p>
             <table className="studio-trrules__table">
               <thead>
@@ -96,7 +96,7 @@ export function TranslationContexts({ client }: { client: TranslationRulesClient
                   <th>Context</th>
                   <th>Translated properties</th>
                   <th>Components</th>
-                  <th>Assets</th>
+                  <th>Media</th>
                   <th>Modified</th>
                   <th aria-label="Actions" />
                 </tr>
@@ -342,12 +342,12 @@ export function TranslationContextEditor({ client, context }: { client: Translat
         )}
 
         {tab === 'references' && (
-          <FormSection title="Assets" description="When a page is translated with what it uses, the images and files it shows.">
+          <FormSection title="Media" description="When a page is translated with what it uses, the images and files it shows.">
             <Checkbox isSelected={rules.translateAssets} onChange={(v) => set({ translateAssets: v })}>
               Translate the assets a page shows: they get language versions with their metadata translated
             </Checkbox>
             <TagsField label="Translated metadata" values={rules.assetProperties} onChange={(v) => set({ assetProperties: v })} />
-            <p className="studio-trrules__muted">Assets without such texts stay shared by every language. Experience Fragments and content fragments a page uses are translated with it either way.</p>
+            <p className="studio-trrules__muted">Files without such texts stay shared by every language. Experience Fragments and content fragments a page uses are translated with it either way.</p>
           </FormSection>
         )}
 

@@ -62,7 +62,7 @@ const KIND: Record<ItemKind, string> = {
   page: 'Page',
   'experience-fragment': 'Experience Fragment',
   'content-fragment': 'Content Fragment',
-  asset: 'Asset',
+  asset: 'File',
 };
 const message = (e: unknown) => (e instanceof Error ? e.message : String(e));
 

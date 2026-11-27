@@ -122,7 +122,7 @@ describe('translation review', () => {
     expect(grid.textContent).toContain('To review');
     // assets' metadata copies are reviewed here too
     expect(grid.textContent).toContain('Plajă');
-    expect(grid.textContent).toContain('Asset');
+    expect(grid.textContent).toContain('File');
 
     // ask a reviewer: the workflow starts for the selected copy, which then shows as in review
     act(() => {

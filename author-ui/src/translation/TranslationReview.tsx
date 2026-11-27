@@ -79,7 +79,7 @@ export function stateLight(state: ReviewState): { text: string; variant: 'notice
 }
 
 const kindLabel = (k: QueueItem['kind']) =>
-  k === 'content-fragment' ? 'Content Fragment' : k === 'experience-fragment' ? 'Experience Fragment' : k === 'asset' ? 'Asset' : 'Page';
+  k === 'content-fragment' ? 'Content Fragment' : k === 'experience-fragment' ? 'Experience Fragment' : k === 'asset' ? 'File' : 'Page';
 const lang = (code?: string) => (code ? `${languageName(code) ?? code} (${code})` : '');
 
 /**
