@@ -72,10 +72,10 @@ describe('Assets Configurations', () => {
     const list = await screen.findByRole('list', { name: 'Media configurations' });
     expect(within(list).getAllByRole('link').map((a) => a.querySelector('strong')?.textContent)).toEqual([
       'Upload Restrictions',
-      'DRM Configuration',
-      'System Watermarking Profile',
-      'Assets Omnisearch Configuration',
-      'Asset Duplication Detector',
+      'Usage rights',
+      'Watermark',
+      'Search',
+      'Duplicate check',
       'Link Share',
     ]);
     fireEvent.click(within(list).getAllByRole('link')[0]);

@@ -22,6 +22,7 @@ If you have not used Sensible Studio before, take the [tour of the interface](..
 :::cards
 - [Media](media.md): Upload, organise, describe, find and share images, video and documents.
 - [Images and delivery](media-delivery.md): Renditions, any size by address, presets, focus crops and auto tags.
+- [Media settings](media-settings.md): Metadata schemas and profiles, search forms, reports, collections, shared links and the Media configurations.
 - [Content Fragments](content-fragments.md): Content in fields, with models of your own, for pages and applications.
 - [Experience Fragments](experience-fragments.md): Parts of pages written once and shown in many places.
 - [Tags](tags.md): The words that classify everything.

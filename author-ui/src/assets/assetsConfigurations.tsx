@@ -36,10 +36,10 @@ const message = (e: unknown) => (e instanceof Error ? e.message : String(e));
 /** The cards, in AEM's order, with AEM's names. */
 export const CONFIG_CARDS: Array<{ key: AssetsConfigEditor; title: string; description: string }> = [
   { key: 'uploadrestrictions', title: 'Upload Restrictions', description: 'The types of file that may be uploaded' },
-  { key: 'digitalrightsmanagement', title: 'DRM Configuration', description: 'Files with a license are downloaded only after it is agreed to' },
-  { key: 'watermark', title: 'System Watermarking Profile', description: 'The picture drawn on the renditions of the profiles that ask for it' },
-  { key: 'assetsomnisearch', title: 'Assets Omnisearch Configuration', description: 'How many results are counted, and where a search starts' },
-  { key: 'assetduplicationdetector', title: 'Asset Duplication Detector', description: 'Whether an upload is checked for the same file elsewhere in Media' },
+  { key: 'digitalrightsmanagement', title: 'Usage rights', description: 'Files with a license are downloaded only after it is agreed to' },
+  { key: 'watermark', title: 'Watermark', description: 'The picture drawn on the renditions of the profiles that ask for it' },
+  { key: 'assetsomnisearch', title: 'Search', description: 'How many results are counted, and where a search starts' },
+  { key: 'assetduplicationdetector', title: 'Duplicate check', description: 'Whether an upload is checked for the same file elsewhere in Media' },
   { key: 'linkshare', title: 'Link Share', description: 'What the Share Link dialog starts with, for how long, and who may share' },
 ];
 
@@ -204,21 +204,21 @@ function Editor({
         <>
           <p className="studio-assetsconfig__intro">
             A file has a license when its metadata has <code>adobe_dam:restrictions</code> (the license&apos;s text) or{' '}
-            <code>xmpRights:WebStatement</code> (the address of a page with it), as in AEM. With DRM on, Download shows the license of each such file
+            <code>xmpRights:WebStatement</code> (the address of a page with it). With this on, Download shows the license of each such file
             and leaves out the ones not agreed to; other files download as before. Share Link is not affected: whoever shares decides.
           </p>
           <Switch isSelected={draft.drm.enabled} onChange={(on) => setDraft({ ...draft, drm: { ...draft.drm, enabled: on } })} isDisabled={readOnly}>
-            Enable DRM
+            Ask for agreement before a download
           </Switch>
           {draft.drm.enabled && (
             <p className="studio-assets__muted" role="note">
               {config.watermark?.ready
-                ? 'A licensed picture is shown large with the system watermark on it.'
-                : 'No watermark is set: licensed pictures are previewed as they are. Set one in System Watermarking Profile to mark their previews.'}
+                ? 'A licensed picture is shown large with the watermark on it.'
+                : 'No watermark is set: licensed pictures are previewed as they are. Set one in Watermark to mark their previews.'}
             </p>
           )}
           <TextField
-            label="DRM Usage Terms URL"
+            label="Usage terms URL"
             description="The general terms, linked next to each license (a page of the site, or an https address)"
             value={draft.drm.usageTermsUrl}
             onChange={(v) => setDraft({ ...draft, drm: { ...draft.drm, usageTermsUrl: v } })}
@@ -425,7 +425,8 @@ export function AssetsConfigurationsPage({
   return (
     <div className="studio-assets__profiles studio-assetsconfig">
       <ToolBar
-        url={routeUrl({ kind: 'assetsconfigurations', editor })}
+        url={routeUrl({ kind: 'assetsconfigurations' })}
+        extra={editor && card ? [{ path: `editor:${editor}`, title: card.title }] : undefined}
         primary={
           editor && serverName && admin ? (
             <Button variant="accent" onPress={() => void save()} isDisabled={busy || !dirty || invalid}>

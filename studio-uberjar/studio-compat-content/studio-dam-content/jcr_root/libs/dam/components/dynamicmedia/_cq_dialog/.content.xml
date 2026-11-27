@@ -15,7 +15,7 @@
                 <items jcr:primaryType="nt:unstructured">
                     <asset
                         jcr:primaryType="nt:unstructured"
-                        jcr:title="Asset"
+                        jcr:title="Image"
                         sling:resourceType="granite/ui/components/coral/foundation/container"
                         margin="{Boolean}true">
                         <items jcr:primaryType="nt:unstructured">

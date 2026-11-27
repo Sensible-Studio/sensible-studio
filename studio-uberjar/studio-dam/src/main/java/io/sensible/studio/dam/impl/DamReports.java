@@ -58,10 +58,10 @@ final class DamReports {
 
     /** The report types: id → (title, description, kind). */
     enum Type {
-        UPLOAD("assetadditionreport", "Upload", "Report of uploaded assets", true),
-        MODIFICATION("assetmodificationreport", "Modification", "Report of modified assets", true),
-        EXPIRATION("assetexpiryreport", "Expiration", "Report of expired assets", true),
-        PUBLISH("assetpublishreport", "Publish", "Report of published assets", true),
+        UPLOAD("assetadditionreport", "Upload", "Report of uploaded files", true),
+        MODIFICATION("assetmodificationreport", "Modification", "Report of modified files", true),
+        EXPIRATION("assetexpiryreport", "Expiration", "Report of expired files", true),
+        PUBLISH("assetpublishreport", "Publish", "Report of published files", true),
         DISK_USAGE("foldersizeandstrengthreport", "Disk Usage", "Report of disk usage", false),
         FILES("foldercontentreport", "Files", "Report of files in folder", true),
         LINK_SHARE("linksharereport", "Link Share", "Report of shared links", false);
@@ -339,7 +339,7 @@ final class DamReports {
 
     /** Folders with the number and size of their assets (sub-folders included), largest first. */
     private static void diskUsage(Resource root, Request q, Result out) {
-        out.rows.add(new ArrayList<>(Arrays.asList("Folder", "Title", "Assets", "Size", q.includeRenditions ? "Renditions Size" : null)));
+        out.rows.add(new ArrayList<>(Arrays.asList("Folder", "Title", "Files", "Size", q.includeRenditions ? "Renditions Size" : null)));
         out.rows.get(0).removeIf(java.util.Objects::isNull);
         Map<String, long[]> totals = new LinkedHashMap<>(); // path → {assets, original bytes, rendition bytes}
         Map<String, String> titles = new LinkedHashMap<>();
@@ -373,7 +373,7 @@ final class DamReports {
             int[] seen, Result out) {
         long[] t = new long[3];
         totals.put(folder.getPath(), t);
-        titles.put(folder.getPath(), DamItems.ROOT.equals(folder.getPath()) ? "Assets" : DamItems.title(folder));
+        titles.put(folder.getPath(), DamItems.ROOT.equals(folder.getPath()) ? "Media" : DamItems.title(folder));
         for (Resource c : folder.getChildren()) {
             if (DamItems.isFolder(c) && !c.getPath().equals(DamCollections.ROOT)) {
                 long[] sub = walkFolders(c, totals, titles, renditions, seen, out);
