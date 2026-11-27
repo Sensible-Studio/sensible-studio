@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Place } from './places';
-import { boot, canBack, canForward, deserialize, focusedId, initialState, paneOf, placeOf, reducer, serialize, tabOf, type ShellState } from './tabs';
+import { boot, canBack, capped, MAX_HISTORY, canForward, deserialize, focusedId, initialState, paneOf, placeOf, reducer, serialize, tabOf, type ShellState } from './tabs';
 
 const sites = (path: string): Place => ({ kind: 'sites', path });
 const editor = (path: string): Place => ({ kind: 'editor', path });
@@ -218,4 +218,29 @@ describe('split view', () => {
     expect(booted.tabs).toHaveLength(1);
     expect(tabOf(booted).focus).toBe('second');
   });
+
+describe('a tab\'s history has an end', () => {
+  it('keeps the newest places when it moves on', () => {
+    const many = Array.from({ length: MAX_HISTORY + 30 }, (_, i) => i);
+    const c = capped(many, many.length - 1);
+    expect(c.entries).toHaveLength(MAX_HISTORY);
+    expect(c.entries[c.index]).toBe(many.length - 1);
+    expect(c.entries[0]).toBe(30);
+  });
+  it('keeps where the tab is when that is in the middle, and short histories whole', () => {
+    const many = Array.from({ length: 300 }, (_, i) => i);
+    const c = capped(many, 100);
+    expect(c.entries).toHaveLength(MAX_HISTORY);
+    expect(c.entries[c.index]).toBe(100);
+    expect(c.entries[c.entries.length - 1]).toBeGreaterThan(100); // some of Forward stays
+    expect(capped([1, 2, 3], 1)).toEqual({ entries: [1, 2, 3], index: 1 });
+    expect(capped(many, 0).index).toBe(0);
+  });
+  it('cuts a long saved history when it is read', () => {
+    const urls = Array.from({ length: 400 }, (_, i) => `/sites.html/content/p${i}`);
+    const state = deserialize(JSON.stringify({ v: 1, tabs: [{ id: 't1', urls, index: 399 }], active: 't1' }))!;
+    expect(state.tabs[0].entries).toHaveLength(MAX_HISTORY);
+    expect(serialize(state)).toContain('/sites.html/content/p399');
+  });
+});
 });

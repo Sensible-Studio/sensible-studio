@@ -56,6 +56,15 @@ export type ShellAction =
   | { type: 'focus'; tab: string; pane: 'first' | 'second' };
 
 const MAX_CLOSED = 10;
+/** How far Back goes in one tab. Without a limit a tab's history grows for as long as the tab lives, and it is saved on every move. */
+export const MAX_HISTORY = 50;
+
+/** The history around where the tab is, no longer than MAX_HISTORY. */
+export function capped<T>(entries: T[], index: number): { entries: T[]; index: number } {
+  if (entries.length <= MAX_HISTORY) return { entries, index };
+  const start = Math.max(0, Math.min(index - MAX_HISTORY + 1 + Math.min(10, entries.length - 1 - index), entries.length - MAX_HISTORY));
+  return { entries: entries.slice(start, start + MAX_HISTORY), index: index - start };
+}
 let counter = 0;
 export const newId = () => `t${Date.now().toString(36)}${(counter++).toString(36)}`;
 
@@ -114,7 +123,7 @@ export function reducer(state: ShellState, action: ShellAction): ShellState {
       const id = action.tab ?? focusedId(state);
       const current = paneOf(state, id);
       if (samePlace(placeOf(current), action.place)) return state;
-      return update(state, id, (t) => ({ ...t, entries: [...t.entries.slice(0, t.index + 1), action.place], index: t.index + 1, title: undefined }));
+      return update(state, id, (t) => ({ ...t, ...capped([...t.entries.slice(0, t.index + 1), action.place], t.index + 1), title: undefined }));
     }
     case 'replace': {
       const id = action.tab ?? focusedId(state);
@@ -245,12 +254,13 @@ export function deserialize(json: string | null): ShellState | null {
     const tabs: Tab[] = saved.tabs
       .filter((t) => t && Array.isArray(t.urls) && t.urls.length > 0 && typeof t.id === 'string')
       .map((t) => {
-        const entries = t.urls.map((u) => placeOfUrl(String(u)));
-        const tab: Tab = { id: t.id, entries, index: Math.max(0, Math.min(Number(t.index) || 0, entries.length - 1)) };
+        const all = t.urls.map((u) => placeOfUrl(String(u)));
+        // a history saved before there was a limit is cut to it here
+        const tab: Tab = { id: t.id, ...capped(all, Math.max(0, Math.min(Number(t.index) || 0, all.length - 1))) };
         if (typeof t.title === 'string' && t.title) tab.title = t.title;
         if (t.second && Array.isArray(t.second.urls) && t.second.urls.length > 0) {
           const e2 = t.second.urls.map((u) => placeOfUrl(String(u)));
-          tab.second = { entries: e2, index: Math.max(0, Math.min(Number(t.second.index) || 0, e2.length - 1)) };
+          tab.second = capped(e2, Math.max(0, Math.min(Number(t.second.index) || 0, e2.length - 1)));
           tab.focus = t.focus === 'second' ? 'second' : 'first';
         }
         return tab;
