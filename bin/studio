@@ -47,6 +47,7 @@ build_if_needed() {
 # Builds the Rust DAM service (dam-service/) and puts it where Sensible Studio's process manager looks for it:
 # instances/author/dam/bin/studio-dam. Without Rust, Sensible Studio still starts; assets just are not processed.
 install_dam_service() {
+    # The copy is made beside the old file and moved over it: macOS kills (137) a program whose file was overwritten in place.
     local src="$DIR/dam-service" bin="$DIR/dam-service/target/release/studio-dam" dest="$AUTHOR_HOME/dam/bin/studio-dam"
     if [ -n "$RELEASE" ]; then
         bin="$DIR/lib/bin/studio-dam"
@@ -55,7 +56,7 @@ install_dam_service() {
             return 0
         fi
         if [ ! -x "$dest" ] || ! cmp -s "$bin" "$dest"; then
-            mkdir -p "$(dirname "$dest")" && cp "$bin" "$dest" && chmod +x "$dest"
+            mkdir -p "$(dirname "$dest")" && cp "$bin" "$dest.new" && chmod +x "$dest.new" && mv -f "$dest.new" "$dest"
         fi
         return 0
     fi
@@ -69,7 +70,7 @@ install_dam_service() {
         (cd "$src" && cargo build --release --quiet) || { echo "⚠️  DAM service build failed"; return 0; }
     fi
     if [ ! -x "$dest" ] || ! cmp -s "$bin" "$dest"; then
-        mkdir -p "$(dirname "$dest")" && cp "$bin" "$dest" && chmod +x "$dest"
+        mkdir -p "$(dirname "$dest")" && cp "$bin" "$dest.new" && chmod +x "$dest.new" && mv -f "$dest.new" "$dest"
     fi
 }
 
@@ -127,7 +128,7 @@ studio-uberjar/studio-compat-content/studio-workflow-content
 studio-uberjar/studio-siterail/oak-index
 "
 # Weekender: the demo site of our own (a travel magazine with freely licensed photos), from its releases
-DEMO_VERSION="1.0.0"
+DEMO_VERSION="1.0.1"
 DEMO_URL="https://github.com/Sensible-Studio/weekender/releases/download/v$DEMO_VERSION/weekender.all-$DEMO_VERSION.zip"
 WKND_VERSION="4.0.4"
 WKND_URL="https://github.com/adobe/aem-guides-wknd/releases/download/aem-guides-wknd-$WKND_VERSION/aem-guides-wknd.all-$WKND_VERSION.zip"
