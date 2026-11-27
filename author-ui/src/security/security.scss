@@ -683,3 +683,11 @@ a.studio-listview__title {
     }
   }
 }
+
+// the key that does the same, shown as in the other consoles' bars
+.studio-actionbar__hint {
+  margin-left: 4px;
+  font: inherit;
+  font-size: var(--studio-type-xs, 11px);
+  color: var(--studio-text-faint);
+}

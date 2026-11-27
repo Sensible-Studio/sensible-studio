@@ -40,7 +40,7 @@ import { ErrorState, LoadingState } from '../shell/FeedbackState';
 import ProjectAdd from '@spectrum-icons/workflow/ProjectAdd';
 import { useCallback, useEffect, useMemo, useRef, useState, type Key, type MouseEvent, type ReactElement } from 'react';
 import { createDefaultRegistry, type DialogResponse, type GraniteEnv, type GraniteNode, type PostEntry } from '../granite';
-import { parentOf, type StudioClient, type SiteItem, type SiteListing } from '../editor/api/StudioClient';
+import { nameOf, parentOf, type StudioClient, type SiteItem, type SiteListing } from '../editor/api/StudioClient';
 import { ComponentDialog, type OpenDialog } from '../editor/dialogs/ComponentDialog';
 import { studioGraniteEnv } from '../editor/dialogs/graniteEnv';
 import { propertiesUrl } from '../pageprops/api';
@@ -165,6 +165,8 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
   const [creatingFolder, setCreatingFolder] = useState<string | null>(null);
   const [startingWorkflow, setStartingWorkflow] = useState<string[] | null>(null);
   const [moving, setMoving] = useState<SiteItem | null>(null);
+  /** with several selected: the others, which go along to the same place */
+  const [movingMore, setMovingMore] = useState<SiteItem[]>([]);
   // Publish / Unpublish: AEM's dialog, for the selected pages
   const [publishing, setPublishing] = useState<{ action: 'activate' | 'deactivate'; items: SiteItem[]; deep?: boolean } | null>(null);
   const replication = useMemo(() => replicationClient ?? new HttpReplicationClient(), [replicationClient]);
@@ -479,6 +481,13 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
       case 'lock':
       case 'unlock':
         if (single?.type === 'page') lock(single, action === 'lock');
+        else if (sel.length > 1 && sel.every((i) => i.type === 'page')) {
+          const want = action === 'lock';
+          const todo = sel.filter((i) => !!i.locked !== want);
+          void run(async () => {
+            for (const it of todo) await client.setPageLock(it.path, want);
+          }, `${todo.length} page${todo.length === 1 ? '' : 's'} ${want ? 'locked' : 'unlocked'}`);
+        }
         break;
       case 'languages':
         if (sel.length > 0 && sel.every((i) => i.type === 'page')) setLanguageCopiesOf(sel.map((i) => i.path));
@@ -533,7 +542,13 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
         ToastQueue.info(`${sel.length === 1 ? sel[0].title : `${sel.length} items`} copied: open the destination and Paste`, { timeout: 4000 });
         break;
       case 'move':
-        if (single) setMoving(single);
+        if (single) {
+          setMovingMore([]);
+          setMoving(single);
+        } else if (sel.length > 1) {
+          setMovingMore(sel.slice(1));
+          setMoving(sel[0]);
+        }
         break;
       case 'delete':
         if (sel.length) setDeleting(sel);
@@ -572,6 +587,8 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
     if (pages && sel.length > 1) out.push(a('edit', 'Edit', <Edit />, { shortcut: 'e' }), a('properties', 'Properties', <Properties />, { shortcut: 'p' }));
     if (page && root.path === '/content/forms') out.push(a('submissions', 'Submissions', <Inbox />, { shortcut: 's' }));
     if (page) out.push(page.locked ? a('unlock', 'Unlock', <LockOpen />) : a('lock', 'Lock', <LockClosed />));
+    // several: Lock while any of them is open, Unlock once all are locked
+    if (pages && sel.length > 1) out.push(sel.every((i) => i.locked) ? a('unlock', 'Unlock', <LockOpen />) : a('lock', 'Lock', <LockClosed />));
     if (current && isBlueprint) out.push(a('rollout', 'Sync changes', <Sync />), a('overview', 'Linked copy Overview', <ViewTree />));
     if (current && canSync) out.push(a('sync', 'Synchronize', <Sync />));
     if (pages) out.push(a('publish', 'Publish', <PublishCheck />));
@@ -596,7 +613,7 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
     // AEM's Restore ▾: a version of this page, or deleted pages below it
     if (page) out.push(a('restore-version', 'Restore Version', <History />, { group: 'Restore', groupIcon: <History /> }), a('restore-tree', 'Restore Tree', <History />, { group: 'Restore' }));
     out.push(a('copy', 'Copy', <Copy />, { shortcut: '⌘C', separator: true }));
-    if (one) out.push(a('move', 'Move', <Move />, { shortcut: 'm' }));
+    out.push(a('move', 'Move', <Move />, { shortcut: 'm' }));
     out.push(a('delete', 'Delete', <Delete />, { shortcut: '⌫', danger: true }));
     return out;
   };
@@ -849,9 +866,28 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
           <MoveDialog
             client={client}
             item={moving}
+            more={movingMore}
             onMove={(dest, name, adjust) => {
               const it = moving;
+              const others = movingMore;
               setMoving(null);
+              if (others.length > 0) {
+                // several: each to the same place under its own name; what was live follows, as for one
+                void run(async () => {
+                  let adjusted = 0;
+                  const failed: string[] = [];
+                  for (const one of [it, ...others]) {
+                    const moved = await client.movePage(one.path, dest, nameOf(one.path), adjust);
+                    adjusted += moved.adjusted ?? 0;
+                    if (moved.republishError) failed.push(one.title);
+                  }
+                  setSelected([]);
+                  if (dest !== path) navigate(dest);
+                  ToastQueue.positive(`${others.length + 1} items moved${adjusted ? `, ${adjusted} reference${adjusted === 1 ? '' : 's'} adjusted` : ''}`, { timeout: 5000 });
+                  if (failed.length) ToastQueue.negative(`${failed.join(', ')}: live, and could not be published at the new address`, { timeout: 12000 });
+                });
+                return;
+              }
               void run(async () => {
                 const moved = await client.movePage(it.path, dest, name, adjust);
                 setSelected([]);
@@ -918,7 +954,7 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
             more={creatingRelease.slice(1).map((i) => i.path)}
             onCreated={(l) => {
               setCreatingRelease(null);
-              ToastQueue.positive(`Release ${l.title} created`, { timeout: 6000, actionLabel: 'Open', onAction: () => go({ kind: 'editor', path: l.sourceInLaunch }) });
+              ToastQueue.positive(`Release ${l.title} created`, { timeout: 6000, shouldCloseOnAction: true, actionLabel: 'Open', onAction: () => go({ kind: 'editor', path: l.sourceInLaunch }) });
             }}
           />
         )}

@@ -175,6 +175,8 @@ export function Overlay(props: Props) {
     const { x, y } = point(e);
     const h = hit(x, y);
     if (h?.kind === 'editable' && h.editable.dialog) onConfigure(h.editable);
+    // on an empty drop zone a double click asks what to put there
+    else if (h?.kind === 'placeholder' && onInsertInto && !hidePlaceholder?.(h.container)) onInsertInto(h.container);
   };
 
   const onWheel = (e: React.WheelEvent) => {

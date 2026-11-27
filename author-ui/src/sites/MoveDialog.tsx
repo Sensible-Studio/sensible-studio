@@ -7,6 +7,8 @@ import { StudioDialog } from '../shell/StudioDialog';
 interface Props {
   client: StudioClient;
   item: SiteItem;
+  /** the other selected items: they go to the same place, each under its own name (renaming is for one) */
+  more?: SiteItem[];
   /** `adjust`: pages whose references to the item are rewritten */
   onMove(destParent: string, name: string, adjust: string[]): void;
 }
@@ -17,7 +19,9 @@ const NAME = /^[A-Za-z0-9_.~-]+$/;
  * Rename and/or move a page or folder: new name, destination parent below /content and which of the
  * pages referring to it get their links rewritten (all by default; links inside it always are).
  */
-export function MoveDialog({ client, item, onMove }: Props) {
+export function MoveDialog({ client, item, more = [], onMove }: Props) {
+  const all = [item, ...more];
+  const several = all.length > 1;
   const container = useDialogContainer();
   const [name, setName] = useState(nameOf(item.path));
   const [dest, setDest] = useState(parentOf(item.path));
@@ -26,7 +30,10 @@ export function MoveDialog({ client, item, onMove }: Props) {
   /** the places below the destination, for choosing it by clicking instead of typing a path */
   const [below, setBelow] = useState<SiteItem[]>([]);
   const [browsing, setBrowsing] = useState(false);
-  const refs = useReferences(client, [item.path]);
+  const refs = useReferences(
+    client,
+    all.map((i) => i.path),
+  );
   const [adjust, setAdjust] = useState<Set<string> | null>(null);
   const chosen = adjust ?? new Set((refs.pages ?? []).map((p) => p.page));
 
@@ -42,10 +49,10 @@ export function MoveDialog({ client, item, onMove }: Props) {
       client.siteChildren(d).then(
         (l) => {
           if (cancelled) return;
-          const insideItself = d === item.path || d.startsWith(`${item.path}/`);
+          const insideItself = all.some((i) => d === i.path || d.startsWith(`${i.path}/`));
           setDestOk(!insideItself);
           setDestTitle(l.item.title);
-          setBelow(l.children.filter((c) => c.path !== item.path));
+          setBelow(l.children.filter((c) => !all.some((i) => i.path === c.path)));
         },
         () => !cancelled && setDestOk(false),
       );
@@ -54,14 +61,16 @@ export function MoveDialog({ client, item, onMove }: Props) {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [client, dest, item.path]);
+    // the selection is fixed while the dialog is open
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client, dest, item.path, more.length]);
 
   const nameOk = NAME.test(name);
   const unchanged = name === nameOf(item.path) && dest.replace(/\/$/, '') === parentOf(item.path);
 
   return (
     <StudioDialog size="M">
-      <Heading>Move {item.title}</Heading>
+      <Heading>{several ? `Move ${all.length} items` : `Move ${item.title}`}</Heading>
       <Divider />
       <Content>
         <Form
@@ -73,15 +82,21 @@ export function MoveDialog({ client, item, onMove }: Props) {
             }
           }}
         >
-          <TextField
-            label="Name"
-            value={name}
-            onChange={setName}
-            isRequired
-            validationState={nameOk ? undefined : 'invalid'}
-            errorMessage="Letters, digits and - _ . ~ only"
-            autoFocus
-          />
+          {several ? (
+            <Text>
+              {all.map((i) => i.title).join(', ')}: each keeps its name.
+            </Text>
+          ) : (
+            <TextField
+              label="Name"
+              value={name}
+              onChange={setName}
+              isRequired
+              validationState={nameOk ? undefined : 'invalid'}
+              errorMessage="Letters, digits and - _ . ~ only"
+              autoFocus
+            />
+          )}
           <TextField
             label="Destination"
             description={destOk && destTitle ? `Into ${destTitle}` : undefined}
@@ -122,7 +137,7 @@ export function MoveDialog({ client, item, onMove }: Props) {
               error={refs.error}
               selected={chosen}
               onSelected={setAdjust}
-              empty="No other page refers to it. Links inside it are adjusted."
+              empty={several ? 'No other page refers to them. Links inside them are adjusted.' : 'No other page refers to it. Links inside it are adjusted.'}
             />
           </div>
         </Form>

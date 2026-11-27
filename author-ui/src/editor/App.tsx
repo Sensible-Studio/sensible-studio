@@ -1091,7 +1091,7 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
       if (!open) s.push('copy');
       if (c && !open) s.push('cut');
       if (c) s.push('delete');
-      if (c && !open && clipboard && canPasteInto(c) && !clipboard.items.some((i) => i.path === e.path)) s.push('paste');
+      if (c && !open && clipboard && canPasteInto(c) && !(clipboard.mode === 'cut' && clipboard.items.some((i) => i.path === e.path))) s.push('paste');
       if (c) s.push('insert');
       s.push('policy', open ? 'lockStructure' : 'unlockStructure');
       if (e.parent) s.push('parent');
@@ -1118,7 +1118,8 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
     if (hasPanels(e)) out.push('panelSelect');
     out.push('copy');
     if (c && !inherited) out.push('cut', 'delete');
-    if (c && clipboard && canPasteInto(c) && !clipboard.items.some((i) => i.path === e.path)) out.push('paste');
+    // a copied component offers Paste at once: pasting before itself makes the duplicate; a cut one cannot go onto itself
+    if (c && clipboard && canPasteInto(c) && !(clipboard.mode === 'cut' && clipboard.items.some((i) => i.path === e.path))) out.push('paste');
     if (c) out.push('insert');
     if (c) out.push('group');
     // MSM, like AEM: on a blueprint page every component can be rolled out on its own

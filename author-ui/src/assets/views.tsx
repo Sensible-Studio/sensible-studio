@@ -13,7 +13,7 @@ import Info from '@spectrum-icons/workflow/Info';
 import AudioIcon from '@spectrum-icons/workflow/Audio';
 import VideoOutline from '@spectrum-icons/workflow/VideoOutline';
 import LockClosed from '@spectrum-icons/workflow/LockClosed';
-import { useEffect, useState, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react';
 import { endDrag, startDrag } from '../editor/overlay/dragPayload';
 import type { AssetItem, DamClient, DamItem, FolderItem } from './api';
 import { liveCopyLabel } from './liveCopy';
@@ -255,9 +255,23 @@ export function ListView({ items, selected, onSelectOnly, onOpen, onContextMenu 
     const item = row && items.find((i) => i.path === row.dataset.key);
     if (item) onContextMenu(item, e);
   };
+  // in a narrow place (a small window, the inspector open) the list shows fewer columns whole instead of all of them cut
+  const host = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(1200);
+  useEffect(() => {
+    // the host itself takes no box (display: contents): the room is its parent's
+    const el = host.current?.parentElement;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => setWidth(el.clientWidth || 1200));
+    ro.observe(el);
+    setWidth(el.clientWidth || 1200);
+    return () => ro.disconnect();
+  }, []);
+  const columns = listColumns(width);
   return (
-    <div className="studio-assets__tablehost" onContextMenu={onMenu}>
+    <div className="studio-assets__tablehost" onContextMenu={onMenu} ref={host}>
     <TableView
+      key={columns.map((c) => c.key).join()}
       aria-label="Media"
       selectionMode="multiple"
       selectionStyle="checkbox"
@@ -272,46 +286,65 @@ export function ListView({ items, selected, onSelectOnly, onOpen, onContextMenu 
       UNSAFE_className="studio-assets__table"
       height="100%"
     >
-      <TableHeader>
-        <Column key="name" width="40%">
-          Name
-        </Column>
-        <Column key="type">Type</Column>
-        <Column key="dims">Dimensions</Column>
-        <Column key="size" align="end">
-          Size
-        </Column>
-        <Column key="status">Status</Column>
-        <Column key="modified" minWidth={136}>
-          Modified
-        </Column>
+      <TableHeader columns={columns}>
+        {(c) => (
+          <Column key={c.key} width={c.key === 'name' ? (columns.length > 3 ? '40%' : undefined) : undefined} minWidth={c.key === 'modified' ? 136 : c.key === 'name' ? 180 : undefined} align={c.key === 'size' ? 'end' : undefined}>
+            {c.label}
+          </Column>
+        )}
       </TableHeader>
       <TableBody items={items}>
         {(item) => (
           <Row key={item.path}>
-            <Cell textValue={item.title}>
-              <div className="studio-assets__row-name">
-                <Thumb item={item} src={item.type === 'asset' ? item.thumbnail : item.previews?.[0]} className="studio-assets__row-thumb" />
-                <div>
-                  <div className="studio-assets__row-title">{item.title}</div>
-                  <div className="studio-assets__row-sub">
-                    {item.name}
-                    {item.type === 'asset' && item.score !== undefined ? ` · fits ${fitLabel(item.score)}` : ''}
-                  </div>
-                </div>
-              </div>
-            </Cell>
-            <Cell>{typeLabel(item)}</Cell>
-            <Cell>{item.type === 'asset' ? dimensions(item) : ''}</Cell>
-            <Cell>{item.type === 'asset' ? formatBytes(item.size) : ''}</Cell>
-            <Cell>{item.type === 'asset' ? statusText(item) : liveCopyLabel(item.liveCopy) ?? ''}</Cell>
-            <Cell>{item.modified ? relativeTime(new Date(item.modified)) : ''}</Cell>
+            {(columnKey) => {
+              switch (columnKey) {
+                case 'name':
+                  return (
+                    <Cell textValue={item.title}>
+                      <div className="studio-assets__row-name">
+                        <Thumb item={item} src={item.type === 'asset' ? item.thumbnail : item.previews?.[0]} className="studio-assets__row-thumb" />
+                        <div>
+                          <div className="studio-assets__row-title">{item.title}</div>
+                          <div className="studio-assets__row-sub">
+                            {item.name}
+                            {item.type === 'asset' && item.score !== undefined ? ` · fits ${fitLabel(item.score)}` : ''}
+                          </div>
+                        </div>
+                      </div>
+                    </Cell>
+                  );
+                case 'type':
+                  return <Cell>{typeLabel(item)}</Cell>;
+                case 'dims':
+                  return <Cell>{item.type === 'asset' ? dimensions(item) : ''}</Cell>;
+                case 'size':
+                  return <Cell>{item.type === 'asset' ? formatBytes(item.size) : ''}</Cell>;
+                case 'status':
+                  return <Cell>{item.type === 'asset' ? statusText(item) : liveCopyLabel(item.liveCopy) ?? ''}</Cell>;
+                default:
+                  return <Cell>{item.modified ? relativeTime(new Date(item.modified)) : ''}</Cell>;
+              }
+            }}
           </Row>
         )}
       </TableBody>
     </TableView>
     </div>
   );
+}
+
+const LIST_COLUMNS = [
+  { key: 'name', label: 'Name', from: 0 },
+  { key: 'type', label: 'Type', from: 560 },
+  { key: 'dims', label: 'Dimensions', from: 900 },
+  { key: 'size', label: 'Size', from: 420 },
+  { key: 'status', label: 'Status', from: 760 },
+  { key: 'modified', label: 'Modified', from: 660 },
+] as const;
+
+/** The list's columns for a width: the name always, the others as there is room for them whole. */
+export function listColumns(width: number): Array<{ key: string; label: string }> {
+  return LIST_COLUMNS.filter((c) => width >= c.from).map(({ key, label }) => ({ key, label }));
 }
 
 function statusText(item: AssetItem): string {

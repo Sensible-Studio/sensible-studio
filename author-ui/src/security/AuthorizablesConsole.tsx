@@ -138,7 +138,7 @@ export function AuthorizablesConsole({ kind, user }: Props) {
               <ActionButton isQuiet onPress={() => go(editUrl(single))}>
                 <Properties />
                 <Text>
-                  Properties <span className="studio-actionbar__hint">(p)</span>
+                  Properties <kbd className="studio-actionbar__hint">p</kbd>
                 </Text>
               </ActionButton>
             )}

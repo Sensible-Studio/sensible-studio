@@ -351,6 +351,7 @@ export function GenerateVariations({ client }: { client: VariationsClient }) {
                 timeout: 8000,
                 actionLabel: 'Open',
                 onAction: () => navigate(`/editor.html${r.variations[0]}.html`),
+                shouldCloseOnAction: true,
               });
             }}
           />
