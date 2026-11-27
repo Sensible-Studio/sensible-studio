@@ -196,7 +196,7 @@ RewriteRule ^/(dispatcher|_live)(/|\$) - [F,L]
 RewriteRule ^/?\$ $HOME_PAGE [R=302,L]
 RewriteRule ^$ROOT/(.*)\$ /\$1 [R=301,L]
 RewriteCond %{REQUEST_URI} !^/(apps|bin|content|etc|etc\\.clientlibs|home|libs|system|tmp|var|dispatcher|_live|\\.well-known)(/|\\.|\$)
-RewriteRule ^/(.*\\.html)\$ $ROOT/\$1 [PT,L]
+RewriteRule ^/(.*\\.(?:html|webp|png|jpe?g|gif|svg))\$ $ROOT/\$1 [PT,L]
 ErrorDocument 502 "The site is not available at the moment."
 ErrorDocument 503 "The site is not available at the moment."
 <IfModule mod_headers.c>
