@@ -3,7 +3,7 @@
 <properties>
 <entry key="group">io.sensible.studio</entry>
 <entry key="name">studio-wcm-foundation</entry>
-<entry key="version">0.1.15</entry>
+<entry key="version">0.1.16</entry>
 <entry key="description">Sensible Studio's own base page component and HTL clientlib templates, at the resource types AEM components inherit from. Written for Sensible Studio; contains no Adobe content.</entry>
 <entry key="createdBy">Sensible Studio</entry>
 <entry key="packageType">application</entry>
