@@ -5,6 +5,9 @@
     <filter root="/libs/wcm/foundation/components/responsivegrid"/>
     <filter root="/libs/wcm/foundation/components/parsys"/>
     <filter root="/libs/cq/cloudserviceconfigs/components/servicelibs"/>
+    <filter root="/libs/cq/cloudserviceconfigs/components/servicecomponents"/>
+    <filter root="/libs/cq/cloudconfig/components/scripttags"/>
+    <filter root="/libs/granite/contexthub/components/contexthub"/>
     <filter root="/libs/cq/experience-fragments/components/xfpage"/>
     <filter root="/libs/cq/experience-fragments/components/experiencefragment"/>
     <filter root="/libs/cq/experience-fragments/editor/components/buildingblock"/>
