@@ -222,7 +222,8 @@ export function ModelEditor({ client, studio, path }: Props) {
         const p = String(m.PROCESS ?? '');
         if (!p) return 'No process selected';
         const label = processes && Object.entries(processes.processes).find(([l, c]) => c === p || l === p)?.[0];
-        return label ?? p.slice(p.lastIndexOf('.') + 1);
+        // the process is registered under AEM's word for the content a flow is about; the card says it in ours
+        return (label ?? p.slice(p.lastIndexOf('.') + 1)).replace('Set Payload Properties', 'Set properties on the content');
       }
       case 'participant':
         return m.PARTICIPANT ? `Assigned to ${String(m.PARTICIPANT)}` : 'No participant selected';

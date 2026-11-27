@@ -4,7 +4,7 @@
     <jcr:content
         jcr:primaryType="nt:unstructured"
         jcr:title="Request for Review"
-        jcr:description="An administrator reviews the payload and approves it or asks for changes; the decision is written to the payload as studioReviewStatus."
+        jcr:description="An administrator reviews the content and approves it or asks for changes; the decision is kept on the content as studioReviewStatus."
         cq:template="/libs/cq/workflow/templates/model"
         sling:resourceType="cq/workflow/components/pages/model">
         <flow

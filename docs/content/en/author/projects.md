@@ -68,7 +68,7 @@ A task for you shows in the **Inbox** section on [Home](../getting-started/tour.
 
 ![Home: the Inbox section with a project task and two flow steps](../images/projects-home.webp)
 
-The bell at the top right and the Inbox console count flow steps only; see [Flows and the Inbox](flows.md).
+The bell at the top right counts your open tasks together with the flow steps, and the Inbox console lists them under **Tasks from projects**; see [Flows and the Inbox](flows.md).
 
 ## Team
 

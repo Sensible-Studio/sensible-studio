@@ -17,6 +17,7 @@ export function inboxChanged() {
 export function InboxBell({ onOpen }: { onOpen?(url: string): void } = {}) {
   const [count, setCount] = useState<number | null>(null);
   const [mentions, setMentions] = useState(0);
+  const [tasks, setTasks] = useState(0);
   useEffect(() => {
     let live = true;
     const load = () =>
@@ -30,11 +31,19 @@ export function InboxBell({ onOpen }: { onOpen?(url: string): void } = {}) {
         (r) => live && setMentions(r.unread),
         () => undefined,
       );
+    // the project tasks assigned to the user: they wait in the Inbox like the steps
+    const loadTasks = () =>
+      fetch('/bin/studio/projects.json?op=mytasks', { credentials: 'same-origin' })
+        .then((r) => (r.ok ? (r.json() as Promise<{ tasks?: unknown[] }>) : null))
+        .then((d) => live && setTasks(Array.isArray(d?.tasks) ? d!.tasks!.length : 0))
+        .catch(() => undefined);
     void load();
     void loadMentions();
+    void loadTasks();
     const timer = window.setInterval(() => {
       void load();
       void loadMentions();
+      void loadTasks();
     }, POLL_MS);
     // the engine works in jobs: read again a moment after a change
     const later = () => window.setTimeout(load, 1500);
@@ -47,8 +56,8 @@ export function InboxBell({ onOpen }: { onOpen?(url: string): void } = {}) {
       window.removeEventListener(NOTIFICATIONS_CHANGED, loadMentions);
     };
   }, []);
-  const total = (count ?? 0) + mentions;
-  const parts = [count ? `${count} step${count === 1 ? '' : 's'} waiting` : '', mentions ? `${mentions} new mention${mentions === 1 ? '' : 's'}` : ''].filter(Boolean);
+  const total = (count ?? 0) + mentions + tasks;
+  const parts = [count ? `${count} step${count === 1 ? '' : 's'} waiting` : '', mentions ? `${mentions} new mention${mentions === 1 ? '' : 's'}` : '', tasks ? `${tasks} task${tasks === 1 ? '' : 's'}` : ''].filter(Boolean);
   const label = parts.length ? `Inbox: ${parts.join(', ')}` : 'Inbox';
   return (
     <TooltipTrigger>

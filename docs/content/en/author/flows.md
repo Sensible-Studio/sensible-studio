@@ -51,7 +51,7 @@ While a page is in a flow, a band in the editor says so: which flow, which step 
 
 ## The Inbox
 
-The steps waiting for you arrive in your Inbox. The bell in the top bar shows how many there are; a click on it opens the Inbox, which is also at **Home › System › Flows › Inbox**.
+The steps waiting for you arrive in your Inbox. The bell in the top bar shows how many there are, tasks from projects included; a click on it opens the Inbox, which is also at **Home › System › Flows › Inbox**.
 
 ![The Inbox with two steps](../images/flows-inbox.webp)
 
@@ -96,7 +96,11 @@ The dialog says who the step is assigned to now. Type a name in **Delegate to** 
 
 The top has the run's status, its model and version, its content, who started it and when, and the comment. The table lists each step: its status, who it was assigned to, who completed it, when it started and ended, and the comment left.
 
-Tasks from [projects](projects.md), and reminders such as a translation project's due date, arrive in the same Inbox.
+### Tasks from projects
+
+Your open tasks from [projects](projects.md) are listed below the steps, with the project, when the task is due and its priority. The bell counts them too. A click on a task opens its project, where you mark it done.
+
+![The tasks from projects, below the steps of the Inbox](../images/flows-inbox-tasks.webp)
 
 ## Follow a flow
 

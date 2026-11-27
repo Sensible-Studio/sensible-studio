@@ -15,7 +15,7 @@ export default [
   { name: 'start', steps: [{ goto: SRC }, { wait: 2500 }, pick('Arctic Surfing'), { wait: 1500 }, button('Create'), { wait: 600 }, { shot: 'flows-create-menu', keepPointer: true }, { click: { text: 'Start Flow', contains: true, last: true } }, { wait: 2000 }, { click: { text: 'Select…', closest: 'button' } }, { wait: 600 }, { shot: 'flows-start-models', keepPointer: true }, { click: { text: 'Request for Review', last: true } }, { wait: 600 },
     setField('Title', 'Arctic Surfing: new pictures'), setField('Comment', 'Please check the captions.'), { wait: 400 }, { shot: 'flows-start' }] },
   { name: 'page', steps: [{ goto: '/editor.html/content/weekender/language-masters/en/magazine/ski-touring.html' }, { wait: 4500 }, { shot: 'flows-editor' }] },
-  { name: 'inbox', steps: [{ goto: '/workflow/inbox.html' }, { wait: 3000 }, { shot: 'flows-inbox' }, row('Review content'), { wait: 1200 }, { shot: 'flows-inbox-selected' },
+  { name: 'inbox', steps: [{ goto: '/workflow/inbox.html' }, { wait: 3000 }, { shot: 'flows-inbox' }, { shot: 'flows-inbox-tasks', clip: 'section[aria-label="Project tasks"]' }, row('Review content'), { wait: 1200 }, { shot: 'flows-inbox-selected' },
     button('Complete'), { wait: 1500 }, { shot: 'flows-complete' }, { key: 'Escape' }, { wait: 600 }, button('Delegate'), { wait: 1500 }, { shot: 'flows-delegate' }, { key: 'Escape' }, { wait: 600 },
     button('Flow History'), { wait: 2000 }, { shot: 'flows-history' }] },
   { name: 'instances', steps: [{ goto: '/workflow/instances.html' }, { wait: 3000 }, { shot: 'flows-instances' }, row('Ski Touring'), { wait: 1200 }, { shot: 'flows-instances-selected' }] },

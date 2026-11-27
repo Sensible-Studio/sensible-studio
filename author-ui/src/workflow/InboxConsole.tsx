@@ -31,6 +31,7 @@ import { useNavigate, useScreenTitle, useTab } from '../shell/ShellContext';
 import { ToolBar } from '../shell/ToolCrumbs';
 import { StudioDialog } from '../shell/StudioDialog';
 import { EmptyState, ErrorState, LoadingState } from '../shell/FeedbackState';
+import { dueText, projectUrl, type MyTask } from '../projects/api';
 import { httpNotifications, mentionParts, notificationUrl, NOTIFICATIONS_CHANGED, type NotificationsClient, type StudioNotification } from '../shell/notifications';
 
 const TOOL = '/workflow/inbox.html';
@@ -45,6 +46,18 @@ export function InboxConsole({ client, user, notifications = httpNotifications }
   const go = useNavigate();
   const tab = useTab();
   const [items, setItems] = useState<InboxEntry[] | null>(null);
+  // the project tasks assigned to the user wait here too, beside the flow steps
+  const [tasks, setTasks] = useState<MyTask[]>([]);
+  useEffect(() => {
+    let live = true;
+    fetch('/bin/studio/projects.json?op=mytasks', { credentials: 'same-origin' })
+      .then((r) => (r.ok ? (r.json() as Promise<{ tasks?: MyTask[] }>) : { tasks: [] }))
+      .then((d) => live && setTasks(Array.isArray(d.tasks) ? d.tasks : []))
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, []);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [completing, setCompleting] = useState<InboxEntry | null>(null);
@@ -125,7 +138,7 @@ export function InboxConsole({ client, user, notifications = httpNotifications }
         ) : !items ? (
           <LoadingState />
         ) : items.length === 0 ? (
-          <EmptyState title="Inbox clear">Nothing waits for you.</EmptyState>
+          tasks.length === 0 ? <EmptyState title="Inbox clear">Nothing waits for you.</EmptyState> : null
         ) : (
           <div className="studio-listview">
             <table className="studio-table">
@@ -186,6 +199,42 @@ export function InboxConsole({ client, user, notifications = httpNotifications }
               </tbody>
             </table>
           </div>
+        )}
+        {tasks.length > 0 && (
+          <section className="studio-listview" aria-label="Project tasks" style={{ marginTop: 16 }}>
+            <h2 style={{ margin: 0, padding: '12px 10px 8px', fontSize: 14, fontWeight: 600 }}>Tasks from projects</h2>
+            <table className="studio-table">
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Project</th>
+                  <th>Due</th>
+                  <th>Priority</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tasks.map((task) => (
+                  <tr key={`${task.project}:${task.id}`}>
+                    <td>
+                      <a
+                        href={projectUrl(task.project.split('/').pop() ?? task.project)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          go(projectUrl(task.project.split('/').pop() ?? task.project));
+                        }}
+                      >
+                        {task.title}
+                      </a>
+                      {task.description && <div className="studio-replication__muted">{task.description}</div>}
+                    </td>
+                    <td>{task.projectTitle}</td>
+                    <td>{dueText(task.due)}</td>
+                    <td>{task.priority}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
         )}
       </main>
 

@@ -91,6 +91,24 @@ const PREVIEW = { published: 'On Preview', modified: 'Modified since sent to Pre
 const when = (iso?: string) => (iso ? ` · ${new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}` : '');
 const replication = new HttpReplicationClient();
 
+/** Whether a request for the page still waits in a publishing queue: "Published" then means asked for, not delivered. */
+function usePending(path: string, type: string, stamp?: string): boolean {
+  const [pending, setPending] = useState(false);
+  useEffect(() => {
+    let live = true;
+    setPending(false);
+    if (type !== 'page') return undefined;
+    replication.status([path]).then(
+      (s) => live && setPending(!!s[0]?.pending),
+      () => undefined,
+    );
+    return () => {
+      live = false;
+    };
+  }, [path, type, stamp]);
+  return pending;
+}
+
 /** The page on the preview instance, once it was sent there (AEM as a Cloud Service's preview URL). */
 export function OpenInPreview({ path, previewed }: { path: string; previewed?: string }) {
   const [url, setUrl] = useState<string | null>(null);
@@ -158,6 +176,7 @@ export function Inspector({ tab, onTab, onClose, client, siteRail, msm, workflow
 /** Properties at a glance, as the column preview shows them, plus the way to the full form. */
 function PropertiesPane({ client, msm, item, onChanged, onEdit, onProperties, onPublish }: { client: StudioClient; msm?: MsmClient; item: SiteItem; onChanged(): void; onEdit(item: SiteItem): void; onProperties(item: SiteItem): void; onPublish?(item: SiteItem): void }) {
   const thumb = thumbUrl(client, item);
+  const pending = usePending(item.path, item.type, item.lastPublished);
   const rows: Array<[string, string | undefined]> = [
     ['Title', item.title],
     ['Name', item.name],
@@ -166,7 +185,7 @@ function PropertiesPane({ client, msm, item, onChanged, onEdit, onProperties, on
     ['Modified by', item.lastModifiedBy],
     ['Language', item.language],
     ['Locked by', item.locked ? item.lockOwner : undefined],
-    ['Publishing', item.publication ? PUBLICATION[item.publication] + when(item.lastPublished) : 'Not published'],
+    ['Publishing', (item.publication ? PUBLICATION[item.publication] + when(item.lastPublished) : 'Not published') + (pending ? ' · waiting in the publishing queue' : '')],
     ['Preview', item.preview ? PREVIEW[item.preview] + when(item.lastPreviewed) : undefined],
   ];
   return (

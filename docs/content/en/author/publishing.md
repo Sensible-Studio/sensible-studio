@@ -53,14 +53,14 @@ When a preview has been set up, the dialog also asks for the destination:
 
 Each page in the Pages console shows its state with a dot after its title, and in words in the inspector.
 
-![A published page selected: the green dot in the list, Published with its date in the inspector](../images/publishing-states.webp)
+![A published page selected: the green dot in the list; in the inspector, Published with its date, and that a request still waits in the queue](../images/publishing-states.webp)
 
 | State | Meaning |
 |---|---|
 | **Published** (green) | The live site has the page as it is now |
 | **Modified** (orange) | The page was changed since it was published. Visitors still see the older one |
 | **Not published** (no dot) | The page has never been published, or was unpublished |
-| **Pending** | A request is waiting to be delivered |
+| **Pending** | A request is waiting to be delivered. The inspector's **Publishing** line then ends with *waiting in the publishing queue* |
 
 The inspector's **Properties** and **Timeline** tabs say when the page was last published, and by whom.
 
