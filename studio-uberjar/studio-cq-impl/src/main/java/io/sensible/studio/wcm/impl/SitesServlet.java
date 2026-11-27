@@ -154,12 +154,16 @@ public class SitesServlet extends SlingAllMethodsServlet {
             }
         } catch (WCMException | IllegalArgumentException e) {
             resolver.revert();
+            if (denied(e)) {
+                send(response, HttpServletResponse.SC_FORBIDDEN, Collections.singletonMap("error", "You are not allowed to do that here"));
+                return;
+            }
             send(response, HttpServletResponse.SC_CONFLICT, Collections.singletonMap("error", e.getMessage()));
         } catch (PersistenceException e) {
             // The repository refused (most often: no right to write there). Left to travel on as an IOException,
             // Sling took it for a client that went away and the answer was an empty 200: a failure that read as done.
             resolver.revert();
-            boolean denied = String.valueOf(e.getMessage()).contains("Access denied") || String.valueOf(e.getCause()).contains("AccessDenied");
+            boolean denied = denied(e);
             send(response, denied ? HttpServletResponse.SC_FORBIDDEN : HttpServletResponse.SC_CONFLICT,
                     Collections.singletonMap("error", denied ? "You are not allowed to do that here" : String.valueOf(e.getMessage())));
         }
@@ -799,5 +803,15 @@ public class SitesServlet extends SlingAllMethodsServlet {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Cache-Control", "no-store");
         response.getWriter().write(EditorJson.write(body));
+    }
+    /** The repository refused for lack of rights (also when wrapped): a 403 with words, not Oak's. */
+    static boolean denied(Throwable e) {
+        for (Throwable t = e; t != null; t = t.getCause() == t ? null : t.getCause()) {
+            String m = String.valueOf(t.getMessage());
+            if (t instanceof javax.jcr.AccessDeniedException || m.contains("OakAccess0000") || m.contains("Access denied")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -180,6 +180,10 @@ public class PageTranslationServlet extends SlingAllMethodsServlet {
             send(response, 502, m);
         } catch (PersistenceException e) {
             request.getResourceResolver().revert();
+            if (denied(e)) {
+                send(response, 403, error("You are not allowed to do that here"));
+                return;
+            }
             send(response, 500, error("Could not save: " + e.getMessage()));
         } finally {
             if (service != null) service.close();
@@ -292,5 +296,15 @@ public class PageTranslationServlet extends SlingAllMethodsServlet {
             }
         }
         return sb.toString();
+    }
+    /** The repository refused for lack of rights (also when wrapped): a 403 with words, not Oak's. */
+    static boolean denied(Throwable e) {
+        for (Throwable t = e; t != null; t = t.getCause() == t ? null : t.getCause()) {
+            String m = String.valueOf(t.getMessage());
+            if (t instanceof javax.jcr.AccessDeniedException || m.contains("OakAccess0000") || m.contains("Access denied")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
