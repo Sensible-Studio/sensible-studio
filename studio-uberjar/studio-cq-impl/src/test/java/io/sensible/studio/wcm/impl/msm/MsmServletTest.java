@@ -54,7 +54,7 @@ class MsmServletTest {
         assertTrue(body.contains("\"sourcePath\":\"" + BLUEPRINT + "/adventures\""), body);
         assertTrue(body.contains("\"status\":\"synced\""), body);
         assertTrue(body.contains("\"pageExclusions\":[\"jcr:.*\""), body);
-        assertTrue(body.contains("\"title\":\"Standard rollout\""), body);
+        assertTrue(body.contains("\"title\":\"Standard sync\""), body);
 
         String bp = call("GET", "op", "status", "path", BLUEPRINT).getOutputAsString();
         assertTrue(bp.contains("\"isSource\":true"), bp);

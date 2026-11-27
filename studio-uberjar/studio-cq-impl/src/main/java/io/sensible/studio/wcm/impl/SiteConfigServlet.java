@@ -6,6 +6,7 @@ package io.sensible.studio.wcm.impl;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -118,7 +119,13 @@ public class SiteConfigServlet extends SlingAllMethodsServlet {
                     }
                     manager.persistConfigurationCollection(resource, name, new ConfigurationCollectionPersistData(items));
                 } else {
-                    manager.persistConfiguration(resource, name, new ConfigurationPersistData(values(request, "p.", metadata)));
+                    Map<String, Object> values = new LinkedHashMap<>(values(request, "p.", metadata));
+                    keepWhatPublishingWrote(resource, name, values);
+                    // When it was changed, for "Changed since it was published": without it an edited
+                    // configuration read "On the live site as it is here" while the live site had the earlier one.
+                    values.put("cq:lastModified", Calendar.getInstance());
+                    values.put("cq:lastModifiedBy", request.getResourceResolver().getUserID());
+                    manager.persistConfiguration(resource, name, new ConfigurationPersistData(values));
                 }
             } else {
                 send(response, 400, error("op is save or delete"));
@@ -131,6 +138,27 @@ public class SiteConfigServlet extends SlingAllMethodsServlet {
         } catch (RuntimeException e) {
             request.getResourceResolver().revert();
             send(response, 500, error(e.getMessage()));
+        }
+    }
+
+    /**
+     * Saving replaces every property of the configuration, and with them went cq:lastReplicated and its two
+     * companions: a published configuration, once edited, read "Not published" and could not be unpublished,
+     * while the live site went on serving the earlier values.
+     */
+    private void keepWhatPublishingWrote(Resource resource, String name, Map<String, Object> values) {
+        ConfigurationData before = manager.getConfiguration(resource, name);
+        if (before == null || before.isInherited() || before.getResourcePath() == null) {
+            return;
+        }
+        Resource stored = resource.getResourceResolver().getResource(before.getResourcePath());
+        if (stored == null) {
+            return;
+        }
+        for (Map.Entry<String, Object> e : stored.getValueMap().entrySet()) {
+            if (e.getKey().startsWith("cq:lastReplicat") || e.getKey().startsWith("cq:lastPublished")) {
+                values.putIfAbsent(e.getKey(), e.getValue());
+            }
         }
     }
 
@@ -227,7 +255,9 @@ public class SiteConfigServlet extends SlingAllMethodsServlet {
         List<Map<String, Object>> out = new ArrayList<>();
         for (String property : data.getPropertyNames()) {
             ValueInfo<?> info = data.getValueInfo(property);
-            if (info == null || property.startsWith("jcr:") || property.startsWith("sling:")) {
+            // What the repository keeps about the node (jcr:, sling:, and cq:lastReplicated… once it is published)
+            // is not a setting: published configurations showed three fields more, one of them a GregorianCalendar.
+            if (info == null || property.indexOf(':') >= 0) {
                 continue;
             }
             PropertyMetadata<?> pm = info.getPropertyMetadata();

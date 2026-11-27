@@ -106,6 +106,24 @@ describe('site configurations', () => {
     expect((screen.getByRole('button', { name: 'Publish' }) as HTMLButtonElement).disabled).toBe(true);
   });
 
+  it('says a configuration is being taken off the live site, and asks again until it is', async () => {
+    const on = { path: DETAIL.resourcePath!, published: true, activated: true, pending: false };
+    const leaving = { ...on, published: false, activated: false, pending: true };
+    const off = { ...leaving, pending: false };
+    const status = vi.fn().mockResolvedValueOnce([on]).mockResolvedValue([off]);
+    const replication = { status, activate: vi.fn(), deactivate: vi.fn(() => Promise.resolve([leaving])) };
+    render(
+      <Provider theme={defaultTheme}>
+        <SiteConfigConsole client={client()} path="/content/wknd/en" onPath={() => undefined} replication={replication} />
+      </Provider>,
+    );
+    expect(await screen.findByText(/On the live site as it is here/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Unpublish' }));
+    expect(await screen.findByText(/Being taken off the live site/)).toBeTruthy();
+    expect(await screen.findByText(/Not published from this author/, undefined, { timeout: 4000 })).toBeTruthy();
+    expect(status).toHaveBeenCalledTimes(2);
+  });
+
   it('offers no publishing for what is inherited', async () => {
     const replication = { status: vi.fn(() => Promise.resolve([])), activate: vi.fn(), deactivate: vi.fn() };
     render(

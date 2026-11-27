@@ -272,8 +272,19 @@ public class TargetingServlet extends SlingAllMethodsServlet {
             return false;
         }
         try {
-            String at = s.nodeExists(conf + "/settings") ? conf + "/settings" : conf;
-            return s.nodeExists(at) && s.hasPermission(at, Session.ACTION_ADD_NODE + "," + Session.ACTION_SET_PROPERTY);
+            if (!s.nodeExists(conf)) {
+                return false;
+            }
+            // Asked where the settings are written, not at <conf>/settings: a template author is allowed
+            // below settings/cloudsettings only, and was told "You may not change it" about what he may.
+            String at = conf;
+            for (String name : ContextHubConfig.SUBPATH.substring(1).split("/")) {
+                at = at + "/" + name;
+                if (!s.nodeExists(at)) {
+                    return s.hasPermission(at, Session.ACTION_ADD_NODE);
+                }
+            }
+            return s.hasPermission(at + "/store", Session.ACTION_ADD_NODE) && s.hasPermission(at + "/title", Session.ACTION_SET_PROPERTY);
         } catch (RepositoryException e) {
             return false;
         }

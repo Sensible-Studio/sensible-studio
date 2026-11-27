@@ -2,7 +2,7 @@ import { ActionButton, Button, DialogTrigger, NumberField, ProgressCircle, Switc
 import Add from '@spectrum-icons/workflow/Add';
 import Close from '@spectrum-icons/workflow/Close';
 import Refresh from '@spectrum-icons/workflow/Refresh';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useNavigate, useScreenTitle, useTab } from '../shell/ShellContext';
 import { ToolBar } from '../shell/ToolCrumbs';
 import '../sites/sites.scss';
@@ -196,6 +196,26 @@ function Live({ replication, detail, dirty }: { replication?: Publishing; detail
       live = false;
     };
   }, [replication, own, detail]);
+  // While it travels, ask again: "On its way" stayed on the screen long after it had arrived. Not for ever:
+  // a target that is down keeps it on its way for as long as it is down.
+  const pending = !!state?.pending;
+  const asked = useRef(0);
+  useEffect(() => {
+    if (!pending) asked.current = 0;
+    if (!replication || !own || !pending || asked.current >= 15) return;
+    let live = true;
+    const timer = setTimeout(() => {
+      asked.current += 1;
+      replication.status([own]).then(
+        (s) => live && setState({ published: !!s[0]?.published, activated: !!s[0]?.activated, pending: !!s[0]?.pending }),
+        () => undefined,
+      );
+    }, 2000);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [replication, own, pending, state]);
   if (!replication || !own) return null;
   const run = (work: Promise<Array<{ published: boolean; activated?: boolean; pending: boolean }>>, what: string) => {
     setBusy(true);
@@ -214,7 +234,9 @@ function Live({ replication, detail, dirty }: { replication?: Publishing; detail
   const words = !state
     ? 'Checking the live site…'
     : state.pending
-      ? 'On its way to the live site.'
+      ? state.activated
+        ? 'On its way to the live site.'
+        : 'Being taken off the live site.'
       : state.published
         ? 'On the live site as it is here.'
         : state.activated
