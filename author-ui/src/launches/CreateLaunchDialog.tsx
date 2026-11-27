@@ -87,7 +87,7 @@ export function CreateLaunchDialog({ client, msm, source, sourceTitle, more = []
         >
           <TextField label="Release title" value={title} onChange={setTitle} isRequired autoFocus />
           <TextField label="Description" value={description} onChange={setDescription} />
-          <TextField type="datetime-local" label="Live date" value={liveDate} onChange={setLiveDate} description={ready && liveDate ? 'When the release goes live by itself' : 'When the release is meant to go live (for information; promotion is manual)'} />
+          <TextField type="datetime-local" label="Live date" value={liveDate} onChange={setLiveDate} description={ready && liveDate ? 'When the release goes live by itself' : 'When the release is meant to go live (for information; going live is manual)'} />
           <Checkbox isSelected={ready && !!liveDate} onChange={setReady} isDisabled={!liveDate}>
             Production ready: go live and publish by itself at the live date
           </Checkbox>

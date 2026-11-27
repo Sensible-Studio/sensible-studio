@@ -1,9 +1,10 @@
-import { ActionButton, Button, DialogContainer, Text, ToastQueue, ToggleButton, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ActionButton, AlertDialog, Button, DialogContainer, Text, ToastQueue, ToggleButton, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import Add from '@spectrum-icons/workflow/Add';
 import Clock from '@spectrum-icons/workflow/Clock';
 import Delete from '@spectrum-icons/workflow/Delete';
 import Edit from '@spectrum-icons/workflow/Edit';
 import Launch from '@spectrum-icons/workflow/Launch';
+import Properties from '@spectrum-icons/workflow/Properties';
 import Refresh from '@spectrum-icons/workflow/Refresh';
 import { useCallback, useEffect, useState } from 'react';
 import type { StudioClient } from '../editor/api/StudioClient';
@@ -11,6 +12,7 @@ import type { MsmClient } from '../msm/MsmClient';
 import { ProductBar } from '../shell/ProductBar';
 import { editorUrl, formatDate, type Launch as LaunchInfo, type LaunchesClient } from './api';
 import { CreateLaunchDialog } from './CreateLaunchDialog';
+import { LaunchPropertiesDialog } from './LaunchPropertiesDialog';
 import { PromoteLaunchDialog } from './PromoteLaunchDialog';
 import { SourcePickerDialog } from './SourcePickerDialog';
 import { useNavigate, useTab } from '../shell/ShellContext';
@@ -37,6 +39,8 @@ export function LaunchesConsole({ client, msm, studio }: Props) {
   const [picking, setPicking] = useState(false);
   const [creating, setCreating] = useState<{ source: string; title: string } | null>(null);
   const [promoting, setPromoting] = useState<LaunchInfo | null>(null);
+  const [editing, setEditing] = useState<LaunchInfo | null>(null);
+  const [deleting, setDeleting] = useState<LaunchInfo | null>(null);
 
   useEffect(() => {
     studio.currentUser().then(setUser, () => setUser(null));
@@ -114,7 +118,7 @@ export function LaunchesConsole({ client, msm, studio }: Props) {
                     {l.createdBy && <div className="studio-replication__muted">by {l.createdBy}</div>}
                   </td>
                   <td>
-                    {l.promoted ? <span className="studio-replication__ok">Promoted {formatDate(l.promoted)}</span> : l.productionReady && !l.autoError ? `Goes live by itself ${formatDate(l.liveDate)}` : 'In progress'}
+                    {l.promoted ? <span className="studio-replication__ok">Went live {formatDate(l.promoted)}</span> : l.productionReady && !l.autoError ? `Goes live by itself ${formatDate(l.liveDate)}` : 'In progress'}
                     {l.autoError && (
                       <div className="studio-publish__error" role="alert">
                         {l.promoted ? 'Not published' : 'Did not go live'}: {l.autoError}
@@ -127,6 +131,12 @@ export function LaunchesConsole({ client, msm, studio }: Props) {
                         <Edit />
                       </ActionButton>
                       <Tooltip>Open in the page editor</Tooltip>
+                    </TooltipTrigger>
+                    <TooltipTrigger delay={400}>
+                      <ActionButton isQuiet aria-label="Properties" onPress={() => setEditing(l)}>
+                        <Properties />
+                      </ActionButton>
+                      <Tooltip>Title, description and live date</Tooltip>
                     </TooltipTrigger>
                     {!l.promoted && (
                       <TooltipTrigger delay={400}>
@@ -157,19 +167,7 @@ export function LaunchesConsole({ client, msm, studio }: Props) {
                       <Tooltip>Go live</Tooltip>
                     </TooltipTrigger>
                     <TooltipTrigger delay={400}>
-                      <ActionButton
-                        isQuiet
-                        aria-label="Delete"
-                        onPress={() =>
-                          client.remove(l.path).then(
-                            () => {
-                              load();
-                              ToastQueue.positive(`Release "${l.title}" deleted`, { timeout: 3000 });
-                            },
-                            (e: unknown) => ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 }),
-                          )
-                        }
-                      >
+                      <ActionButton isQuiet aria-label="Delete" onPress={() => setDeleting(l)}>
                         <Delete />
                       </ActionButton>
                       <Tooltip>Delete</Tooltip>
@@ -194,6 +192,30 @@ export function LaunchesConsole({ client, msm, studio }: Props) {
       </DialogContainer>
       <DialogContainer onDismiss={() => setCreating(null)}>
         {creating && <CreateLaunchDialog client={client} msm={msm} source={creating.source} sourceTitle={creating.title} onCreated={load} />}
+      </DialogContainer>
+      <DialogContainer onDismiss={() => setEditing(null)}>{editing && <LaunchPropertiesDialog client={client} launch={editing} onSaved={load} />}</DialogContainer>
+      <DialogContainer onDismiss={() => setDeleting(null)}>
+        {deleting && (
+          <AlertDialog
+            title="Delete release"
+            variant="destructive"
+            primaryActionLabel="Delete"
+            cancelLabel="Cancel"
+            onPrimaryAction={() => {
+              const l = deleting;
+              client.remove(l.path).then(
+                () => {
+                  load();
+                  ToastQueue.positive(`Release "${l.title}" deleted`, { timeout: 3000 });
+                },
+                (e: unknown) => ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 }),
+              );
+            }}
+          >
+            Delete the release “{deleting.title}”? Its copies of the pages{deleting.pages ? ` (${deleting.pages})` : ''} and everything changed in them are deleted. The pages of the site are not
+            touched.
+          </AlertDialog>
+        )}
       </DialogContainer>
       <DialogContainer onDismiss={() => setPromoting(null)}>{promoting && <PromoteLaunchDialog client={client} launch={promoting} onDone={load} />}</DialogContainer>
     </div>

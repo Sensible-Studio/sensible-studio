@@ -10,6 +10,11 @@ interface Props {
   onPick(path: string, title: string): void;
 }
 
+/** What lies beside the sites under /content and holds no pages to release: the other consoles' roots and Sling's samples. */
+const NOT_PAGES = new Set(
+  ['launches', 'cq:tags', 'cq:graphql', 'dam', 'experience-fragments', 'forms', 'projects', 'campaigns', 'usergenerated', 'htl', 'slingshot', 'starter'].map((n) => `/content/${n}`),
+);
+
 /** Picks the source page of a new launch: a path field and a small page browser under /content. */
 export function SourcePickerDialog({ studio, onPick }: Props) {
   const dialog = useDialogContainer();
@@ -21,7 +26,7 @@ export function SourcePickerDialog({ studio, onPick }: Props) {
     let live = true;
     setItems(null);
     studio.listChildren(folder).then(
-      (list) => live && setItems(list.filter((i) => i.type === 'cq:Page' || i.type?.endsWith('Folder')).filter((i) => !i.path.startsWith('/content/launches'))),
+      (list) => live && setItems(list.filter((i) => i.type === 'cq:Page' || i.type?.endsWith('Folder')).filter((i) => !NOT_PAGES.has(i.path))),
       () => live && setItems([]),
     );
     return () => {
@@ -41,7 +46,7 @@ export function SourcePickerDialog({ studio, onPick }: Props) {
             <span key={i}>
               {i > 0 && ' / '}
               <button type="button" className="studio-launch__crumb" onClick={() => setFolder('/' + crumbs.slice(0, i + 1).join('/'))}>
-                {c}
+                {i === 0 ? 'Pages' : c}
               </button>
             </span>
           ))}

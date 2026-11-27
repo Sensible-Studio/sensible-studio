@@ -64,7 +64,9 @@ export function PromoteLaunchDialog({ client, launch, page, onDone }: Props) {
             <Radio value="pageAndSubpages">This page and the pages below it</Radio>
           </RadioGroup>
         )}
-        <Checkbox isSelected={modifiedOnly} onChange={setModifiedOnly} marginTop="size-100" isDisabled={busy}>
+        {/* one under the other: side by side they wrapped as they pleased */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 8 }}>
+        <Checkbox isSelected={modifiedOnly} onChange={setModifiedOnly} isDisabled={busy}>
           Only the pages changed in the release
         </Checkbox>
         <Checkbox isSelected={publish} onChange={setPublish} isDisabled={busy}>
@@ -73,6 +75,7 @@ export function PromoteLaunchDialog({ client, launch, page, onDone }: Props) {
         <Checkbox isSelected={remove} onChange={setRemove} isDisabled={busy}>
           Delete the release afterwards
         </Checkbox>
+        </div>
         <div className="studio-launch__pages">
           {pages === null ? (
             <ProgressCircle size="S" isIndeterminate aria-label="Loading pages" />

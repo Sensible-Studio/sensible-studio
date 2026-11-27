@@ -150,7 +150,7 @@ export function TopBar(props: Props) {
                   <Item key="workflow">Start Flow</Item>,
                 ]}
               </Section>,
-              <Section key="launches" title={launch ? `Launch: ${launch.title}` : 'Releases'}>
+              <Section key="launches" title={launch ? `Release: ${launch.title}` : 'Releases'}>
                 {launch
                   ? [<Item key="promoteLaunch">Go live</Item>, ...(launch.source ? [<Item key="openLaunchSource">Open Source Page</Item>] : [])]
                   : [
