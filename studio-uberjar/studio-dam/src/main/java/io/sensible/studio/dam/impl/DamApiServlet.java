@@ -1443,7 +1443,7 @@ public class DamApiServlet extends SlingAllMethodsServlet {
             }
             try {
                 for (String p : live) {
-                    replicatorNow.replicate(session, com.day.cq.replication.ReplicationActionType.DEACTIVATE, p);
+                    replicatorNow.replicate(session, com.day.cq.replication.ReplicationActionType.DELETE, p);
                 }
             } catch (com.day.cq.replication.ReplicationException e) {
                 throw new ApiException(409, live.get(0) + " is published and could not be unpublished (" + e.getMessage()
@@ -1466,7 +1466,8 @@ public class DamApiServlet extends SlingAllMethodsServlet {
     /** Whether the file, or any file below the folder, is published now. */
     static boolean hasPublished(Resource r) {
         Resource content = r.getChild("jcr:content");
-        if (content != null && "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction", String.class))) {
+        if (content != null && ("Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction", String.class))
+                || "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction_preview", String.class)))) {
             return true;
         }
         if (r.isResourceType("dam:Asset") || "dam:Asset".equals(r.getValueMap().get("jcr:primaryType", String.class))) {

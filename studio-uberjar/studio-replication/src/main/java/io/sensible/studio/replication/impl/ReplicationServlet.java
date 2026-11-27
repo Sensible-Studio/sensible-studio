@@ -345,7 +345,7 @@ public class ReplicationServlet extends SlingAllMethodsServlet {
                 error(response, HttpServletResponse.SC_NOT_FOUND, "Unknown op");
             }
         } catch (ReplicationException e) {
-            error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            error(response, e instanceof ReplicatorImpl.NotAllowed ? HttpServletResponse.SC_FORBIDDEN : HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (RepositoryException | PersistenceException e) {
             error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }

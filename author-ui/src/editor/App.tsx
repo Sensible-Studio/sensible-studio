@@ -410,7 +410,9 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
       });
     }
     if (data?.page.locked && data.page.lockOwner && data.page.lockOwner !== currentUser) {
-      out.push({ id: 'lock', variant: 'warning', title: `This page is locked by ${data.page.lockOwner}.`, text: 'It cannot be edited until it is unlocked.' });
+      out.push({ id: 'lock', variant: 'warning', title: `This page is locked by ${data.page.lockOwner}.`, text: 'It cannot be edited or published until it is unlocked.' });
+    } else if (data?.page.canEdit === false) {
+      out.push({ id: 'reader', variant: 'info', title: 'You can read this page, not change it.', text: 'Your account has no right to edit here: what you change would not be saved.' });
     }
     if (launchInfo?.launch) {
       const l = launchInfo.launch;

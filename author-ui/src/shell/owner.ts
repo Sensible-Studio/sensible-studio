@@ -24,14 +24,25 @@ export function takeOver(store: Store, user: string | null | undefined): boolean
   return true;
 }
 
-/** Asks who is signed in, once at start; when the browser's tabs were somebody else's, starts again at Home. */
+let handedOver = false;
+/** True from the moment the kept tabs were found to be somebody else's until the page has started again: nothing is kept meanwhile. */
+export const keepsNothing = () => handedOver;
+
+/**
+ * Asks who is signed in, once at start; when the browser's tabs were somebody else's, starts again at the address
+ * the person asked for, with that one tab. (The shell had already read the other person's tabs and would write
+ * them back at its next move: {@link keepsNothing} stops that until the page is loaded anew.)
+ */
 export function watchOwner(win: Window = window): void {
   void win
     .fetch('/libs/granite/security/currentuser.json', { credentials: 'same-origin', headers: { Accept: 'application/json' } })
     .then((r) => (r.ok ? (r.json() as Promise<{ authorizableId?: string }>) : null))
     .then((u) => {
       try {
-        if (takeOver(win.localStorage, u?.authorizableId)) win.location.replace('/studio/start.html');
+        if (takeOver(win.localStorage, u?.authorizableId)) {
+          handedOver = true;
+          win.location.reload();
+        }
       } catch {
         /* a browser without storage keeps nothing to hand over */
       }

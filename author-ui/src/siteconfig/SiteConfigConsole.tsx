@@ -47,6 +47,9 @@ export function valuesOf(properties: ConfigProperty[]): Values {
   return out;
 }
 
+/** The site a path belongs to: the page right below `/content`. */
+export const siteOf = (path: string): string | null => /^\/content\/[^/]+/.exec(path)?.[0] ?? null;
+
 export function SiteConfigConsole({ client, path, onPath: go, replication }: Props) {
   const navigate = useNavigate();
   const tab = useTab();
@@ -57,6 +60,7 @@ export function SiteConfigConsole({ client, path, onPath: go, replication }: Pro
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [detail, setDetail] = useState<ConfigDetail | null>(null);
+  const [making, setMaking] = useState(false);
 
   useEffect(() => setTyped(path), [path]);
 
@@ -127,7 +131,33 @@ export function SiteConfigConsole({ client, path, onPath: go, replication }: Pro
                   {list.contextPaths.length > 1 && <> (inside {list.contextPaths.slice(1).map((c) => c).join(', ')})</>}. What you set applies to it and everything below.
                 </>
               ) : (
-                <>No site configuration applies here: none of its ancestors names one (<code>sling:configRef</code>). The values shown are the global ones and the defaults; saving is not possible.</>
+                <>
+                  This site has no configuration of its own yet: the values shown are the global ones and the defaults, and nothing can be saved.
+                  {siteOf(path) && (
+                    <span className="studio-siteconfig__make">
+                      <Button
+                        variant="secondary"
+                        isDisabled={making}
+                        onPress={() => {
+                          setMaking(true);
+                          client.createContext(path).then(
+                            () => {
+                              setMaking(false);
+                              ToastQueue.positive(`${siteOf(path)} has a configuration of its own now`, { timeout: 4000 });
+                              load();
+                            },
+                            (e: unknown) => {
+                              setMaking(false);
+                              ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 });
+                            },
+                          );
+                        }}
+                      >
+                        Give {siteOf(path)} a configuration
+                      </Button>
+                    </span>
+                  )}
+                </>
               )}
             </p>
           )}

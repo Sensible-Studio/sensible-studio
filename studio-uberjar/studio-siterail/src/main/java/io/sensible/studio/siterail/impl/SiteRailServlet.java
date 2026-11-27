@@ -324,7 +324,7 @@ public class SiteRailServlet extends SlingAllMethodsServlet {
                     }
                     try {
                         for (String p : live) {
-                            rep.replicate(r.getResourceResolver().adaptTo(javax.jcr.Session.class), ReplicationActionType.DEACTIVATE, p);
+                            rep.replicate(r.getResourceResolver().adaptTo(javax.jcr.Session.class), ReplicationActionType.DELETE, p);
                         }
                     } catch (ReplicationException e) {
                         throw new IllegalArgumentException(live.get(0) + " is published and could not be unpublished (" + e.getMessage() + "); nothing was deleted");
@@ -343,7 +343,8 @@ public class SiteRailServlet extends SlingAllMethodsServlet {
     /** Whether the page or any page below it is published now. */
     static boolean hasPublished(Resource r) {
         Resource content = r.getChild("jcr:content");
-        if (content != null && "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction", String.class))) {
+        if (content != null && ("Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction", String.class))
+                || "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction_preview", String.class)))) {
             return true;
         }
         for (Resource c : r.getChildren()) {

@@ -38,6 +38,7 @@ function client(over: Partial<SiteConfigClient> = {}): SiteConfigClient {
     save: vi.fn(() => Promise.resolve(DETAIL)),
     saveItems: vi.fn(() => Promise.resolve(DETAIL)),
     remove: vi.fn(() => Promise.resolve(DETAIL)),
+    createContext: vi.fn(() => Promise.resolve(LIST)),
     ...over,
   };
 }
@@ -84,7 +85,7 @@ describe('site configurations', () => {
         <SiteConfigConsole client={c} path="/content" onPath={() => undefined} />
       </Provider>,
     );
-    expect(await screen.findByText(/No site configuration applies here/)).toBeTruthy();
+    expect(await screen.findByText(/has no configuration of its own yet/)).toBeTruthy();
     const field = (await screen.findByLabelText('Site name')) as HTMLInputElement;
     fireEvent.change(field, { target: { value: 'x' } });
     expect((screen.getByRole('button', { name: 'Save' }) as HTMLButtonElement).disabled).toBe(true);
@@ -122,6 +123,20 @@ describe('site configurations', () => {
     expect(await screen.findByText(/Being taken off the live site/)).toBeTruthy();
     expect(await screen.findByText(/Not published from this author/, undefined, { timeout: 4000 })).toBeTruthy();
     expect(status).toHaveBeenCalledTimes(2);
+  });
+
+  it('gives a site without a configuration one of its own', async () => {
+    const none = { ...LIST, contextPath: null, contextPaths: [] };
+    const list = vi.fn().mockResolvedValueOnce(none).mockResolvedValue(LIST);
+    const c = client({ list });
+    render(
+      <Provider theme={defaultTheme}>
+        <SiteConfigConsole client={c} path="/content/shop/en" onPath={() => undefined} />
+      </Provider>,
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Give /content/shop a configuration' }));
+    await waitFor(() => expect(c.createContext).toHaveBeenCalledWith('/content/shop/en'));
+    expect(await screen.findByText(/Belongs to the site at/)).toBeTruthy();
   });
 
   it('offers no publishing for what is inherited', async () => {

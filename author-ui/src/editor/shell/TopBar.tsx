@@ -281,7 +281,7 @@ export function TopBar(props: Props) {
           </TooltipTrigger>
         )}
         {!template && !launch && (
-          <Button variant="accent" onPress={() => onPageAction('publish')}>
+          <Button variant="accent" isDisabled={page?.canPublish === false} onPress={() => onPageAction('publish')}>
             Publish
           </Button>
         )}

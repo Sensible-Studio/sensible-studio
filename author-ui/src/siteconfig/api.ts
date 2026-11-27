@@ -75,6 +75,8 @@ export interface SiteConfigClient {
   save(path: string, name: string, values: Values): Promise<ConfigDetail>;
   saveItems(path: string, name: string, items: Array<{ name: string; values: Values }>): Promise<ConfigDetail>;
   remove(path: string, name: string): Promise<ConfigDetail>;
+  /** Gives the site of `path` a configuration of its own (`/conf/<site>`, named on the site's root page). */
+  createContext(path: string): Promise<ConfigList>;
 }
 
 /** The form body of a save: `p.<property>` once per value; nothing for a value not set. */
@@ -126,6 +128,10 @@ export class HttpSiteConfigClient implements SiteConfigClient {
       encodeValues(body, `i.${k}.p.`, item.values);
     });
     return this.post<ConfigDetail>(body);
+  }
+
+  createContext(path: string) {
+    return this.post<ConfigList>(new URLSearchParams({ op: 'createContext', path }));
   }
 
   remove(path: string, name: string) {

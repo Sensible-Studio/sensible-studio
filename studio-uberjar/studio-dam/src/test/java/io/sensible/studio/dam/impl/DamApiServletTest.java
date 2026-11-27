@@ -754,7 +754,7 @@ class DamApiServletTest {
                 java.util.Arrays.asList("/content/dam/wknd/alps.png", "/content/dam/wknd/surf.jpg"), rep);
         assertEquals(List.of("/content/dam/wknd/surf.jpg"), r.get("unpublished"));
         assertEquals(1, calls.size());
-        assertTrue(calls.get(0).toUpperCase().contains("DEACTIVATE") && calls.get(0).endsWith("/content/dam/wknd/surf.jpg"), calls.get(0));
+        assertTrue(calls.get(0).toUpperCase().contains("DELETE") && calls.get(0).endsWith("/content/dam/wknd/surf.jpg"), calls.get(0));
         assertNull(resolver.getResource("/content/dam/wknd/surf.jpg"));
     }
 

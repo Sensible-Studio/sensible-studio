@@ -257,7 +257,8 @@
 
 .studio-theme .studio-topbar {
   display: grid;
-  grid-template-columns: auto minmax(260px, 1fr) auto auto auto;
+  // the page's name gives way first: at 260px it pushed Full screen and Close out of a window narrower than 850px
+  grid-template-columns: auto minmax(120px, 1fr) auto auto auto;
   gap: var(--studio-space-4);
   height: 56px;
   padding: 0 var(--studio-space-4);

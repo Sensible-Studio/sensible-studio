@@ -19,6 +19,7 @@ import { newTabPlace, readNewTab, storeNewTab, type NewTabPref } from './prefs';
 import { readTheme, storeTheme, THEMES, type ThemeId } from '../theme/pref';
 import { recordVisit } from './recent';
 import { readSidebar, Sidebar, storeSidebar, takesSidebar } from './Sidebar';
+import { keepsNothing } from './owner';
 import { boot, canBack, canForward, deserialize, focusedId, HOME, isSecond, paneId, paneOf, placeOf, reducer, serialize, STORAGE_KEY, tabIdOf, tabOf, type Pane, type ShellAction, type ShellState, type Tab } from './tabs';
 import { KEEP_ALIVE, MAX_BACKGROUND_EDITORS, SHELL_KINDS, View } from './views';
 import './shell.scss';
@@ -73,7 +74,7 @@ export function Shell({ client, initial }: Props) {
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(STORAGE_KEY, serialize(state));
+      if (!keepsNothing()) window.localStorage.setItem(STORAGE_KEY, serialize(state));
     } catch {
       /* private window: the tabs live for this page only */
     }

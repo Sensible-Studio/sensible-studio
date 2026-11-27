@@ -17,6 +17,9 @@ import javax.servlet.Servlet;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ResourceResolver;
+import org.apache.sling.api.resource.PersistenceException;
+import org.apache.sling.api.resource.ModifiableValueMap;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.apache.sling.caconfig.management.ConfigurationCollectionData;
 import org.apache.sling.caconfig.management.ConfigurationData;
@@ -95,6 +98,10 @@ public class SiteConfigServlet extends SlingAllMethodsServlet {
             return;
         }
         String op = request.getParameter("op");
+        if ("createContext".equals(op)) {
+            createContext(resource, response);
+            return;
+        }
         String name = request.getParameter("name");
         if (name == null || name.isEmpty()) {
             send(response, 400, error("name is missing"));
@@ -159,6 +166,53 @@ public class SiteConfigServlet extends SlingAllMethodsServlet {
             if (e.getKey().startsWith("cq:lastReplicat") || e.getKey().startsWith("cq:lastPublished")) {
                 values.putIfAbsent(e.getKey(), e.getValue());
             }
+        }
+    }
+
+    /**
+     * A site made here had no configuration of its own, and nothing in the product could give it one: Site
+     * configurations (the data layer, the analytics scripts) said "no site configuration applies" and stopped.
+     * This makes {@code /conf/<site>} with its {@code sling:configs} and names it on the site's root page.
+     */
+    private void createContext(Resource resource, SlingHttpServletResponse response) throws IOException {
+        ResourceResolver resolver = resource.getResourceResolver();
+        String[] parts = resource.getPath().split("/");
+        if (parts.length < 3 || !"content".equals(parts[1])) {
+            send(response, 400, error("A site is a page below /content"));
+            return;
+        }
+        if (contexts.getContextPath(resource) != null) {
+            send(response, 409, error(resource.getPath() + " belongs to a site configuration already"));
+            return;
+        }
+        Resource root = resolver.getResource("/content/" + parts[2]);
+        Resource content = root == null ? null : root.getChild("jcr:content");
+        Resource confs = resolver.getResource("/conf");
+        if (content == null || confs == null) {
+            send(response, 409, error("/content/" + parts[2] + " is not a page"));
+            return;
+        }
+        try {
+            Resource conf = confs.getChild(parts[2]);
+            if (conf == null) {
+                Map<String, Object> props = new LinkedHashMap<>();
+                props.put("jcr:primaryType", "sling:Folder");
+                props.put("jcr:title", content.getValueMap().get("jcr:title", parts[2]));
+                conf = resolver.create(confs, parts[2], props);
+            }
+            if (conf.getChild("sling:configs") == null) {
+                resolver.create(conf, "sling:configs", java.util.Collections.singletonMap("jcr:primaryType", (Object) "sling:Folder"));
+            }
+            ModifiableValueMap page = content.adaptTo(ModifiableValueMap.class);
+            if (page == null) {
+                throw new PersistenceException("not allowed");
+            }
+            page.put("sling:configRef", conf.getPath());
+            resolver.commit();
+            send(response, 200, list(resource));
+        } catch (PersistenceException | RuntimeException e) {
+            resolver.revert();
+            send(response, 403, error("You are not allowed to do that here"));
         }
     }
 

@@ -673,7 +673,7 @@ public class SitesServlet extends SlingAllMethodsServlet {
                     if (r == null) {
                         throw new ReplicationException("Publishing is not available on this instance");
                     }
-                    r.replicate(session, ReplicationActionType.DEACTIVATE, path);
+                    r.replicate(session, ReplicationActionType.DELETE, path);
                     r.replicate(session, ReplicationActionType.ACTIVATE, live.toArray(new String[0]), new ReplicationOptions());
                     out.put("republished", live);
                 } catch (ReplicationException e) {

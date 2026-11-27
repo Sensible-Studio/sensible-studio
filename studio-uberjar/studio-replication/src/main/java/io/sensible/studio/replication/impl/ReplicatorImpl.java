@@ -77,6 +77,19 @@ public class ReplicatorImpl implements Replicator {
             throw new ReplicationException("Nothing to replicate");
         }
         ReplicationOptions o = options == null ? new ReplicationOptions() : options;
+        if (type == ReplicationActionType.DELETE && o.getFilter() == AgentFilter.DEFAULT) {
+            // What is deleted (or moved away) leaves every tier. Unpublishing is the publish tier's alone, so a page
+            // that had been sent to Preview stayed there for good once it was deleted on the author.
+            replicateAs(session, ReplicationActionType.DEACTIVATE, paths, o, user);
+            if (hasPreview()) {
+                ReplicationOptions preview = new ReplicationOptions();
+                preview.setFilter(Tiers.filter(Tiers.PREVIEW));
+                preview.setSynchronous(o.isSynchronous());
+                preview.setSuppressStatusUpdate(o.isSuppressStatusUpdate());
+                replicateAs(session, ReplicationActionType.DEACTIVATE, paths, preview, user);
+            }
+            return;
+        }
         // the default (every enabled agent) is the publish tier: the preview tier gets only what is sent to it
         AgentFilter filter = o.getFilter() == AgentFilter.DEFAULT ? Tiers.filter(null) : o.getFilter();
         List<Agent> targets = new ArrayList<>();
@@ -216,10 +229,27 @@ public class ReplicatorImpl implements Replicator {
                 allowed = acm.hasPrivileges(existing, new Privilege[] {acm.privilegeFromName(Privilege.JCR_WRITE)});
             }
             if (!allowed) {
-                throw new ReplicationException(session.getUserID() + " may not replicate " + path);
+                throw new NotAllowed("You are not allowed to publish " + path);
+            }
+            // a page somebody else locked is theirs to publish, as it is theirs to change
+            String content = existing + "/jcr:content/studio:lockOwner";
+            if (existing.equals(path) && session.propertyExists(content)) {
+                String owner = session.getProperty(content).getString();
+                if (!owner.isEmpty() && !owner.equals(session.getUserID())) {
+                    throw new NotAllowed("This page is locked by " + owner + ". It can be published again once it is unlocked.");
+                }
             }
         } catch (RepositoryException e) {
             throw new ReplicationException("Cannot check replication rights on " + path + ": " + e.getMessage(), e);
+        }
+    }
+
+    /** A refusal for want of the right: a 403 with words for the person, not a 400 naming "replicate". */
+    static final class NotAllowed extends ReplicationException {
+        private static final long serialVersionUID = 1L;
+
+        NotAllowed(String message) {
+            super(message);
         }
     }
 }

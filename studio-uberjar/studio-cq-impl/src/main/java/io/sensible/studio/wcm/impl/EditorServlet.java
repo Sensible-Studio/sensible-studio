@@ -481,6 +481,8 @@ public class EditorServlet extends SlingAllMethodsServlet {
         m.put("locked", page.isLocked());
         m.put("lockOwner", page.getLockOwner());
         m.put("canUnlock", page.canUnlock());
+        m.put("canEdit", may(page, false));
+        m.put("canPublish", may(page, true));
         m.put("language", page.getLanguage().toLanguageTag());
         ValueMap cv = page.getContentResource() == null ? ValueMap.EMPTY : page.getContentResource().getValueMap();
         m.put("lastReplicated", iso(cv.get("cq:lastReplicated", Calendar.class)));
@@ -732,5 +734,37 @@ public class EditorServlet extends SlingAllMethodsServlet {
     private static void error(SlingHttpServletResponse response, int status, String message) throws IOException {
         response.setStatus(status);
         send(response, Collections.singletonMap("error", message == null ? "" : message));
+    }
+
+    /**
+     * Whether the signed-in user may change the page's content, or publish it. The editor opened for a reader
+     * with every tool and a Publish button, and each of them ended in a refusal.
+     */
+    private static boolean may(Page page, boolean publish) {
+        org.apache.sling.api.resource.Resource content = page.getContentResource();
+        javax.jcr.Session session = content == null ? null : content.getResourceResolver().adaptTo(javax.jcr.Session.class);
+        if (session == null) {
+            return true;
+        }
+        String owner = page.getLockOwner();
+        if (owner != null && !owner.equals(session.getUserID())) {
+            return false;
+        }
+        try {
+            boolean write = session.hasPermission(content.getPath() + "/jcr:title", javax.jcr.Session.ACTION_SET_PROPERTY)
+                    && session.hasPermission(content.getPath() + "/root/new", javax.jcr.Session.ACTION_ADD_NODE);
+            if (!publish) {
+                return write;
+            }
+            javax.jcr.security.AccessControlManager acm = session.getAccessControlManager();
+            try {
+                return acm.hasPrivileges(page.getPath(), new javax.jcr.security.Privilege[] {acm.privilegeFromName("crx:replicate")}) || write;
+            } catch (javax.jcr.security.AccessControlException e) {
+                return write;
+            }
+        } catch (javax.jcr.RepositoryException | RuntimeException e) {
+            // not known: the server still judges every change
+            return true;
+        }
     }
 }

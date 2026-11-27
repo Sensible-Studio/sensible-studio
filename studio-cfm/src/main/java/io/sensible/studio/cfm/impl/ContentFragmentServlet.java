@@ -168,7 +168,7 @@ public class ContentFragmentServlet extends SlingAllMethodsServlet {
             throw new IllegalArgumentException(path + " is published and publishing is not available here to take it down; nothing was deleted");
         }
         try {
-            r.replicate(session, com.day.cq.replication.ReplicationActionType.DEACTIVATE, path);
+            r.replicate(session, com.day.cq.replication.ReplicationActionType.DELETE, path);
         } catch (com.day.cq.replication.ReplicationException e) {
             throw new IllegalArgumentException(path + " is published and could not be unpublished (" + e.getMessage() + "); nothing was deleted");
         }
@@ -177,7 +177,8 @@ public class ContentFragmentServlet extends SlingAllMethodsServlet {
 
     static boolean published(org.apache.sling.api.resource.Resource asset) {
         org.apache.sling.api.resource.Resource content = asset.getChild("jcr:content");
-        return content != null && "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction", String.class));
+        return content != null && ("Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction", String.class))
+                || "Activate".equalsIgnoreCase(content.getValueMap().get("cq:lastReplicationAction_preview", String.class)));
     }
 
     @Override

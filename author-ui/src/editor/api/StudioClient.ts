@@ -85,6 +85,9 @@ export interface PageInfo {
   locked: boolean;
   lockOwner?: string;
   canUnlock?: boolean;
+  /** What the signed-in user may do with the page; absent (an older server): everything is offered. */
+  canEdit?: boolean;
+  canPublish?: boolean;
   language?: string;
   /** Replication status, as AEM records it on the page. */
   lastReplicated?: string;
