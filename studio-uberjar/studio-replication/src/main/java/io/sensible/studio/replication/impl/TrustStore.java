@@ -299,6 +299,10 @@ public class TrustStore implements ResourceChangeListener {
         } catch (javax.net.ssl.SSLHandshakeException e) {
             out.put("trusted", false);
             out.put("message", seen.isEmpty() ? e.getMessage() : reason(e));
+        } catch (java.net.SocketTimeoutException e) {
+            // the certificate was accepted (the handshake is behind us) and then the server said nothing
+            out.put("trusted", !seen.isEmpty());
+            out.put("message", seen.isEmpty() ? "The server did not answer in time" : "The certificate is trusted; the server did not answer the request in time");
         } catch (IOException | GeneralSecurityException | RuntimeException e) {
             out.put("trusted", false);
             out.put("message", e.getMessage() == null ? e.toString() : e.getMessage());

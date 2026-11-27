@@ -309,6 +309,11 @@ public class SitesServlet extends SlingAllMethodsServlet {
         m.put("name", r.getName());
         m.put("title", titleOf(r, pm));
         m.put("canCreate", mayAddBelow(r.getResourceResolver(), r.getPath()));
+        boolean write = may(r.getResourceResolver(), r.getPath() + (r.getChild("jcr:content") != null ? "/jcr:content" : "") + "/jcr:title",
+                javax.jcr.Session.ACTION_SET_PROPERTY);
+        m.put("canEdit", write);
+        m.put("canDelete", may(r.getResourceResolver(), r.getPath(), javax.jcr.Session.ACTION_REMOVE));
+        m.put("canPublish", mayPublish(r.getResourceResolver(), r.getPath(), write));
         boolean hasChildren = false;
         for (Resource c : r.getChildren()) {
             if (isListed(c)) {
@@ -842,14 +847,33 @@ public class SitesServlet extends SlingAllMethodsServlet {
      * let the refusal say so. Without a JCR session (tests on mocks), or when it cannot be told: yes.
      */
     static boolean mayAddBelow(org.apache.sling.api.resource.ResourceResolver resolver, String path) {
+        return may(resolver, path + "/studio-probe", javax.jcr.Session.ACTION_ADD_NODE);
+    }
+
+    /** Whether the signed-in user may do {@code action} at {@code path}; yes when it cannot be told. */
+    static boolean may(org.apache.sling.api.resource.ResourceResolver resolver, String path, String action) {
         javax.jcr.Session session = resolver == null ? null : resolver.adaptTo(javax.jcr.Session.class);
         if (session == null) {
             return true;
         }
         try {
-            return session.hasPermission(path + "/studio-probe", javax.jcr.Session.ACTION_ADD_NODE);
+            return session.hasPermission(path, action);
         } catch (javax.jcr.RepositoryException | RuntimeException e) {
             return true;
+        }
+    }
+
+    /** Publishing is a right of its own (crx:replicate); where it is not known, whoever may change may publish. */
+    static boolean mayPublish(org.apache.sling.api.resource.ResourceResolver resolver, String path, boolean write) {
+        javax.jcr.Session session = resolver == null ? null : resolver.adaptTo(javax.jcr.Session.class);
+        if (session == null) {
+            return true;
+        }
+        try {
+            javax.jcr.security.AccessControlManager acm = session.getAccessControlManager();
+            return acm.hasPrivileges(path, new javax.jcr.security.Privilege[] {acm.privilegeFromName("crx:replicate")}) || write;
+        } catch (javax.jcr.RepositoryException | RuntimeException e) {
+            return write;
         }
     }
 }

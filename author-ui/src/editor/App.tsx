@@ -198,13 +198,19 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
   goRef.current = go;
   // Somebody else saved this page since it was read here: said once, nothing refused (their change is on the page
   // already, this author's too; what the screen shows of theirs is as old as its last load).
+  const reloadAllRef = useRef<() => void>(() => undefined);
   useEffect(() => {
     const onChanged = (e: Event) => {
       const d = (e as CustomEvent<{ page: string; by: string; at: string }>).detail;
       if (!d || d.page !== pagePath) return;
       const at = new Date(d.at);
       const when = Number.isNaN(at.getTime()) ? '' : ` at ${at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-      ToastQueue.info(`${d.by} changed this page${when}, while you had it open. Your change is saved; reload to see theirs.`, { timeout: 12000 });
+      ToastQueue.info(`${d.by} changed this page${when}, while you had it open. Your change is saved; reload to see theirs.`, {
+        timeout: 15000,
+        actionLabel: 'Reload',
+        onAction: () => reloadAllRef.current(),
+        shouldCloseOnAction: true,
+      });
     };
     window.addEventListener(CHANGED_ELSEWHERE, onChanged);
     return () => window.removeEventListener(CHANGED_ELSEWHERE, onChanged);
@@ -514,6 +520,10 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
     panelsRef.current = rememberPanels(treeRef.current);
     win.location.reload();
   }, []);
+  reloadAllRef.current = () => {
+    void loadData();
+    reloadFrame();
+  };
 
   const onFrameLoad = () => {
     const frame = frameRef.current;

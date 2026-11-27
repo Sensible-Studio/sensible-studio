@@ -156,6 +156,10 @@ export interface PageListItem {
 export interface SiteItem {
   /** Whether the signed-in user may add a page or a folder below it; absent (an older server): offered. */
   canCreate?: boolean;
+  /** What else the signed-in user may do with it; absent (an older server): offered. */
+  canEdit?: boolean;
+  canDelete?: boolean;
+  canPublish?: boolean;
   path: string;
   name: string;
   title: string;

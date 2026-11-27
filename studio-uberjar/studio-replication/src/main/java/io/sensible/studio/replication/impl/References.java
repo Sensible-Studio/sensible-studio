@@ -78,6 +78,9 @@ final class References {
             if (published) {
                 continue;
             }
+            if (s == null && cameWithTheInstallation(rr.getResource(top))) {
+                continue;
+            }
             Map<String, Object> m = new LinkedHashMap<>();
             m.put("path", top);
             m.put("type", top.startsWith("/content/dam/") ? "asset" : top.startsWith("/content/experience-fragments/") ? "experience-fragment"
@@ -102,6 +105,22 @@ final class References {
             out.add(m);
         }
         return out;
+    }
+
+    /**
+     * A template the installation itself brought (a package of the install folder, which every instance has) and
+     * nobody has changed is on the publish instances as well, though it was never published: the first page of a
+     * new site offered its template as "Not published", ticked.
+     */
+    static boolean cameWithTheInstallation(Resource r) {
+        if (r == null || !r.getPath().startsWith("/conf/")
+                || !"sling-package-install".equals(r.getValueMap().get("jcr:createdBy", String.class))) {
+            return false;
+        }
+        Resource content = r.getChild("jcr:content");
+        java.util.Calendar created = r.getValueMap().get("jcr:created", java.util.Calendar.class);
+        java.util.Calendar modified = content == null ? null : content.getValueMap().get("cq:lastModified", java.util.Calendar.class);
+        return modified == null || (created != null && !modified.after(created));
     }
 
     /** The pictures of {@code r} when it is an image set ({@code jcr:content/studio:imageSet}); nothing otherwise. */

@@ -89,7 +89,8 @@ export function ToolBar({ url, title, extra, onGo, children, end, primary, onClo
       actions={end}
       primary={primary}
       onClose={closable ? onClose ?? (() => navigate(SYSTEM)) : undefined}
-      closeLabel={closeLabel ?? 'Close settings'}
+      // named after the tool, as the tab's own close button is: "Close settings" said nothing of which
+      closeLabel={closeLabel ?? `Close ${title ?? toolOf(url)?.tool.title ?? 'settings'}`}
     />
   );
 }

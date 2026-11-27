@@ -37,4 +37,24 @@ class ReferencesTest {
         References.setMembers(null, needed);
         assertTrue(needed.isEmpty());
     }
+
+    @Test
+    void aTemplateTheInstallationBroughtIsOnEveryInstance() {
+        java.util.Calendar then = java.util.Calendar.getInstance();
+        then.add(java.util.Calendar.DAY_OF_YEAR, -3);
+        java.util.Calendar later = java.util.Calendar.getInstance();
+        context.create().resource("/conf/global/settings/wcm/templates/page", "jcr:createdBy", "sling-package-install", "jcr:created", then);
+        context.create().resource("/conf/global/settings/wcm/templates/page/jcr:content", "jcr:title", "Content page");
+        context.create().resource("/conf/site/settings/wcm/templates/changed", "jcr:createdBy", "sling-package-install", "jcr:created", then);
+        context.create().resource("/conf/site/settings/wcm/templates/changed/jcr:content", "cq:lastModified", later);
+        context.create().resource("/conf/site/settings/wcm/templates/mine", "jcr:createdBy", "ana", "jcr:created", then);
+        context.create().resource("/content/site/page", "jcr:createdBy", "sling-package-install", "jcr:created", then);
+        var rr = context.resourceResolver();
+        assertTrue(References.cameWithTheInstallation(rr.getResource("/conf/global/settings/wcm/templates/page")));
+        // changed since, made by a person, not a configuration, not there
+        assertTrue(!References.cameWithTheInstallation(rr.getResource("/conf/site/settings/wcm/templates/changed")));
+        assertTrue(!References.cameWithTheInstallation(rr.getResource("/conf/site/settings/wcm/templates/mine")));
+        assertTrue(!References.cameWithTheInstallation(rr.getResource("/content/site/page")));
+        assertTrue(!References.cameWithTheInstallation(null));
+    }
 }

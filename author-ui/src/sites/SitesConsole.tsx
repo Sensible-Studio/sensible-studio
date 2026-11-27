@@ -132,6 +132,20 @@ export const sitesUrl = (path: string) => `/sites.html${path}`;
  * and folders below /content, an action bar for the selection (Edit, Properties, Lock, Copy, Move,
  * Delete), Paste, and Create Page from the templates allowed at that place.
  */
+const canMakeHere = (item: { canCreate?: boolean }) => item.canCreate !== false;
+
+const CHANGES = new Set(['lock', 'unlock', 'rollout', 'sync', 'version', 'create-page', 'create-site', 'create-livecopy', 'release', 'restore-version', 'restore-tree', 'flow', 'languages', 'translate']);
+const PUBLISHES = new Set(['publish', 'publish-tree', 'unpublish']);
+const REMOVES = new Set(['move', 'delete']);
+
+/** Whether an action is one the signed-in user may take on every selected item (the server says per item; when it does not, yes). */
+export function allowedFor(id: string, sel: Array<Pick<SiteItem, 'canEdit' | 'canDelete' | 'canPublish'>>): boolean {
+  if (CHANGES.has(id)) return sel.every((i) => i.canEdit !== false);
+  if (PUBLISHES.has(id)) return sel.every((i) => i.canPublish !== false);
+  if (REMOVES.has(id)) return sel.every((i) => i.canDelete !== false);
+  return true;
+}
+
 export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: siteRailClient, replication: replicationClient }: Props) {
   const registry = useMemo(() => createDefaultRegistry(), []);
   const msm = useMemo(() => msmClient ?? new HttpMsmClient(), [msmClient]);
@@ -616,7 +630,8 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
     out.push(a('copy', 'Copy', <Copy />, { shortcut: '⌘C', separator: true }));
     out.push(a('move', 'Move', <Move />, { shortcut: 'm' }));
     out.push(a('delete', 'Delete', <Delete />, { shortcut: '⌫', danger: true }));
-    return out;
+    // what the person may not do with these is not offered: a reader had every action, each ending in a refusal
+    return out.filter((x) => allowedFor(x.id, sel));
   };
   const actions = selection.length ? actionsFor(selection) : [];
   useRegisterActions(tab?.id, selection.length ? { subject: single ? single.title : `${selection.length} items`, actions } : null);
@@ -661,6 +676,8 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
 
   // ------------------------------------------------------------------------------------------ render
 
+  // an installation with nothing in it: say where a first site comes from, not only that there is none
+  const emptyLabels = current?.item.path === '/content' ? { empty: canMakeHere(current.item) ? 'No site yet. Create \u203a Site makes the first one.' : 'No site yet.' } : undefined;
   const canCreate = (current?.item.path === '/content' || current?.item.type === 'page' || current?.item.type === 'folder') && current?.item.canCreate !== false;
   // Create ▾ follows the place: experience fragments are made as fragments (with their master variation), and
   // inside one what is made is a variation; folders go into folders
@@ -765,11 +782,11 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
           ) : !current ? (
             <LoadingState />
           ) : view === 'column' ? (
-            <ColumnView client={client} msm={msm} onChanged={refresh} listings={listings} trail={trail} current={current} selected={selected} onOpen={(i) => navigate(i.path)} onToggle={toggle} onContextMenu={onItemMenu} renderBadge={renderBadge} renderIcon={renderIcon} renderPreview={inspector && selection.length > 0 ? () => null : undefined} />
+            <ColumnView labels={emptyLabels} client={client} msm={msm} onChanged={refresh} listings={listings} trail={trail} current={current} selected={selected} onOpen={(i) => navigate(i.path)} onToggle={toggle} onContextMenu={onItemMenu} renderBadge={renderBadge} renderIcon={renderIcon} renderPreview={inspector && selection.length > 0 ? () => null : undefined} />
           ) : view === 'list' ? (
-            <ListView client={client} items={current.children} selected={selected} onOpen={(i) => (i.hasChildren ? navigate(i.path) : i.type === 'page' ? edit(i) : navigate(i.path))} onToggle={toggle} onContextMenu={onItemMenu} renderBadge={renderBadge} renderIcon={renderIcon} />
+            <ListView labels={emptyLabels} client={client} items={current.children} selected={selected} onOpen={(i) => (i.hasChildren ? navigate(i.path) : i.type === 'page' ? edit(i) : navigate(i.path))} onToggle={toggle} onContextMenu={onItemMenu} renderBadge={renderBadge} renderIcon={renderIcon} />
           ) : (
-            <CardView client={client} items={current.children} selected={selected} onOpen={(i) => (i.hasChildren ? navigate(i.path) : i.type === 'page' ? edit(i) : navigate(i.path))} onToggle={toggle} onContextMenu={onItemMenu} renderBadge={renderBadge} renderIcon={renderIcon} />
+            <CardView labels={emptyLabels} client={client} items={current.children} selected={selected} onOpen={(i) => (i.hasChildren ? navigate(i.path) : i.type === 'page' ? edit(i) : navigate(i.path))} onToggle={toggle} onContextMenu={onItemMenu} renderBadge={renderBadge} renderIcon={renderIcon} />
           )}
         </main>
         {/* details are of what is ticked: with nothing selected there is no panel and no button for it */}

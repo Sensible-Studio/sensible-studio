@@ -198,7 +198,7 @@ function PropertiesPane({ client, msm, item, onChanged, onEdit, onProperties, on
             <Text>Edit</Text>
           </Button>
           {onPublish && (
-            <Button variant="secondary" onPress={() => onPublish(item)}>
+            <Button variant="secondary" isDisabled={item.canPublish === false} onPress={() => onPublish(item)}>
               <Text>Publish</Text>
             </Button>
           )}

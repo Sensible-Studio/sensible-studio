@@ -115,6 +115,15 @@ public class TrustStoreServlet extends SlingAllMethodsServlet {
                         error(response, HttpServletResponse.SC_CONFLICT, "There is a certificate called " + name + " already");
                         return;
                     }
+                    // the same certificate under a second name is trusted no more than once, and listed twice
+                    String pem = TrustStore.pem(certs.get(i));
+                    for (Resource other : root.getChildren()) {
+                        if (pem.equals(other.getValueMap().get(TrustStore.CERTIFICATE, String.class))) {
+                            rr.revert();
+                            error(response, HttpServletResponse.SC_CONFLICT, "This certificate is trusted already, as " + other.getName());
+                            return;
+                        }
+                    }
                     Map<String, Object> props = new LinkedHashMap<>();
                     props.put("jcr:primaryType", "nt:unstructured");
                     props.put(TrustStore.CERTIFICATE, TrustStore.pem(certs.get(i)));
