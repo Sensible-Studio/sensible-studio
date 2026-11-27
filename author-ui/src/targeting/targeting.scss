@@ -559,3 +559,6 @@ table.studio-audiences__table { width: calc(100% - 48px); }
   display: grid;
   gap: 4px;
 }
+
+// Where the report's numbers were counted: a line above the table, on the table's own margin.
+.studio-activities__counted { margin: var(--studio-space-4, 12px) 24px 0; font-size: 13px; }

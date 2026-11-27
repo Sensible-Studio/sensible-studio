@@ -91,13 +91,23 @@ export interface ExperienceStats {
   days: DayStats[];
 }
 
+/** A live instance the author asked for its counters (visitors are counted there, not on the author). */
+export interface StatsSource {
+  id: string;
+  title: string;
+  ok: boolean;
+  error?: string;
+}
+
 export interface TargetInfo {
   path: string;
   targeted: boolean;
   experiences: Experience[];
   goal?: Goal;
   mode?: TargetMode;
+  /** the author's own counters plus what every live instance counted */
   stats?: Record<string, ExperienceStats>;
+  statsSources?: StatsSource[];
 }
 
 /** One row of the activity report: a targeted component on a page with its counters. */
@@ -222,8 +232,11 @@ export interface TargetingClient {
   setGoal(path: string, goal: Goal): Promise<TargetInfo>;
   /** by audience, or an A/B test with these shares (experience name → percent, adding up to 100) */
   setSplit(path: string, mode: TargetMode, shares: Record<string, number>): Promise<TargetInfo>;
-  resetStats(path: string): Promise<void>;
+  /** Clears the counters here and on the live instances; the instances that could not be reached. */
+  resetStats(path: string): Promise<string[] | void>;
   activities(root: string): Promise<Activity[]>;
+  /** The activities with the live instances their counters came from. */
+  activityReport?(root: string): Promise<{ activities: Activity[]; sources: StatsSource[] }>;
   redirects(pagePath: string): Promise<Redirect[]>;
   setRedirects(pagePath: string, redirects: Redirect[]): Promise<Redirect[]>;
   /** ContextHub's configuration for a page or a configuration */
@@ -323,11 +336,16 @@ export class HttpTargetingClient implements TargetingClient {
   }
 
   async resetStats(path: string) {
-    await this.post<unknown>({ op: 'resetStats', path });
+    return (await this.post<{ notReset?: string[] }>({ op: 'resetStats', path })).notReset ?? [];
   }
 
   async activities(root: string) {
-    return (await this.get<{ activities: Activity[] }>({ op: 'activities', path: root })).activities;
+    return (await this.activityReport(root)).activities;
+  }
+
+  async activityReport(root: string) {
+    const r = await this.get<{ activities: Activity[]; statsSources?: StatsSource[] }>({ op: 'activities', path: root });
+    return { activities: r.activities, sources: r.statsSources ?? [] };
   }
 
   async redirects(pagePath: string) {
@@ -347,6 +365,16 @@ export const GOAL_TYPES: Array<{ id: GoalType; label: string; hint: string }> = 
 ];
 
 /** The totals of a target over its experiences. */
+/** Where the numbers of a report come from, in a sentence; `warn` when an instance did not answer. */
+export function countedOn(sources: StatsSource[] | undefined): { text: string; warn: boolean } | null {
+  if (!sources) return null;
+  if (sources.length === 0) return { text: 'Counted on this instance only: no publishing target delivers to a live instance.', warn: false };
+  const down = sources.filter((s) => !s.ok);
+  if (down.length === 0) return { text: sources.length === 1 ? 'Counted on the live site.' : `Counted on the live site: ${sources.length} instances, added up.`, warn: false };
+  const names = down.map((s) => s.title).join(', ');
+  return { text: `${names} did not answer: what ${down.length === 1 ? 'it' : 'they'} counted is missing from these numbers.`, warn: true };
+}
+
 export function totals(stats: Record<string, ExperienceStats> | undefined): ExperienceStats {
   const t: ExperienceStats = { impressions: 0, conversions: 0, rate: 0, days: [] };
   for (const s of Object.values(stats ?? {})) {

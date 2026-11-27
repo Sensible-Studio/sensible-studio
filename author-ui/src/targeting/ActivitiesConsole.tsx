@@ -5,7 +5,7 @@ import Undo from '@spectrum-icons/workflow/Undo';
 import { useCallback, useEffect, useState } from 'react';
 import type { StudioClient } from '../editor/api/StudioClient';
 import { ProductBar } from '../shell/ProductBar';
-import { GOAL_TYPES, totals, type Activity, type TargetingClient } from './api';
+import { countedOn, GOAL_TYPES, totals, type Activity, type StatsSource, type TargetingClient } from './api';
 import { Link, useNavigate, useTab } from '../shell/ShellContext';
 import { ToolBar } from '../shell/ToolCrumbs';
 import { EmptyState, ErrorState, LoadingState } from '../shell/FeedbackState';
@@ -43,11 +43,13 @@ export function ActivitiesConsole({ client, studio, initialRoot }: Props) {
       .catch(() => setRoots(['/content']));
   }, [studio]);
 
+  const [sources, setSources] = useState<StatsSource[] | undefined>(undefined);
   const load = useCallback(() => {
     setRows(null);
-    client.activities(root).then(
+    (client.activityReport ? client.activityReport(root) : client.activities(root).then((activities) => ({ activities, sources: undefined }))).then(
       (r) => {
-        setRows(r);
+        setRows(r.activities);
+        setSources(r.sources);
         setError(null);
       },
       (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
@@ -68,12 +70,15 @@ export function ActivitiesConsole({ client, studio, initialRoot }: Props) {
 
   const reset = (a: Activity) =>
     client.resetStats(a.path).then(
-      () => {
+      (missed) => {
         load();
-        ToastQueue.positive('Report reset', { timeout: 3000 });
+        if (missed && missed.length > 0) ToastQueue.negative(`Not reset on ${missed.join(', ')}: the instance did not answer`, { timeout: 8000 });
+        else ToastQueue.positive('Report reset', { timeout: 3000 });
       },
       (e: unknown) => ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 }),
     );
+
+  const counted = countedOn(sources);
 
   return (
     <div className="studio-sites studio-activities">
@@ -96,7 +101,8 @@ export function ActivitiesConsole({ client, studio, initialRoot }: Props) {
       <main className="studio-sites__content">
         {error && <ErrorState title="Could not load activities">{error}</ErrorState>}
         {!rows && !error && <LoadingState label="Loading activities" />}
-        {rows && rows.length === 0 && <EmptyState title="No activities">No personalized components exist under {root}. In the page editor, select a component and use Target.</EmptyState>}
+        {rows && rows.length === 0 && <EmptyState title="No activities">No personalized components exist under {root}. In the page editor, select a component and use Personalize.</EmptyState>}
+        {rows && rows.length > 0 && counted && <p className={`studio-targeting__hint studio-activities__counted${counted.warn ? ' studio-targeting__hint--problem' : ''}`}>{counted.text}</p>}
         {rows && rows.length > 0 && (
           <table className="studio-audiences__table studio-activities__table studio-table">
             <thead>

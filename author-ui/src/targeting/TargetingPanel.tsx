@@ -3,7 +3,7 @@ import Add from '@spectrum-icons/workflow/Add';
 import Delete from '@spectrum-icons/workflow/Delete';
 import Edit from '@spectrum-icons/workflow/Edit';
 import { useCallback, useEffect, useState } from 'react';
-import { describe, evenShares, GOAL_TYPES, segmentName, sharesProblem, totals, type TargetMode, type Experience, type Goal, type GoalType, type Redirect, type Segment, type TargetInfo, type TargetingClient } from './api';
+import { countedOn, describe, evenShares, GOAL_TYPES, segmentName, sharesProblem, totals, type TargetMode, type Experience, type Goal, type GoalType, type Redirect, type Segment, type TargetInfo, type TargetingClient } from './api';
 import { RedirectsSection } from './RedirectsSection';
 import { SegmentDialog } from './SegmentDialog';
 import { StudioDialog } from '../shell/StudioDialog';
@@ -392,6 +392,7 @@ function GoalSection({ client, target, onChanged }: { client: TargetingClient; t
   }, [target.path, saved.type, saved.value, saved.activity]);
   const dirty = type !== saved.type || value !== (saved.value ?? '') || activity !== (saved.activity ?? '');
   const sum = totals(target.stats);
+  const counted = countedOn(target.statsSources);
   const run = async (work: () => Promise<void>, done: string) => {
     setBusy(true);
     try {
@@ -429,6 +430,8 @@ function GoalSection({ client, target, onChanged }: { client: TargetingClient; t
       </div>
       <div className="studio-targeting__report" aria-label="Activity report">
         <h4>Report</h4>
+        {counted && sum.impressions > 0 && <p className={`studio-targeting__hint${counted.warn ? ' studio-targeting__hint--problem' : ''}`}>{counted.text}</p>}
+        {counted?.warn && sum.impressions === 0 && <p className="studio-targeting__hint studio-targeting__hint--problem">{counted.text}</p>}
         {sum.impressions === 0 ? (
           <p className="studio-targeting__hint">Nothing counted yet. Impressions and conversions are counted on the live site (not in the editor or preview).</p>
         ) : (
@@ -463,7 +466,17 @@ function GoalSection({ client, target, onChanged }: { client: TargetingClient; t
               </tbody>
             </table>
             <div className="studio-targeting__buttons">
-              <Button variant="secondary" isDisabled={busy} onPress={() => void run(async () => { await client.resetStats(target.path); onChanged(await client.target(target.path)); }, 'Report reset')}>
+              <Button
+                variant="secondary"
+                isDisabled={busy}
+                onPress={() =>
+                  void run(async () => {
+                    const missed = (await client.resetStats(target.path)) ?? [];
+                    if (missed.length > 0) ToastQueue.negative(`Not reset on ${missed.join(', ')}: the instance did not answer`, { timeout: 8000 });
+                    onChanged(await client.target(target.path));
+                  }, 'Report reset')
+                }
+              >
                 Reset report
               </Button>
             </div>
