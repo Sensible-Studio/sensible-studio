@@ -56,6 +56,19 @@ export function GraphQLConsole({ client }: { client: GraphQLClient }) {
 
   // the global endpoint is /conf/global's: that one is never free
   const free = useMemo(() => confs.filter((c) => !endpoints?.some((e) => (e.conf ?? 'global') === nameOfConf(c.path))), [confs, endpoints]);
+  // configurations that have persisted queries and no endpoint: the queries run, and nothing here showed them
+  const orphans = useMemo(() => {
+    const names = [...new Set(persisted.map((q) => q.conf))];
+    return names.filter((n) => n && !endpoints?.some((e) => e.conf === n));
+  }, [persisted, endpoints]);
+  const createFor = (conf: string, title: string) =>
+    client.createEndpoint(conf, title).then(
+      () => {
+        ToastQueue.positive(`Endpoint ${title} created`, { timeout: 3000 });
+        load();
+      },
+      (e: unknown) => ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 }),
+    );
   const confTitle = (conf: string | null) => (conf ? confs.find((c) => nameOfConf(c.path) === conf)?.title ?? conf : 'All configurations');
   const copy = (text: string) =>
     navigator.clipboard?.writeText(`${window.location.origin}${text}`).then(
@@ -145,6 +158,34 @@ export function GraphQLConsole({ client }: { client: GraphQLClient }) {
                         )}
                       </KeyValueRow>
                     )}
+                  </KeyValueList>
+                </SettingsCard>
+              );
+            })}
+            {orphans.map((conf) => {
+              const queries = persisted.filter((q) => q.conf === conf);
+              const title = `${confTitle(conf)} Endpoint`;
+              return (
+                <SettingsCard
+                  key={`orphan:${conf}`}
+                  title={confTitle(conf)}
+                  description={`No endpoint. Its persisted ${queries.length === 1 ? 'query still runs' : 'queries still run'} at /graphql/execute.json, but cannot be opened or tried here until the configuration has an endpoint.`}
+                  actions={
+                    <Button variant="secondary" style="outline" onPress={() => void createFor(conf, title)}>
+                      <Add />
+                      <Text>Create endpoint</Text>
+                    </Button>
+                  }
+                >
+                  <KeyValueList>
+                    <KeyValueRow label="Configuration">{`/conf/${conf}`}</KeyValueRow>
+                    <KeyValueRow label="Persisted queries">
+                      <span className="studio-gql-console__queries">
+                        {queries.map((q) => (
+                          <span key={q.path}>{q.name}</span>
+                        ))}
+                      </span>
+                    </KeyValueRow>
                   </KeyValueList>
                 </SettingsCard>
               );
