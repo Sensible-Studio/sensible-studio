@@ -34,6 +34,7 @@ import { RecordCard, RecordIcon, RecordModelIcon } from '../shell/recordIcons';
 import Folder from '@spectrum-icons/workflow/Folder';
 import { StudioDialog, StudioConfirmDialog } from '../shell/StudioDialog';
 import { ScreenFrame } from '../shell/ScreenFrame';
+import { SelectionBar } from '../shell/SelectionBar';
 import { ErrorState, LoadingState } from '../shell/FeedbackState';
 
 interface Props {
@@ -222,41 +223,31 @@ export function CfModels({ client, initialPath, studio = STUB_STUDIO }: Props) {
   return (
     <div className="studio-cfc">
       {!tab && <ProductBar user={user} />}
-      <ScreenFrame
-        identity={<PathCrumbs crumbs={trail} onGo={(p) => navigate(p === ROOT ? null : p)} />}
-        actions={<Flex gap="size-100" alignItems="center" wrap>
-          <ActionButton isQuiet onPress={() => go(cfConsoleUrl('/content/dam'))}>
-            <RecordIcon />
-            <Text>{VOCAB.records}</Text>
-          </ActionButton>
-          <ViewSwitch view={view} onChange={setView} />
-        </Flex>}
-        primary={<Button variant="accent" onPress={() => setDialog('create')} isDisabled={!confs?.length}><Add /><Text>Create model</Text></Button>}
-      />
-
-      {selectedModels.length > 0 && (
-        <div className="studio-cfc__selection" role="toolbar" aria-label="Selection">
-          <Text>{selectedModels.length} selected</Text>
-          {selectedModels.length === 1 && (
-            <ActionButton isQuiet onPress={() => go(cfModelEditorUrl(selectedModels[0].path))}>
-              <Edit />
-              <Text>Edit</Text>
+      {/* with a selection the bar is the selection bar every console has; without one, the console's own */}
+      {selectedModels.length > 0 ? (
+        <SelectionBar
+          count={selectedModels.length}
+          leading={['edit', 'enable', 'disable']}
+          onClear={() => setSelected(new Set())}
+          actions={[
+            ...(selectedModels.length === 1 ? [{ id: 'edit', label: 'Edit', icon: <Edit />, run: () => go(cfModelEditorUrl(selectedModels[0].path)) }] : []),
+            { id: 'enable', label: 'Enable', run: () => void setEnabled(true) },
+            { id: 'disable', label: 'Disable', run: () => void setEnabled(false) },
+            { id: 'delete', label: 'Delete', icon: <Delete />, danger: true, run: () => setDialog('delete') },
+          ]}
+        />
+      ) : (
+        <ScreenFrame
+          identity={<PathCrumbs crumbs={trail} onGo={(p) => navigate(p === ROOT ? null : p)} />}
+          actions={<Flex gap="size-100" alignItems="center" wrap>
+            <ActionButton isQuiet onPress={() => go(cfConsoleUrl('/content/dam'))}>
+              <RecordIcon />
+              <Text>{VOCAB.records}</Text>
             </ActionButton>
-          )}
-          <ActionButton isQuiet onPress={() => void setEnabled(true)}>
-            Enable
-          </ActionButton>
-          <ActionButton isQuiet onPress={() => void setEnabled(false)}>
-            Disable
-          </ActionButton>
-          <ActionButton isQuiet onPress={() => setDialog('delete')}>
-            <Delete />
-            <Text>Delete</Text>
-          </ActionButton>
-          <ActionButton isQuiet onPress={() => setSelected(new Set())} marginStart="auto">
-            Clear
-          </ActionButton>
-        </div>
+            <ViewSwitch view={view} onChange={setView} />
+          </Flex>}
+          primary={<Button variant="accent" onPress={() => setDialog('create')} isDisabled={!confs?.length}><Add /><Text>Create model</Text></Button>}
+        />
       )}
 
       <div className="studio-cfc__content">
