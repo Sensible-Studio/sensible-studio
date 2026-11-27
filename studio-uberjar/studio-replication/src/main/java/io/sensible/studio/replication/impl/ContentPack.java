@@ -335,12 +335,40 @@ public final class ContentPack {
         writeNode(session, parent, node, keepChildPages, pack.binaries, true);
     }
 
-    /** Removes the node at {@code path} (deactivation). Nothing is saved. */
+    /**
+     * Removes the node at {@code path} (deactivation). Nothing is saved. Folders and pages that {@link #install} made
+     * only to hold it (bare ancestors: a type and nothing else) go with their last content, so that a folder deleted
+     * on the author does not stay behind here as an empty one.
+     */
     public static boolean remove(Session session, String path) throws RepositoryException {
         if (!session.nodeExists(path)) {
             return false;
         }
-        session.getNode(path).remove();
+        Node node = session.getNode(path);
+        Node parent = node.getParent();
+        node.remove();
+        while (parent != null && parent.getDepth() >= 3 && isShell(parent)) {
+            Node up = parent.getParent();
+            parent.remove();
+            parent = up;
+        }
+        return true;
+    }
+
+    private static final java.util.Set<String> SHELL_TYPES = new java.util.HashSet<>(
+            java.util.Arrays.asList("cq:Page", "sling:Folder", "sling:OrderedFolder", "nt:folder"));
+
+    /** A bare ancestor: nothing below it, and nothing on it but what the repository writes itself. */
+    static boolean isShell(Node n) throws RepositoryException {
+        if (n.hasNodes() || !SHELL_TYPES.contains(n.getPrimaryNodeType().getName())) {
+            return false;
+        }
+        for (javax.jcr.PropertyIterator it = n.getProperties(); it.hasNext();) {
+            String name = it.nextProperty().getName();
+            if (!"jcr:primaryType".equals(name) && !"jcr:created".equals(name) && !"jcr:createdBy".equals(name)) {
+                return false;
+            }
+        }
         return true;
     }
 

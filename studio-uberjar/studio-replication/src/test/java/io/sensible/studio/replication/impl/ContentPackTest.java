@@ -139,6 +139,31 @@ class ContentPackTest {
     }
 
     @Test
+    void foldersMadeOnlyToHoldWhatWasPublishedGoWithTheirLastContent() throws Exception {
+        Node root = session.getRootNode().addNode("live", "sling:Folder");
+        Node dam = root.addNode("dam", "sling:Folder");
+        Node site = dam.addNode("site", "sling:Folder");
+        site.setProperty("jcr:title", "Site"); // published for itself: it has something to say
+        Node shell = site.addNode("campaign", "sling:OrderedFolder").addNode("spring", "sling:OrderedFolder");
+        shell.addNode("a.jpg", "nt:unstructured");
+        shell.addNode("b.jpg", "nt:unstructured");
+        session.save();
+        assertTrue(ContentPack.remove(session, "/live/dam/site/campaign/spring/a.jpg"));
+        assertTrue(session.nodeExists("/live/dam/site/campaign/spring"), "something is still in it");
+        assertTrue(ContentPack.remove(session, "/live/dam/site/campaign/spring/b.jpg"));
+        session.save();
+        assertFalse(session.nodeExists("/live/dam/site/campaign"), "the empty folders above go too");
+        assertTrue(session.nodeExists("/live/dam/site"), "a folder with a title of its own stays");
+        // never above the third level, however bare
+        Node high = dam.addNode("bare", "sling:Folder");
+        high.addNode("x", "nt:unstructured");
+        session.save();
+        assertTrue(ContentPack.remove(session, "/live/dam/bare/x"));
+        assertFalse(session.nodeExists("/live/dam/bare"));
+        assertTrue(session.nodeExists("/live/dam"));
+    }
+
+    @Test
     void thePackCarriesItsNamespacesAndTheReceiverRegistersTheMissingOnes() throws Exception {
         // the author knows a namespace an imported package brought (XMP's stRef); the pack names it
         session.getWorkspace().getNamespaceRegistry().registerNamespace("stRef", "http://ns.adobe.com/xap/1.0/sType/ResourceRef#");
