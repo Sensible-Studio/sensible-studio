@@ -63,7 +63,7 @@ export function HistoryDialog({ client, id, onClose }: { client: WorkflowClient;
                   <dd>{stageLabel(instance.stage, instance.stages)}</dd>
                 </>
               )}
-              <dt>Payload</dt>
+              <dt>Content</dt>
               <dd>
                 <PayloadLink payload={instance.payload} />
               </dd>

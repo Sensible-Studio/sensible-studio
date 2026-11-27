@@ -206,7 +206,7 @@ export function InstancesConsole({ client, user }: { client: WorkflowClient; use
                   <th>Status</th>
                   <th>{view === 'archive' ? 'Ended' : 'Current Step'}</th>
                   <th>Stage</th>
-                  <th>Payload</th>
+                  <th>Content</th>
                   <th>Initiator</th>
                   <th>Start Time</th>
                   <th>Model</th>

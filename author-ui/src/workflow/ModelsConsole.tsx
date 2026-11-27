@@ -399,7 +399,7 @@ const RUN_FORM: GraniteNode = node('run', { 'sling:resourceType': `${CORAL}/cont
   node('items', {}, [
     node('payload', {
       'sling:resourceType': `${CORAL}/form/pathfield`,
-      fieldLabel: 'Payload',
+      fieldLabel: 'Content',
       name: './payload',
       rootPath: '/content',
       required: true,

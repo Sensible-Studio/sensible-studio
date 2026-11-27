@@ -98,7 +98,7 @@ export function InboxConsole({ client, user, notifications = httpNotifications }
             {single.workflow.payload && (
               <ActionButton isQuiet onPress={() => go(payloadUrl(single.workflow.payload!), { newTab: true })}>
                 <LinkOut />
-                <Text>Open Payload</Text>
+                <Text>Open content</Text>
               </ActionButton>
             )}
             <ActionButton isQuiet onPress={() => setHistory(single.workflow.id)}>
@@ -143,7 +143,7 @@ export function InboxConsole({ client, user, notifications = httpNotifications }
                   <th>Step</th>
                   <th>Flow</th>
                   <th>Stage</th>
-                  <th>Payload</th>
+                  <th>Content</th>
                   <th>Assignee</th>
                   <th>Initiator</th>
                   <th>Arrived</th>

@@ -163,7 +163,7 @@ describe('Inbox', () => {
     );
     inProvider(<InboxConsole client={wf} user="admin" />);
     fireEvent.click(await screen.findByLabelText('Select Review content'));
-    expect(screen.getByRole('button', { name: 'Open Payload' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Open content' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Delegate' }));
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByText('administrators')).toBeTruthy();
