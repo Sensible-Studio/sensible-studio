@@ -32,24 +32,24 @@ export default [
   ] },
   // a component inside a container has the whole toolbar; it is selected from the Layers tab
   { name: 'toolbar', steps: [
-    ...open, { click: label('Content Tree') }, { wait: 900 }, { click: { text: 'Title: By Jacob Wester' } }, { wait: 1200 },
+    ...open, { click: label('Content Tree') }, { wait: 900 }, { click: { text: 'Title: By Nils Aaberg' } }, { wait: 1200 },
     { log: toolbar }, { shot: 'editor-toolbar', keepPointer: true },
     { click: label('Edit') }, { wait: 1200 }, { shot: 'editor-inline' }, { key: 'Escape' },
   ] },
   { name: 'insert', steps: [
-    ...open, { click: label('Content Tree') }, { wait: 900 }, { click: { text: 'Title: By Jacob Wester' } }, { wait: 1200 },
+    ...open, { click: label('Content Tree') }, { wait: 900 }, { click: { text: 'Title: By Nils Aaberg' } }, { wait: 1200 },
     { click: label('Insert component') }, { wait: 1200 }, { shot: 'editor-insert' },
   ] },
   { name: 'annotate', steps: [...open, { clickAt: IMAGE }, { wait: 800 }, { click: label('Add annotation') }, { wait: 1200 }, { shot: 'editor-annotation' }] },
   mode('layout', 'Layout', [{ clickAt: IMAGE }, { wait: 1000 }]),
   mode('history', 'History'),
-  mode('developer', 'Developer', [{ click: { text: 'Title: By Jacob Wester' } }, { wait: 1200 }]),
+  mode('developer', 'Developer', [{ click: { text: 'Title: By Nils Aaberg' } }, { wait: 1200 }]),
   mode('personalize', 'Personalize'),
   { name: 'preview', steps: [...open, { click: { text: 'Preview', closest: 'button' } }, { wait: 1800 }, { shot: 'editor-preview' },
     { click: { text: 'Visitor', closest: 'button' } }, { wait: 1200 }, { shot: 'editor-visitor' }] },
   // --- what a few components add ---
   { name: 'styles', steps: [
-    ...open, { click: label('Content Tree') }, { wait: 900 }, { click: { text: 'Title: By Jacob Wester' } }, { wait: 1200 },
+    ...open, { click: label('Content Tree') }, { wait: 900 }, { click: { text: 'Title: By Nils Aaberg' } }, { wait: 1200 },
     { click: label('Styles') }, { wait: 900 }, { shot: 'editor-styles', keepPointer: true },
   ] },
   { name: 'image-editor', steps: [...open, { clickAt: IMAGE }, { wait: 900 }, { click: label('Edit') }, { wait: 2500 }, { shot: 'editor-image-editor' }] },

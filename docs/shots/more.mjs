@@ -23,7 +23,7 @@ export default [
     { files: { selector: '[role="dialog"] input[type="file"]', paths: [U + '/metadata.csv'] } }, { wait: 1200 }, { shot: 'media-import-metadata' },
     button('Import'), { wait: 3000 }, { shot: 'media-import-result' }] },
   { name: 'fragment-dialogs', steps: [
-    { goto: '/cf.html/content/dam/weekender-shared/en/magazine/arctic-surfing' }, { wait: 2500 }, select('Aloha Spirits in Northern Norway'), { wait: 1000 },
+    { goto: '/cf.html/content/dam/weekender-shared/en/magazine/arctic-surfing' }, { wait: 2500 }, select('Surfing under the Northern Lights'), { wait: 1000 },
     button('Properties'), { wait: 1500 }, { shot: 'fragments-properties' }, { key: 'Escape' }, { wait: 500 },
     button('Move'), { wait: 1500 }, { shot: 'fragments-move' }, { key: 'Escape' }, { wait: 500 },
     button('Translate'), { wait: 1500 }, { shot: 'fragments-translate' },

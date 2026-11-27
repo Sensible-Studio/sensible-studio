@@ -13,7 +13,7 @@ const model = [{ goto: MODEL }, { wait: 4000 }];
 export default [
   { name: 'console', steps: [
     { goto: DIR }, { wait: 2500 }, { shot: 'fragments-console' },
-    select('Aloha Spirits in Northern Norway'), { wait: 1200 }, { shot: 'fragments-selected' },
+    select('Surfing under the Northern Lights'), { wait: 1200 }, { shot: 'fragments-selected' },
   ] },
   { name: 'create', steps: [{ goto: DIR }, { wait: 2500 }, button('Create content fragment'), { wait: 2000 }, { shot: 'fragments-create' }] },
   { name: 'editor', steps: [
