@@ -73,8 +73,18 @@ public class WcmBindingsValuesProvider implements BindingsValuesProvider {
             Object pinned = request.getAttribute(ATTR_CURRENT_PAGE);
             if (pinned instanceof Page) {
                 currentPage = (Page) pinned;
-            } else if (resourcePage != null) {
-                request.setAttribute(ATTR_CURRENT_PAGE, resourcePage);
+            } else {
+                // Nothing rendered yet. A servlet may be building a model for a component that lives elsewhere
+                // (Core's search servlet, asked at /content/site/us/en.searchresults.json for a search box kept in
+                // an experience fragment): the current page is the one the address names, not the fragment. With
+                // the fragment as current page the search of every country looked in the language masters.
+                Page asked = pageManager.getContainingPage(request.getRequestPathInfo().getResourcePath());
+                if (asked != null) {
+                    currentPage = asked;
+                }
+                if (currentPage != null) {
+                    request.setAttribute(ATTR_CURRENT_PAGE, currentPage);
+                }
             }
         }
 
