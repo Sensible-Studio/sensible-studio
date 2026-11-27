@@ -39,6 +39,7 @@ A table: **Title**, **Name**, **Template**, **Modified** and **Modified by**. Cl
 | Sign | Meaning |
 |---|---|
 | A chain link after the title | The page is a linked copy: it follows a source page. See [Several sites](sync.md) |
+| A dot after the title | The page was published. Its colour says where it stands now: **Published**, **Modified since published**, or **Unpublished**. A page that was never published has no dot |
 | A lock | Someone locked the page |
 | An arrow at the right of a row | The page has pages below it |
 
