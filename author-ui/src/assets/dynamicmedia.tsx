@@ -234,7 +234,7 @@ export function DynamicRenditions({
   };
   return (
     <div className="studio-assets__dm-rail">
-      <h2>Dynamic</h2>
+      <h2>Image delivery</h2>
       <ul className="studio-assets__renditions">
         {data.presets.map((p) => (
           <li key={p.name}>

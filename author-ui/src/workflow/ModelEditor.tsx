@@ -47,8 +47,8 @@ import { ErrorState, LoadingState } from '../shell/FeedbackState';
 
 /** The steps the side panel offers, in the order AEM users expect them. */
 export const PALETTE: Array<{ kind: keyof typeof STEP_TYPES; title: string; description: string }> = [
-  { kind: 'participant', title: 'Participant Step', description: 'Assigns a work item to a user or group and waits' },
-  { kind: 'dynamicParticipant', title: 'Dynamic Participant Step', description: 'Assigns a work item to whom a chooser selects' },
+  { kind: 'participant', title: 'Participant Step', description: 'Gives the step to a user or group and waits' },
+  { kind: 'dynamicParticipant', title: 'Dynamic Participant Step', description: 'Gives the step to whom a chooser selects' },
   { kind: 'process', title: 'Process Step', description: 'Runs a registered process' },
   { kind: 'or', title: 'OR Split', description: 'Continues with one of its branches' },
   { kind: 'and', title: 'AND Split', description: 'Runs all branches, then joins' },

@@ -376,7 +376,7 @@ export function AssetsConfigurationsPage({
   editor?: AssetsConfigEditor;
 }) {
   const card = CONFIG_CARDS.find((c) => c.key === editor);
-  useScreenTitle(card?.title ?? 'Assets Configurations', `${card?.title ?? 'Assets Configurations'} | Sensible Studio Media`);
+  useScreenTitle(card?.title ?? 'Media configurations', `${card?.title ?? 'Media configurations'} | Sensible Studio Media`);
   const [config, setConfig] = useState<AssetsConfigurations | null>(null);
   const [draft, setDraft] = useState<AssetsConfigurations | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -442,7 +442,7 @@ export function AssetsConfigurationsPage({
         }
       />
       {error ? (
-        <ErrorState title="Assets Configurations could not be loaded">{error}</ErrorState>
+        <ErrorState title="Media configurations could not be loaded">{error}</ErrorState>
       ) : !config || !draft ? (
         <LoadingState label="Loading the settings" />
       ) : editor && card ? (
@@ -479,7 +479,7 @@ export function AssetsConfigurationsPage({
           )}
         </form>
       ) : (
-        <ul className="studio-assetsconfig__cards" aria-label="Assets Configurations">
+        <ul className="studio-assetsconfig__cards" aria-label="Media configurations">
           {CONFIG_CARDS.map((c) => (
             <li key={c.key}>
               <a

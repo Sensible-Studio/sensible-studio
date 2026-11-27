@@ -48,7 +48,9 @@ export const readPinned = () => read<Pin>(PINNED_KEY);
 
 /** A screen was shown (or its title became known): it goes to the top of the recent list. */
 export function recordVisit(url: string, title: string, now = Date.now()) {
-  const rest = read<Visit>(RECENT_KEY).filter((v) => v.url !== url);
+  // a screen that completes its own address as it opens (/audiences.html → /audiences.html/conf/global) is one visit
+  const settled = (v: Visit) => v.title === title && now - v.at < 10000 && (url.startsWith(v.url) || v.url.startsWith(url));
+  const rest = read<Visit>(RECENT_KEY).filter((v) => v.url !== url && !settled(v));
   write(RECENT_KEY, [{ url, title, at: now }, ...rest].slice(0, RECENT_MAX));
 }
 

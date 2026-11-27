@@ -23,7 +23,7 @@ interface Props {
   onDone(): void;
 }
 
-const TYPE_LABEL: Record<UnpublishedReference['type'], string> = { asset: 'Asset', 'experience-fragment': 'Experience Fragment', template: 'Template', segment: 'Audience', page: 'Page' };
+const TYPE_LABEL: Record<UnpublishedReference['type'], string> = { asset: 'File', 'experience-fragment': 'Experience Fragment', template: 'Template', segment: 'Audience', page: 'Page' };
 const STATUS_LABEL: Record<UnpublishedReference['status'], string> = { never: 'Not published', modified: 'Modified since published', deactivated: 'Unpublished' };
 
 /** A local date-time for the "later" field: now + 1 hour, rounded to the next quarter. */
@@ -160,8 +160,8 @@ export function PublishDialog({ client, paths, title, action = 'activate', offer
               ? `${paths.length === 1 ? 'goes' : 'go'} to the preview instance only, for review: the published site does not change.`
               : `${paths.length === 1 ? 'is' : 'are'} removed from the preview instance only.`
             : publishing
-              ? `${paths.length === 1 ? 'goes' : 'go'} to the publish instances through the publishing agents.`
-              : `${paths.length === 1 ? 'is' : 'are'} removed from the publish instances by the publishing agents.`}
+              ? `${paths.length === 1 ? 'goes' : 'go'} to the live site.`
+              : `${paths.length === 1 ? 'is' : 'are'} taken off the live site.`}
         </Text>
         {references === null ? (
           <div style={{ marginTop: 12 }}>
@@ -176,8 +176,8 @@ export function PublishDialog({ client, paths, title, action = 'activate', offer
         ) : references.length > 0 ? (
           <div className="studio-publish__refs">
             <Text UNSAFE_className="studio-publish__hint">
-              {paths.length === 1 ? 'The page uses' : 'They use'} content that is not {tier ? 'on Preview' : 'published'} yet. {tier ? 'Send' : 'Publish'} it too, or{' '}
-              {paths.length === 1 ? 'the page shows' : 'the pages show'} gaps on {tier ? 'Preview' : 'publish'}.
+              {paths.length === 1 ? 'It uses' : 'They use'} content that is not {tier ? 'on Preview' : 'published'} yet. {tier ? 'Send' : 'Publish'} it too, or{' '}
+              {paths.length === 1 ? 'it shows' : 'they show'} gaps on {tier ? 'Preview' : 'the live site'}.
             </Text>
             <ul>
               {references.map((r) => (
@@ -194,7 +194,7 @@ export function PublishDialog({ client, paths, title, action = 'activate', offer
             </ul>
           </div>
         ) : publishing && uses ? (
-          <Text UNSAFE_className="studio-publish__hint">Everything the page uses is already {tier ? 'on Preview' : 'published'}.</Text>
+          <Text UNSAFE_className="studio-publish__hint">Everything {paths.length === 1 ? 'it uses' : 'they use'} is already {tier ? 'on Preview' : 'published'}.</Text>
         ) : null}
         {offerDeep && (
           // on its own line: beside the Now / Later choice the two read as one muddled row

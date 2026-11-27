@@ -293,7 +293,7 @@ export function ImageEditor({ client, path, navigate, loadImage = defaultLoadIma
             <ToolButton label="Flip Horizontally" onPress={() => addOp({ op: 'flip', axis: 'horizontal' })}>
               <FlipHorizontal />
             </ToolButton>
-            <ToolButton label="Release Map" onPress={startMap}>
+            <ToolButton label="Image map" onPress={startMap}>
               <ImageMapRectangle />
             </ToolButton>
             </>

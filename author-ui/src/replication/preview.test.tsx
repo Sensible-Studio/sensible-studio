@@ -44,7 +44,7 @@ describe('publish to preview', () => {
 
   it('offers the destination only when there is a preview tier', async () => {
     show(fakeClient([{ id: 'publish', enabled: true, tier: 'publish' }]));
-    await screen.findByText(/Everything the page uses is already published/);
+    await screen.findByText(/Everything it uses is already published/);
     expect(screen.queryByRole('radiogroup', { name: 'Destination' })).toBeNull();
   });
 

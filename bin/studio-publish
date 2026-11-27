@@ -122,7 +122,7 @@ setup() {
     if [ ! -x "$dam" ] && [ -n "$RELEASE" ]; then dam="$DIR/lib/bin/studio-dam"; fi
     if [ -x "$dam" ]; then
         mkdir -p "$PUBLISH_HOME/dam/bin"
-        cp -f "$dam" "$PUBLISH_HOME/dam/bin/studio-dam"
+        cp -f "$dam" "$PUBLISH_HOME/dam/bin/studio-dam.new" && mv -f "$PUBLISH_HOME/dam/bin/studio-dam.new" "$PUBLISH_HOME/dam/bin/studio-dam"  # moved into place, never overwritten: macOS kills a program whose file changed where it lay
         chmod 755 "$PUBLISH_HOME/dam/bin/studio-dam"
     fi
     # the Sling feature launcher's artifact cache: share the author's download

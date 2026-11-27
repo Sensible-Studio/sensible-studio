@@ -340,7 +340,7 @@ export function CfConsole({ client, initialPath, studio = STUB_STUDIO, dam: damP
       <ScreenFrame
         identity={<PathCrumbs crumbs={trail} onGo={navigate} />}
         tools={<Flex gap="size-100" alignItems="center" wrap>
-          <SearchField aria-label="Search content fragments" placeholder="Search in this folder" value={query} onChange={setQuery} width="size-2400" />
+          <SearchField aria-label="Search content fragments" placeholder="Search here" value={query} onChange={setQuery} width="size-2400" />
           <Picker
             aria-label="Model"
             width="size-2000"
@@ -473,7 +473,8 @@ export function CfConsole({ client, initialPath, studio = STUB_STUDIO, dam: damP
             }}
           >
             Delete {selectedFragments.length === 1 ? `“${selectedFragments[0].title}”` : `${selectedFragments.length} fragments`}? This cannot be undone.
-            Pages that reference {selectedFragments.length === 1 ? 'it' : 'them'} will show nothing in its place.
+            Pages that reference {selectedFragments.length === 1 ? 'it' : 'them'} will show nothing in {selectedFragments.length === 1 ? 'its' : 'their'} place.
+            {' '}If published, {selectedFragments.length === 1 ? 'it is' : 'they are'} taken off the live site first.
           </StudioConfirmDialog>
         )}
       </DialogContainer>

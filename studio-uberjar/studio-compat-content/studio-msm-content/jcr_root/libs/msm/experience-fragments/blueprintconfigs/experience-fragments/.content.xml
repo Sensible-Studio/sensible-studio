@@ -5,7 +5,7 @@
     <jcr:content
         jcr:primaryType="nt:unstructured"
         jcr:title="Experience Fragments"
-        jcr:description="Live copies of experience fragment variations for a new site or language."
+        jcr:description="Linked copies of experience fragment variations for a new site or language."
         cq:template="/libs/wcm/msm/templates/blueprint"
         sling:resourceType="wcm/msm/components/blueprint"
         sitePath="/content/experience-fragments"/>

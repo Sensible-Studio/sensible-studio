@@ -335,7 +335,7 @@ export function TranslationContextEditor({ client, context }: { client: Translat
         )}
 
         {tab === 'filters' && (
-          <FormSection title="Not translated components" description="Their texts stay as they are in every language copy: code, embeds, a brand's slogan.">
+          <FormSection title="Not translated components" description="Their texts stay as they are in every language version: code, embeds, a brand's slogan.">
             <TagsField label="Resource types" values={rules.excludedResourceTypes} onChange={(v) => set({ excludedResourceTypes: v })} />
             <p className="studio-trrules__muted">The components inside them stay as they are too.</p>
           </FormSection>
@@ -344,7 +344,7 @@ export function TranslationContextEditor({ client, context }: { client: Translat
         {tab === 'references' && (
           <FormSection title="Assets" description="When a page is translated with what it uses, the images and files it shows.">
             <Checkbox isSelected={rules.translateAssets} onChange={(v) => set({ translateAssets: v })}>
-              Translate the assets a page shows: they get language copies with their metadata translated
+              Translate the assets a page shows: they get language versions with their metadata translated
             </Checkbox>
             <TagsField label="Translated metadata" values={rules.assetProperties} onChange={(v) => set({ assetProperties: v })} />
             <p className="studio-trrules__muted">Assets without such texts stay shared by every language. Experience Fragments and content fragments a page uses are translated with it either way.</p>

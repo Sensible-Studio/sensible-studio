@@ -270,7 +270,7 @@ function CompleteDialog({ entry, onClose, onComplete }: { entry: InboxEntry; onC
   };
   return (
     <StudioDialog size="M">
-      <Heading>Complete Work Item</Heading>
+      <Heading>Complete step</Heading>
       <Divider />
       <Content>
         <p className="studio-wf__runmodel">
@@ -332,7 +332,7 @@ function CompleteManyDialog({
   const impossible = branching.length > 0 && common.length === 0;
   return (
     <StudioDialog size="M">
-      <Heading>{`Complete ${entries.length} Work Items`}</Heading>
+      <Heading>{`Complete ${entries.length} steps`}</Heading>
       <Divider />
       <Content>
         <ul aria-label="Work items" style={{ maxHeight: 200, overflowY: "auto", margin: "0 0 12px", paddingLeft: 18 }}>

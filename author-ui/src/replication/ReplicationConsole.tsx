@@ -127,7 +127,7 @@ export function ReplicationConsole({ client, studio }: Props) {
         primary={
           <Button variant="accent" onPress={() => setEditing('new')}>
             <Add />
-            <Text>New Agent</Text>
+            <Text>New target</Text>
           </Button>
         }
       />
@@ -148,8 +148,8 @@ export function ReplicationConsole({ client, studio }: Props) {
                   status={<>{a.id}{a.tier === 'preview' ? ' · Preview tier' : ''} · {!a.enabled ? 'Disabled' : a.blocked ? 'Blocked' : a.queue ? 'Delivering' : 'Idle'}</>}
                   actions={<div className="studio-replication__actions" onClick={(e) => e.stopPropagation()}>
                     <Button variant="secondary" onPress={() => void test(a)}>Test Connection</Button>
-                    <Button variant="secondary" onPress={() => void act(() => client.saveAgent({ id: a.id, enabled: !a.enabled }), a.enabled ? 'Agent disabled' : 'Agent enabled')}>{a.enabled ? 'Disable' : 'Enable'}</Button>
-                    <Button variant="secondary" onPress={() => setEditing(a)}><Edit /><Text>Edit agent</Text></Button>
+                    <Button variant="secondary" onPress={() => void act(() => client.saveAgent({ id: a.id, enabled: !a.enabled }), a.enabled ? 'Target disabled' : 'Target enabled')}>{a.enabled ? 'Disable' : 'Enable'}</Button>
+                    <Button variant="secondary" onPress={() => setEditing(a)}><Edit /><Text>Edit target</Text></Button>
                     {a.serializationType === 'reverse' && <Button variant="secondary" onPress={() => void act(async () => {
                       const r = await client.poll(a.id);
                       if (!r.ok) throw new Error(r.message ?? 'Fetch failed');
@@ -157,7 +157,7 @@ export function ReplicationConsole({ client, studio }: Props) {
                       return r.agents;
                     }, '')}>Fetch now</Button>}
                     {a.queue > 0 && a.serializationType !== 'reverse' && <><Button variant="secondary" onPress={() => void act(() => client.retry(a.id), 'Retrying now')}>Retry now</Button><Button variant="negative" onPress={() => void act(() => client.clearQueue(a.id), 'Queue cleared')}>Clear queue</Button></>}
-                    <Button variant="negative" onPress={() => void act(() => client.removeAgent(a.id), 'Agent removed')}><Delete /><Text>Remove agent</Text></Button>
+                    <Button variant="negative" onPress={() => void act(() => client.removeAgent(a.id), 'Target removed')}><Delete /><Text>Remove target</Text></Button>
                   </div>}
                 >
                   <KeyValueList>
@@ -260,7 +260,7 @@ export function ReplicationConsole({ client, studio }: Props) {
           <AgentForm
             agent={editing === 'new' ? null : editing}
             onSave={async (a) => {
-              await act(() => client.saveAgent(a), 'Agent saved');
+              await act(() => client.saveAgent(a), 'Target saved');
               setEditing(null);
             }}
             onCancel={() => setEditing(null)}
@@ -294,7 +294,7 @@ function AgentForm({ agent, onSave, onCancel }: { agent: ReplicationAgent | null
   };
   return (
     <StudioDialog size="M">
-      <Heading>{agent ? `Agent: ${agent.title}` : 'New Publishing Agent'}</Heading>
+      <Heading>{agent ? `Target: ${agent.title}` : 'New publishing target'}</Heading>
       <Divider />
       <Content>
         <Form
@@ -309,7 +309,7 @@ function AgentForm({ agent, onSave, onCancel }: { agent: ReplicationAgent | null
           <Checkbox isSelected={enabled} onChange={setEnabled}>
             Enabled
           </Checkbox>
-          <Picker label="Agent type" selectedKey={kind} onSelectionChange={(k) => setKind(String(k))}>
+          <Picker label="Kind of target" selectedKey={kind} onSelectionChange={(k) => setKind(String(k))}>
             <Item key="studio">Publish instance (delivers the content)</Item>
             <Item key="flush">Cache flush (tells a cache what was published)</Item>
             <Item key="reverse">Reverse (fetches what visitors created on a publish instance)</Item>

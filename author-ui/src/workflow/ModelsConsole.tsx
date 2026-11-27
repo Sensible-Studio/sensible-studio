@@ -249,7 +249,8 @@ function ModelTable({ models, selected, onToggle, onOpen }: ViewProps) {
         <thead>
           <tr>
             <th aria-label="Select" />
-            <th>Title</th>
+            {/* a flow's name on one line: the description is what wraps */}
+            <th style={{ minWidth: 220 }}>Title</th>
             <th>Description</th>
             <th>Details</th>
             <th>Synced</th>

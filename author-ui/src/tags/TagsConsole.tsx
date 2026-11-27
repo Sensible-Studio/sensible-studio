@@ -454,8 +454,8 @@ function DeleteTagsDialog({ client, items, onDelete }: { client: TagsClient; ite
         </>
       )}
       <div className="studio-delete__refs">
-        {used && <Text>These pages and files use them and will lose the tags:</Text>}
-        <ReferenceList refs={refs} error={error} empty="No page or file uses them." />
+        {used && <Text>These pages and files use {items.length === 1 ? 'it' : 'them'} and will lose the {items.length === 1 ? 'tag' : 'tags'}:</Text>}
+        <ReferenceList refs={refs} error={error} empty={`No page or file uses ${items.length === 1 ? 'it' : 'them'}.`} />
       </div>
     </StudioConfirmDialog>
   );

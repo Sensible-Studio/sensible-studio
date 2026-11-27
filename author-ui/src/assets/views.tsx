@@ -282,7 +282,9 @@ export function ListView({ items, selected, onSelectOnly, onOpen, onContextMenu 
           Size
         </Column>
         <Column key="status">Status</Column>
-        <Column key="modified">Modified</Column>
+        <Column key="modified" minWidth={136}>
+          Modified
+        </Column>
       </TableHeader>
       <TableBody items={items}>
         {(item) => (

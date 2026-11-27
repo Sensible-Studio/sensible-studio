@@ -52,4 +52,14 @@ describe('recent and pinned screens', () => {
     expect(iconOfUrl('/replication.html')).toBe('live');
     expect(iconOfUrl('/studio/health.html')).toBe('health');
   });
+
+  it('keeps one visit of a screen that completes its own address', () => {
+    window.localStorage.clear();
+    recordVisit('/audiences.html', 'Audiences', 1000);
+    recordVisit('/audiences.html/conf/global', 'Audiences', 1400);
+    expect(readRecent().map((v) => v.url)).toEqual(['/audiences.html/conf/global']);
+    // later, or under another title, it is another visit
+    recordVisit('/audiences.html', 'Audiences', 60000);
+    expect(readRecent()).toHaveLength(2);
+  });
 });

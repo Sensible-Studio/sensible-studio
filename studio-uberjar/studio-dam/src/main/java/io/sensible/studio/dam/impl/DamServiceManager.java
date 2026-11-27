@@ -199,6 +199,13 @@ public class DamServiceManager implements DamClient {
                     if (waitHealthy(client, startupTimeoutSeconds)) {
                         delegate = client;
                         LOG.info("studio-dam: started (pid {})", process.pid());
+                    } else if (!process.isAlive()) {
+                        // 137 with nothing in its log: the system killed it. macOS does that to a program whose
+                        // file was overwritten where it lay; a fresh copy moved over it starts again.
+                        LOG.error("studio-dam: stopped as it started (code {}){}, see {}", process.exitValue(),
+                                process.exitValue() == 137 ? "; killed by the system: put a fresh copy of the program in place"
+                                        + " (copy it beside the old file, then move it over)" : "",
+                                pb.redirectOutput().file());
                     } else {
                         LOG.error("studio-dam: did not become healthy within {}s (port taken by another program?), see {}",
                                 startupTimeoutSeconds, pb.redirectOutput().file());

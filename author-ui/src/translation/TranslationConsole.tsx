@@ -325,7 +325,7 @@ export function TranslationConsole({ client, initialPath }: Props) {
             }}
           >
             {selectedConfigs.map((c) => c.title).join(', ')} will be deleted. Content of this site then uses the next configuration (the global
-            one, or the instance's default connector). Existing language copies stay as they are.
+            one, or the instance's default connector). Existing language versions stay as they are.
           </StudioConfirmDialog>
         )}
       </DialogContainer>

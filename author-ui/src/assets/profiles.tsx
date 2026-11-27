@@ -6,6 +6,7 @@ import {
   Item,
   NumberField,
   Picker,
+  Text,
   TextField,
 } from '@adobe/react-spectrum';
 import Add from '@spectrum-icons/workflow/Add';
@@ -296,9 +297,10 @@ function ProfileDialog({
         </div>
         <ActionButton onPress={() => setRenditions((rs) => [...rs, { ...EMPTY }])} isDisabled={renditions.length >= 20}>
           <Add />
-          Add Rendition
+          <Text>Add Rendition</Text>
         </ActionButton>
-        {(problems.length > 0 || clash) && (
+        {/* an untouched new form is not wrong yet: it says what is missing once something was typed */}
+        {(dirty || !!profile) && (problems.length > 0 || clash) && (
           <ul className="studio-assets__dialog-error">
             {clash && <li>A profile named {name} exists already.</li>}
             {problems.map((p) => (

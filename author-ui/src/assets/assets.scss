@@ -1993,6 +1993,20 @@ section.studio-assets__uploads > .studio-assets__upload-choices {
   display: flex;
   align-items: center;
   gap: 4px;
+  margin: 4px 0 2px;
+  padding: 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--studio-text-muted);
+  text-transform: uppercase;
+}
+
+// the copy button keeps its own size: the row's name takes the width
+.studio-assets__dm-rail .studio-assets__renditions li > [class*='spectrum-ActionButton'] {
+  flex: 0 0 auto;
+  flex-direction: row;
+  padding: 0;
 }
 
 .studio-smartcrop__bar {
@@ -3259,4 +3273,14 @@ section.studio-assets__uploads > .studio-assets__upload-choices {
   font-size: 12px;
   max-height: 140px;
   overflow: auto;
+}
+
+// the media service is down: said above the files that wait for it
+.studio-assets__waiting {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--studio-text);
+  background: var(--spectrum-global-color-orange-100, #fff4e5);
+  border-bottom: 1px solid var(--spectrum-global-color-orange-400, #f29423);
 }

@@ -128,7 +128,7 @@ interface ColumnProps<T extends BrowserItem> extends ViewProps<T> {
 }
 
 /** One column per level from the root to the current item; the item's preview at the end. */
-export function ColumnView<T extends BrowserItem>({ client, msm, onChanged, listings, trail, current, selected, onOpen, onToggle, onContextMenu, renderPreview, renderIcon, renderBadge }: ColumnProps<T>) {
+export function ColumnView<T extends BrowserItem>({ client, msm, onChanged, listings, trail, current, selected, onOpen, onToggle, onContextMenu, renderPreview, renderIcon, renderBadge, labels }: ColumnProps<T>) {
   const scroller = useRef<HTMLDivElement>(null);
   const preview =
     selected.length === 1
@@ -182,6 +182,10 @@ export function ColumnView<T extends BrowserItem>({ client, msm, onChanged, list
           </ul>
         );
       })}
+      {/* an empty folder says so: a blank column reads as still loading */}
+      {current.item.type === 'folder' && current.children.length === 0 && (
+        <p className="studio-column studio-column--empty">{labels?.empty ?? 'Nothing here yet.'}</p>
+      )}
       {preview && (renderPreview ? renderPreview(preview) : <Preview client={client} msm={msm} onChanged={onChanged} item={preview} renderIcon={renderIcon} />)}
     </div>
   );

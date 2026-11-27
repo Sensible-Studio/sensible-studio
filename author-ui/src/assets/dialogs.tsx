@@ -197,7 +197,7 @@ export function DeleteDialog({
           .
         </>
       )}{" "}
-      This cannot be undone.
+      This cannot be undone. What is published is taken off the live site first.
       {referenced ? (
         <>
           <InlineAlert variant="notice" marginTop="size-200">

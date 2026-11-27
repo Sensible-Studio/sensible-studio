@@ -921,6 +921,11 @@ export function AssetsBrowser({
           }}
           onDrop={onDrop}
         >
+          {processing && listing?.processingAvailable === false && (
+            <p className="studio-assets__waiting" role="status">
+              The media service is not running, so these files wait to be processed: no previews, sizes or renditions until it is back. System › Health says more.
+            </p>
+          )}
           {error ? (
             <IllustratedMessage>
               <Heading>Cannot open {path}</Heading>

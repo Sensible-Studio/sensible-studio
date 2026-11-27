@@ -151,6 +151,8 @@ export interface Listing {
   total: number;
   offset: number;
   items: DamItem[];
+  /** false while the media service is down: uploads wait as "Processing" until it is back */
+  processingAvailable?: boolean;
   /** what the user may do in this folder (absent: allowed; the server checks each action anyway) */
   canCreate?: boolean;
   canEdit?: boolean;

@@ -367,6 +367,12 @@
     border-color: var(--studio-border);
   }
 
+  // an example in an empty field must not read as a value
+  :is(input, textarea)::placeholder {
+    color: var(--studio-text-faint);
+    opacity: 1;
+  }
+
   [class*='spectrum-Menu-popover'],
   [class*='spectrum-Popover'],
   :is([role='dialog'], [role='alertdialog'])[class*='spectrum-Dialog'] {

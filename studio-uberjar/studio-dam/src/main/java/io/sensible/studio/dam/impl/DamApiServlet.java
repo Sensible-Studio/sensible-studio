@@ -551,6 +551,9 @@ public class DamApiServlet extends SlingAllMethodsServlet {
         out.put("total", total);
         out.put("offset", offset);
         out.put("items", items.subList(offset, Math.min(total, offset + limit)));
+        // false while the media service is down: files wait as "Processing", and the screen says why
+        DamClient service = damClient;
+        out.put("processingAvailable", service != null && service.isAvailable());
         return out;
     }
 

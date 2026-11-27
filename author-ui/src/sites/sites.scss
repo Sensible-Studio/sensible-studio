@@ -171,6 +171,14 @@ $sel: color-mix(in srgb, var(--spectrum-blue-900) 12%, transparent);
   overflow-x: auto;
 }
 
+.studio-column--empty {
+  padding: 16px !important;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--studio-text-muted);
+  border-right: 0 !important;
+}
+
 .studio-column {
   flex: none;
   width: 280px;

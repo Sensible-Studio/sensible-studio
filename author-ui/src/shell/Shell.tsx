@@ -485,8 +485,14 @@ function TabStrip({ state, dispatch, newTab }: { state: ShellApi['state']; dispa
   };
   const menuTab = menu ? state.tabs.find((t) => t.id === menu.tab) : undefined;
   const menuIndex = menuTab ? state.tabs.indexOf(menuTab) : -1;
+  // with more tabs than fit, the strip scrolls: the tab being worked in is the one that must stay in sight
+  const strip = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const active = strip.current?.querySelector<HTMLElement>('.studio-tab.is-active');
+    if (active && typeof active.scrollIntoView === 'function') active.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [state.active, state.tabs.length]);
   return (
-    <div className="studio-tabs" role="tablist" aria-label="Open tabs">
+    <div className="studio-tabs" role="tablist" aria-label="Open tabs" ref={strip}>
       {menu && menuTab && (
         <ul className="studio-tabmenu" role="menu" style={{ left: menu.x, top: menu.y }} onMouseDown={(e) => e.stopPropagation()}>
           <li role="none">

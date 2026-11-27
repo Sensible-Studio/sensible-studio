@@ -29,6 +29,8 @@ export function kindOf(item: DamItem): Kind {
   if (m === 'application/pdf') return 'pdf';
   if (m.includes('zip') || m.includes('compressed')) return 'archive';
   if (m.startsWith('text/') || m.includes('officedocument') || m.includes('msword') || m.includes('opendocument')) return 'document';
+  // a short text file is told apart by nothing but its name once the type was looked for in its bytes
+  if ((!m || m === 'application/octet-stream') && /\.(txt|md|csv|rtf|docx?|odt|xlsx?|pptx?)$/i.test(item.name ?? item.path ?? '')) return 'document';
   return 'file';
 }
 

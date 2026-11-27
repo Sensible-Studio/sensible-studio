@@ -3,6 +3,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HttpClient } from './editor/api/HttpClient';
 import { parsePlace } from './shell/places';
+import { installDialogEnter } from './shell/dialogEnter';
+import { installSessionWatch } from './shell/session';
 import { Shell } from './shell/Shell';
 import { applyTheme, readTheme } from './theme/pref';
 import { studioTheme } from './theme/theme';
@@ -25,6 +27,8 @@ import './cf/cf.scss';
  * history and the frame around them. A URL that names nothing opens Start.
  */
 applyTheme(readTheme());
+installSessionWatch();
+installDialogEnter();
 
 const client = new HttpClient();
 const place = parsePlace(window.location);

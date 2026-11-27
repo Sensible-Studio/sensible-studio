@@ -156,7 +156,7 @@ export function TranslateDialog({
         {!source ? (
           <InlineAlert variant="negative">
             <Heading>Not in a language folder</Heading>
-            <Content>Language copies live next to a language folder, e.g. /content/dam/site/en/… → /content/dam/site/fr/…</Content>
+            <Content>Language versions live next to a language folder, e.g. /content/dam/site/en/… → /content/dam/site/fr/…</Content>
           </InlineAlert>
         ) : !languages || !providers ? (
           <ProgressCircle aria-label="Loading languages" isIndeterminate />

@@ -224,7 +224,7 @@ describe('image editor', () => {
 
   it('adds a linked map area', async () => {
     const { dam } = setup();
-    fireEvent.click(await screen.findByRole('button', { name: 'Release Map' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Image map' }));
     fireEvent.click(screen.getByRole('button', { name: 'Add Rectangular Map' }));
     const bar = screen.getByRole('group', { name: 'Map area' });
     fireEvent.change(within(bar).getByRole('textbox', { name: 'Path' }), { target: { value: 'javascript:alert(1)' } });
@@ -241,7 +241,7 @@ describe('image editor', () => {
 
   it('adds a polygonal map area and removes a corner of it', async () => {
     const { dam } = setup();
-    fireEvent.click(await screen.findByRole('button', { name: 'Release Map' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Image map' }));
     fireEvent.click(screen.getByRole('button', { name: 'Add Polygonal Map' }));
     expect(screen.getAllByRole('button', { name: /^Corner \d of 5$/ })).toHaveLength(5);
     fireEvent.doubleClick(screen.getByRole('button', { name: 'Corner 2 of 5' }));

@@ -200,7 +200,7 @@ function LanguagesDialog({
           <InlineAlert variant="info">
             <Heading>Not in a language root</Heading>
             <Content>
-              Language copies live next to a language root, as in AEM: /content/&lt;site&gt;/language-masters/en/… →
+              Language versions live next to a language root: /content/&lt;site&gt;/language-masters/en/… →
               /content/&lt;site&gt;/language-masters/fr/…
             </Content>
           </InlineAlert>
