@@ -143,6 +143,17 @@ public class ReplicationJob implements JobConsumer {
             deliver(session, agent.getConfiguration(), action, path, deep);
             record(rr, agentId, action, path, null);
             return JobResult.OK;
+        } catch (HttpTransport.Refused e) {
+            // A refusal is final: kept in the target's history, taken out of the queue. Left there it was retried
+            // for ever and everything published after it waited behind it (27.11.2026: a stylesheet under /apps,
+            // which a publish instance does not take, held all publishing back for hours).
+            LOG.warn("Replication of {} to {} refused, not tried again: {}", path, agentId, e.getMessage());
+            try (ResourceResolver rr = agents.serviceResolver()) {
+                record(rr, agentId, action, path, "Refused, not tried again: " + e.getMessage());
+            } catch (LoginException | PersistenceException ignored) {
+                // the log is best effort
+            }
+            return JobResult.CANCEL;
         } catch (ReplicationException | IOException | RepositoryException e) {
             LOG.warn("Replication of {} to {} failed (attempt {}): {}", path, agentId, job.getRetryCount() + 1, e.getMessage());
             try (ResourceResolver rr = agents.serviceResolver()) {

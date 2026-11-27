@@ -79,6 +79,9 @@ final class HttpTransport {
             int status = c.getResponseCode();
             InputStream in = status >= 400 ? c.getErrorStream() : c.getInputStream();
             String text = in == null ? "" : new String(ContentPack.readAll(in), StandardCharsets.UTF_8);
+            if (status == 403 && !flush) {
+                throw new Refused("HTTP 403 from " + uri + (text.isEmpty() ? "" : ": " + summary(text)));
+            }
             if (status < 200 || status >= 300) {
                 throw new ReplicationException("HTTP " + status + " from " + uri + (text.isEmpty() ? "" : ": " + summary(text)));
             }
@@ -111,5 +114,17 @@ final class HttpTransport {
     private static String summary(String text) {
         String t = text.replaceAll("<[^>]+>", " ").replaceAll("\\s+", " ").trim();
         return t.length() > 300 ? t.substring(0, 300) + "…" : t;
+    }
+
+    /**
+     * The target understood the request and will not take it (403): it may not be written there, and trying
+     * again changes nothing. A content target's queue drops such a request instead of standing still behind it.
+     */
+    static final class Refused extends ReplicationException {
+        private static final long serialVersionUID = 1L;
+
+        Refused(String message) {
+            super(message);
+        }
     }
 }

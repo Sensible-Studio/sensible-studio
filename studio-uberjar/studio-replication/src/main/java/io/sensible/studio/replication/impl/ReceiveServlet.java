@@ -124,12 +124,19 @@ public class ReceiveServlet extends SlingAllMethodsServlet {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unsupported action " + action);
             }
         } catch (RepositoryException | RuntimeException e) {
-            LOG.error("Replication of {} failed: {}", path, e.getMessage(), e);
             try {
                 session.refresh(false);
             } catch (RepositoryException ignored) {
                 // nothing more to undo
             }
+            if (e instanceof javax.jcr.AccessDeniedException || String.valueOf(e.getMessage()).contains("OakAccess0000")) {
+                // not ours to write (the transport user takes content, not code under /apps or /libs): a refusal,
+                // so the author stops asking instead of holding its whole queue behind this request
+                LOG.warn("Replication of {} refused: {} may not write there", path, session.getUserID());
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, session.getUserID() + " may not write " + path + " on this instance");
+                return;
+            }
+            LOG.error("Replication of {} failed: {}", path, e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
