@@ -86,6 +86,34 @@ public final class PagePermissions {
 
     // ------------------------------------------------------------------ reading
 
+    /**
+     * What the session's own user may do on the page: the five permissions, each true or false. Needs no right to
+     * read the access control list, so an author who may not see who was granted what still sees what they may do.
+     */
+    public Map<String, Object> own(String path) throws RepositoryException {
+        Map<String, Object> row = new LinkedHashMap<>();
+        row.put("principal", session.getUserID());
+        row.put("read", has(path, READ));
+        row.put("modify", has(path, MODIFY));
+        row.put("delete", has(path, DELETE));
+        // as publishing judges it: the privilege, or write (see ReplicatorImpl)
+        row.put("replicate", has(path, REPLICATE) || has(path, Collections.singletonList(Privilege.JCR_WRITE)));
+        row.put("create", has(path, CREATE));
+        return row;
+    }
+
+    private boolean has(String path, List<String> names) {
+        try {
+            Privilege[] privileges = new Privilege[names.size()];
+            for (int i = 0; i < privileges.length; i++) {
+                privileges[i] = acm.privilegeFromName(names.get(i));
+            }
+            return acm.hasPrivileges(path, privileges);
+        } catch (RepositoryException e) {
+            return false; // a privilege this repository does not know, or no such node
+        }
+    }
+
     /** The permissions set on the page itself, per principal. */
     public List<Map<String, Object>> acl(String path) throws RepositoryException {
         Map<String, Map<String, Object>> rows = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);

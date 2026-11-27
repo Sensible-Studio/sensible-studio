@@ -59,8 +59,19 @@ public class PagePermissionsServlet extends SlingAllMethodsServlet {
             if ("effective".equals(request.getParameter("op"))) {
                 out.put("effective", perms.effective(path));
             } else {
-                out.put("acl", perms.acl(path));
-                out.put("cug", perms.cug(path));
+                out.put("own", perms.own(path));
+                try {
+                    out.put("acl", perms.acl(path));
+                    out.put("cug", perms.cug(path));
+                } catch (javax.jcr.AccessDeniedException e) {
+                    // who may not read the access control list (an author) still learns what they may do themselves
+                    out.put("acl", Collections.emptyList());
+                    Map<String, Object> cug = new LinkedHashMap<>();
+                    cug.put("supported", Boolean.FALSE);
+                    cug.put("principals", Collections.emptyList());
+                    out.put("cug", cug);
+                    out.put("restricted", Boolean.TRUE);
+                }
             }
             send(response, HttpServletResponse.SC_OK, out);
         } catch (RepositoryException e) {

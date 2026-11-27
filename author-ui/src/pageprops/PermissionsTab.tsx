@@ -53,6 +53,23 @@ export function PermissionsTab({ client, page }: { client: PagePermissionsClient
     }
   };
 
+  // Who may not read the page's permissions (an author) is told what they may do themselves, in words, and is
+  // not offered Add Permissions or the lists that would only answer "Access denied".
+  if (data?.restricted) {
+    const own = data.own;
+    const may = own ? PERMISSION_FLAGS.filter((f) => own[f]) : [];
+    const mayNot = own ? PERMISSION_FLAGS.filter((f) => !own[f]) : [];
+    return (
+      <div className="studio-pp-permissions">
+        <p className="studio-pp-own">
+          {may.length > 0 ? `On this page you may: ${may.map((f) => PERMISSION_LABELS[f].toLowerCase()).join(', ')}.` : 'You may not do anything on this page.'}
+          {mayNot.length > 0 && may.length > 0 ? ` You may not: ${mayNot.map((f) => PERMISSION_LABELS[f].toLowerCase()).join(', ')}.` : ''}
+        </p>
+        <p className="studio-pp-own studio-pp-own--note">Who may do what here is set by an administrator.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="studio-pp-permissions">
       <div className="studio-pp-actionbar">

@@ -713,3 +713,7 @@
     background: var(--studio-warning);
   }
 }
+
+// What the signed-in user may do, for who may not read the page's permissions.
+.studio-pp-own { margin: 0 0 var(--studio-space-3, 8px); max-width: 60ch; line-height: 1.5; color: var(--studio-text); }
+.studio-pp-own--note { color: var(--studio-text-muted); }

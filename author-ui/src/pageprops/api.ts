@@ -22,6 +22,10 @@ export interface PermissionRow extends Record<PermissionFlag, boolean> {
 export interface PagePermissions {
   acl: PermissionRow[];
   cug: { supported: boolean; principals: PermissionRow[] };
+  /** what the signed-in user may do on the page */
+  own?: Record<PermissionFlag, boolean> & { principal: string };
+  /** the user may not read who was granted what: only `own` says something */
+  restricted?: boolean;
 }
 
 export interface PrincipalChoice {
