@@ -69,7 +69,7 @@ const BUTTONS: Record<ToolbarAction, { label: string; icon: ReactElement }> = {
   xfconvert: { label: 'Convert to experience fragment variant', icon: <BoxExport /> },
   rollout: { label: 'Sync changes', icon: <Launch /> },
   // Targeting mode, like AEM: the component gets an experience per audience
-  target: { label: 'Target', icon: <Target /> },
+  target: { label: 'Personalize', icon: <Target /> },
   untarget: { label: 'Remove personalization', icon: <RemoveCircle /> },
   parent: { label: 'Parent', icon: <SelectContainer /> },
   layout: { label: 'Layout', icon: <ViewColumn /> },

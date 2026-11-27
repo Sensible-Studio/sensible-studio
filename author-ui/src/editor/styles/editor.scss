@@ -535,6 +535,13 @@ $stage-padding: 12px;
   width: 360px;
 }
 
+// The Developer and Personalize panels put their sections straight in the body, which has no padding of
+// its own (the library's lists run edge to edge): without this their headings sat against the edge.
+.studio-sidepanel--developer .studio-sidepanel__body,
+.studio-sidepanel--targeting .studio-sidepanel__body {
+  padding: 4px var(--studio-space-6, 16px) 16px;
+}
+
 .studio-developer {
   display: flex;
   flex-direction: column;

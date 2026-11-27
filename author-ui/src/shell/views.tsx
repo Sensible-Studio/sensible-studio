@@ -114,6 +114,8 @@ const projectsClient = new HttpProjectsClient();
 const damClient = new DamHttpClient();
 const cfClient = new HttpCfClient();
 const graphqlClient = new HttpGraphQLClient();
+// one instance: the query editor reads the publication state in an effect that depends on it
+const graphqlReplication = new HttpReplicationClient();
 const componentsClient = new HttpComponentsClient();
 const msmClient = new HttpMsmClient();
 const translationRulesClient = new HttpTranslationRulesClient();
@@ -147,7 +149,7 @@ export function View({ place, client }: { place: Place; client: StudioClient }) 
     case 'graphql':
       return <GraphQLConsole client={graphqlClient} />;
     case 'graphiql':
-      return <QueryEditor key={`${place.endpoint}:${place.query}`} client={graphqlClient} endpoint={place.endpoint} query={place.query} />;
+      return <QueryEditor key={`${place.endpoint}:${place.query}`} client={graphqlClient} replication={graphqlReplication} endpoint={place.endpoint} query={place.query} />;
     case 'activity':
       return <ActivityConsole />;
     case 'projects':

@@ -628,6 +628,25 @@
     color: inherit;
   }
 
+  // Words and quiet fields on the bar read the bar's colours in every theme: Night Desk has a dark bar,
+  // where Spectrum's own text colours (meant for the light canvas) cannot be read.
+  [class*='spectrum-FieldLabel'],
+  [class*='spectrum-ToggleSwitch-label'],
+  [class*='spectrum-Checkbox-label'],
+  [class*='spectrum-Dropdown--quiet'] > [class*='spectrum-FieldButton'],
+  [class*='spectrum-Dropdown--quiet'] [class*='spectrum-Dropdown-label'] {
+    color: var(--studio-bar-text);
+  }
+  [class*='spectrum-Dropdown--quiet'] > [class*='spectrum-FieldButton'] svg { fill: currentColor; }
+  .studio-assets__count,
+  .studio-cf__subtitle,
+  .studio-start__crumb,
+  .studio-start__crumb-sep { color: color-mix(in srgb, var(--studio-bar-text) 80%, transparent); }
+  .studio-start__crumb:hover,
+  .studio-assets__linkbtn,
+  [class*='spectrum-StatusLight'] { color: var(--studio-bar-text); }
+  .studio-assets__linkbtn:hover { background: var(--studio-bar-hover); }
+
   // the one accent button keeps its own text colour
   &__primary [class*='spectrum-Button'] {
     color: var(--studio-neutral-0);

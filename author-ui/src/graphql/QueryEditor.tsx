@@ -13,6 +13,8 @@ import TextAlignLeft from '@spectrum-icons/workflow/TextAlignLeft';
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { ErrorState, LoadingState } from '../shell/FeedbackState';
 import { InspectorShell } from '../shell/InspectorShell';
+import { PublishDialog } from '../replication/PublishDialog';
+import type { ReplicationClient } from '../replication/api';
 import { useScreenTitle } from '../shell/ShellContext';
 import { StudioConfirmDialog, StudioDialog } from '../shell/StudioDialog';
 import { ToolBar } from '../shell/ToolCrumbs';
@@ -33,7 +35,7 @@ const baseType = (t: string) => t.replace(/[[\]!]/g, '');
  * AEM's GraphQL Query Editor (GraphiQL): a query, its variables and the result, on one endpoint; the
  * persisted queries of the endpoint's configuration on the left, the schema on the right.
  */
-export function QueryEditor({ client, endpoint: wanted, query: wantedQuery }: { client: GraphQLClient; endpoint?: string | null; query?: string | null }) {
+export function QueryEditor({ client, replication, endpoint: wanted, query: wantedQuery }: { client: GraphQLClient; replication?: ReplicationClient; endpoint?: string | null; query?: string | null }) {
   const [endpoints, setEndpoints] = useState<GqlEndpoint[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [key, setKey] = useState<string>(wanted ?? '');
@@ -50,6 +52,9 @@ export function QueryEditor({ client, endpoint: wanted, query: wantedQuery }: { 
   const [schemaError, setSchemaError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState<PersistedQuery | null>(null);
+  // a persisted query answers on the live site only once it is published, like any other content
+  const [live, setLive] = useState<Set<string>>(new Set());
+  const [publishing, setPublishing] = useState<'activate' | 'deactivate' | null>(null);
   const editor = useRef<HTMLTextAreaElement>(null);
 
   useScreenTitle(`GraphQL · ${endpoint?.title ?? 'Query Editor'}`, `Query Editor | GraphQL | ${VOCAB.product}`);
@@ -69,6 +74,15 @@ export function QueryEditor({ client, endpoint: wanted, query: wantedQuery }: { 
     client.persisted(endpoint.conf).then(setPersisted, () => setPersisted([]));
   }, [client, endpoint]);
   useEffect(loadPersisted, [loadPersisted]);
+
+  const loadLive = useCallback(() => {
+    if (!replication || persisted.length === 0) return setLive(new Set());
+    replication.status(persisted.map((q) => q.path)).then(
+      (list) => setLive(new Set(list.filter((s) => s.activated).map((s) => s.path))),
+      () => setLive(new Set()),
+    );
+  }, [replication, persisted]);
+  useEffect(loadLive, [loadLive]);
 
   // a persisted query named in the address opens once its list is read
   const opened = useRef(false);
@@ -190,6 +204,19 @@ export function QueryEditor({ client, endpoint: wanted, query: wantedQuery }: { 
               </ActionButton>
               <Tooltip>{endpoint?.conf ? `Stored in /conf/${endpoint.conf}, run with GET at /graphql/execute.json` : 'Persisted queries belong to a configuration: pick its endpoint'}</Tooltip>
             </TooltipTrigger>
+            {replication && current && (
+              <TooltipTrigger delay={400}>
+                <ActionButton isQuiet onPress={() => setPublishing('activate')} isDisabled={dirty}>
+                  <Text>Publish</Text>
+                </ActionButton>
+                <Tooltip>{dirty ? 'Save the query first' : `The live site answers ${executeUrl(current)} once the query is published`}</Tooltip>
+              </TooltipTrigger>
+            )}
+            {replication && current && live.has(current.path) && (
+              <ActionButton isQuiet onPress={() => setPublishing('deactivate')}>
+                <Text>Unpublish</Text>
+              </ActionButton>
+            )}
             <ToggleButton isQuiet isSelected={schemaOpen} onChange={setSchemaOpen}>
               <Data />
               <Text>Schema</Text>
@@ -236,7 +263,10 @@ export function QueryEditor({ client, endpoint: wanted, query: wantedQuery }: { 
                   <li key={q.path} className={current?.path === q.path ? 'is-current' : undefined}>
                     <button type="button" onClick={() => open(q)} aria-current={current?.path === q.path ? 'true' : undefined}>
                       <span>{q.name}</span>
-                      {q.lastModified && <small>{new Date(q.lastModified).toLocaleDateString()}</small>}
+                      <small>
+                        {q.lastModified ? new Date(q.lastModified).toLocaleDateString() : ''}
+                        {replication ? `${q.lastModified ? ' · ' : ''}${live.has(q.path) ? 'Published' : 'Not published'}` : ''}
+                      </small>
                     </button>
                     <TooltipTrigger delay={400}>
                       <ActionButton isQuiet aria-label={`Delete ${q.name}`} onPress={() => setRemoving(q)}>
@@ -342,6 +372,22 @@ export function QueryEditor({ client, endpoint: wanted, query: wantedQuery }: { 
           />
         )}
       </DialogContainer>
+      <DialogContainer onDismiss={() => setPublishing(null)}>
+        {publishing && current && replication && (
+          <PublishDialog
+            client={replication}
+            paths={[current.path]}
+            title={current.name}
+            action={publishing}
+            noun="Query"
+            uses={false}
+            onDone={() => {
+              setPublishing(null);
+              loadLive();
+            }}
+          />
+        )}
+      </DialogContainer>
       <DialogContainer onDismiss={() => setRemoving(null)}>
         {removing && (
           <StudioConfirmDialog
@@ -350,17 +396,20 @@ export function QueryEditor({ client, endpoint: wanted, query: wantedQuery }: { 
             primaryActionLabel="Delete"
             cancelLabel="Cancel"
             onPrimaryAction={() =>
-              client.deletePersisted(removing).then(
-                () => {
-                  ToastQueue.positive(`Query ${removing.name} deleted`, { timeout: 3000 });
-                  if (current?.path === removing.path) setCurrent(null);
-                  loadPersisted();
-                },
-                (e: unknown) => ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 }),
-              )
+              // a published query is taken off the live site first; nothing is deleted when that fails
+              (replication && live.has(removing.path) ? replication.deactivate([removing.path]) : Promise.resolve([]))
+                .then(() => client.deletePersisted(removing))
+                .then(
+                  () => {
+                    ToastQueue.positive(`Query ${removing.name} deleted`, { timeout: 3000 });
+                    if (current?.path === removing.path) setCurrent(null);
+                    loadPersisted();
+                  },
+                  (e: unknown) => ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 }),
+                )
             }
           >
-            {`You are going to delete ${removing.name}. Applications that call ${executeUrl(removing)} get an error from now on.`}
+            {`You are going to delete ${removing.name}${live.has(removing.path) ? ', which is published: it is taken off the live site too' : ''}. Applications that call ${executeUrl(removing)} get an error from now on.`}
           </StudioConfirmDialog>
         )}
       </DialogContainer>

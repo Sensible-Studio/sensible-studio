@@ -59,7 +59,7 @@ export function TargetingPanel({ client, pagePath, target, experience, onExperie
       <section className="studio-targeting__section" aria-label="Experiences">
         <h3>Experiences</h3>
         {!target ? (
-          <p className="studio-targeting__hint">Select a component and use its Target action; a targeted component gets one experience per audience.</p>
+          <p className="studio-targeting__hint">Select a component and use its Personalize action; a personalized component gets one experience per audience.</p>
         ) : (
           <>
             <ul className="studio-targeting__experiences" role="listbox" aria-label="Experiences">
@@ -117,7 +117,7 @@ export function TargetingPanel({ client, pagePath, target, experience, onExperie
                 Remove personalization
               </Button>
             </div>
-            <p className="studio-targeting__hint">The page shows the highlighted experience; edit it like any component. Removing targeting keeps the experience shown.</p>
+            <p className="studio-targeting__hint">The page shows the highlighted experience; edit it like any component. Removing personalization keeps the experience shown.</p>
           </>
         )}
       </section>
