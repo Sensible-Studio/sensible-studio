@@ -26,6 +26,13 @@
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.api</artifactId>
         </dependency>
+        <!-- run modes: the sign-in page of a publish instance speaks to a visitor, not to an author -->
+        <dependency>
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.settings</artifactId>
+            <version>1.3.10</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Sling context-aware configuration: the management API the Site configuration editor reads and writes through -->
         <dependency>
             <groupId>org.apache.sling</groupId>

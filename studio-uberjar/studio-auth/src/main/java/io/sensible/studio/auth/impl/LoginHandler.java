@@ -225,11 +225,18 @@ public final class LoginHandler extends DefaultAuthenticationFeedbackHandler imp
         if (asked != null && !HttpServletRequest.FORM_AUTH.equals(asked)) {
             return false;
         }
-        // a sign-in attempt that did not come from the login page is not answered with the login page
+        // A sign-in attempt that did not come from the login page is not answered with the login page (a script
+        // gets its 401 or 403), except one: a visitor who typed a wrong password into a site's own sign-in form.
+        // Their browser would be left on a bare line of text at the address of the check; they get the login page,
+        // which says what went wrong and takes them back to the page they came from.
+        String back = null;
         if (!AuthUtil.checkReferer(request, loginForm)) {
-            return false;
+            back = isLogin(request) && !AuthUtil.isValidateRequest(request) ? cameFrom(request) : null;
+            if (back == null) {
+                return false;
+            }
         }
-        String resource = AuthUtil.setLoginResourceAttribute(request, request.getRequestURI());
+        String resource = back != null ? back : AuthUtil.setLoginResourceAttribute(request, request.getRequestURI());
         Map<String, String> parameters = new HashMap<>();
         parameters.put("resource", resource);
         Object reason = request.getAttribute(FAILURE_REASON);
@@ -244,6 +251,33 @@ public final class LoginHandler extends DefaultAuthenticationFeedbackHandler imp
             LOG.error("Could not send the visitor to the login page", e);
         }
         return true;
+    }
+
+    /**
+     * The page of this site a browser's sign-in form was on: the path (and query) of a Referer on this host, for a
+     * request that asks for a page. Null for anything else.
+     */
+    static String cameFrom(HttpServletRequest request) {
+        String accept = request.getHeader("Accept");
+        String referer = request.getHeader("Referer");
+        if (accept == null || !accept.contains("text/html") || referer == null) {
+            return null;
+        }
+        try {
+            java.net.URI u = java.net.URI.create(referer);
+            String path = u.getRawPath();
+            if (u.getHost() == null || !u.getHost().equalsIgnoreCase(request.getServerName()) || path == null
+                    || !path.startsWith("/") || path.startsWith("//") || path.contains("j_security_check")) {
+                return null;
+            }
+            int port = u.getPort() > 0 ? u.getPort() : "https".equals(u.getScheme()) ? 443 : 80;
+            if (port != request.getServerPort()) {
+                return null;
+            }
+            return u.getRawQuery() == null ? path : path + "?" + u.getRawQuery();
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     @Override

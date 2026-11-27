@@ -52,4 +52,19 @@ class LoginPageServletTest {
         assertTrue(html.contains("class=\"error\""));
         assertTrue(html.contains("value=\"/studio/start.html\""));
     }
+
+    @Test
+    void a_wrong_password_is_said_in_words_whatever_names_it() {
+        assertEquals("User name and password do not match.", LoginPageServlet.message("invalid_login"));
+        assertEquals("User name and password do not match.", LoginPageServlet.message("User name and password do not match"));
+        assertEquals("Too many attempts. Try again later.", LoginPageServlet.message("Too many attempts. Try again later."));
+        assertEquals("Sign in failed.", LoginPageServlet.message("something else"));
+    }
+
+    @Test
+    void visitors_of_the_live_site_get_the_form_without_the_authors_welcome() {
+        String page = "<main class=\"page\"><section class=\"welcome\"><h1>Welcome</h1></section><section class=\"panel\"><form></form>"
+                + "<footer>Sensible Studio author</footer></section></main>";
+        assertEquals("<main class=\"page page--solo\"><section class=\"panel\"><form></form></section></main>", LoginPageServlet.forVisitors(page));
+    }
 }

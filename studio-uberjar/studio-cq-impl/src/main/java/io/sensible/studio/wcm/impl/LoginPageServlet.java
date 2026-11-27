@@ -41,13 +41,26 @@ public class LoginPageServlet extends SlingSafeMethodsServlet {
     public static final String URL = PATH + ".html";
     static final String ACTION = URL + "/j_security_check";
 
+    /** Run modes: on a publish instance the page is for a visitor of the site. Absent in tests. */
+    @org.osgi.service.component.annotations.Reference(
+            cardinality = org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL,
+            policy = org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC,
+            policyOption = org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY)
+    private transient volatile org.apache.sling.settings.SlingSettingsService settings;
+
+    private boolean live() {
+        org.apache.sling.settings.SlingSettingsService s = settings;
+        return s != null && s.getRunModes().contains("publish");
+    }
+
     @Override
     protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
             throws ServletException, IOException {
         String resource = safeResource(request.getParameter("resource"));
-        String reason = request.getParameter("j_reason");
-        if (reason == null) {
-            reason = request.getParameter("j_reason_code");
+        // the code says what happened; the text beside it is Sling's own wording
+        String reason = request.getParameter("j_reason_code");
+        if (reason == null || reason.isEmpty()) {
+            reason = request.getParameter("j_reason");
         }
         String user = request.getResourceResolver().getUserID();
         if (user != null && !"anonymous".equals(user) && reason == null) {
@@ -62,6 +75,9 @@ public class LoginPageServlet extends SlingSafeMethodsServlet {
             html = new String(in.readAllBytes(), StandardCharsets.UTF_8);
         }
         String message = message(reason);
+        if (live()) {
+            html = forVisitors(html);
+        }
         html = html.replace("{{action}}", escape(request.getContextPath() + ACTION))
                 .replace("{{resource}}", escape(resource))
                 .replace("{{errorClass}}", message.isEmpty() ? "" : " is-visible")
@@ -87,10 +103,31 @@ public class LoginPageServlet extends SlingSafeMethodsServlet {
         return resource;
     }
 
+    /**
+     * The page as a visitor of the live site meets it (a wrong password in the site's own sign-in form, a
+     * members' page): without the product's welcome, which speaks to authors, and without "author" under the form.
+     */
+    static String forVisitors(String html) {
+        int from = html.indexOf("<section class=\"welcome\">");
+        int to = from < 0 ? -1 : html.indexOf("</section>", from);
+        if (to > 0) {
+            html = html.substring(0, from) + html.substring(to + "</section>".length());
+        }
+        return html.replace("<footer>Sensible Studio author</footer>", "")
+                .replace("<main class=\"page\">", "<main class=\"page page--solo\">")
+                .replace("<title>Sensible Studio | Sign In</title>", "<title>Sign in</title>");
+    }
+
     /** Sling's {@code FormReason} (and its reason codes) in words. */
     static String message(String reason) {
         if (reason == null || reason.isEmpty()) {
             return "";
+        }
+        if ("invalid_login".equalsIgnoreCase(reason) || reason.startsWith("User name and password do not match")) {
+            return "User name and password do not match.";
+        }
+        if (reason.startsWith("Too many attempts")) {
+            return "Too many attempts. Try again later.";
         }
         switch (reason) {
             case "TIMEOUT":
