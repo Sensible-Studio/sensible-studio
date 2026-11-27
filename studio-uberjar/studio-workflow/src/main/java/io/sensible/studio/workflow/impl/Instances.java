@@ -104,8 +104,8 @@ final class Instances {
 
     /** The stages of the model version the instance runs on (the runtime model's {@code workflowStages}). */
     static String[] stages(Resource instance) {
-        String modelId = instance.getValueMap().get("modelId", String.class);
-        Resource meta = modelId == null ? null : instance.getResourceResolver().getResource(modelId + "/metaData");
+        Resource model = Engine.modelResource(instance);
+        Resource meta = model == null ? null : model.getChild("metaData");
         String[] s = meta == null ? null : meta.getValueMap().get("workflowStages", String[].class);
         return s == null ? new String[0] : s;
     }

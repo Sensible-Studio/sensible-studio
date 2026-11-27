@@ -197,8 +197,7 @@ final class Objects {
         @Override
         public WorkflowModel getWorkflowModel() {
             if (model == null) {
-                Resource m = resolver.getResource(instance.getValueMap().get("modelId", ""));
-                model = m == null ? null : RuntimeModel.read(m);
+                model = Engine.modelOf(instance);
             }
             return model;
         }
@@ -363,20 +362,22 @@ final class Objects {
 
         @Override
         public Workflow getWorkflow(String id) throws WorkflowException {
-            Resource r = resolver.getResource(id);
-            if (r == null || r.getValueMap().get("modelId") == null) {
+            ResourceResolver rr = reader();
+            Resource r = rr.getResource(id);
+            if (r == null || r.getValueMap().get("modelId") == null || !mine(r, rr)) {
                 throw new WorkflowException("No workflow " + id);
             }
-            return new WorkflowImpl(resolver, r, null);
+            return new WorkflowImpl(rr, r, null);
         }
 
         @Override
         public Workflow[] getWorkflows(String[] states) {
             List<Workflow> out = new ArrayList<>();
-            for (Resource r : Instances.all(resolver)) {
+            ResourceResolver rr = reader();
+            for (Resource r : Instances.all(rr)) {
                 String s = r.getValueMap().get("status", "");
-                if (states == null || states.length == 0 || java.util.Arrays.asList(states).contains(s)) {
-                    out.add(new WorkflowImpl(resolver, r, null));
+                if ((states == null || states.length == 0 || java.util.Arrays.asList(states).contains(s)) && mine(r, rr)) {
+                    out.add(new WorkflowImpl(rr, r, null));
                 }
             }
             return out.toArray(new Workflow[0]);
@@ -400,15 +401,16 @@ final class Objects {
         @Override
         public WorkItem[] getActiveWorkItems() {
             List<WorkItem> out = new ArrayList<>();
-            List<String> me = Instances.principals(resolver);
-            for (Resource r : Instances.all(resolver)) {
+            ResourceResolver rr = reader();
+            List<String> me = Instances.principals(resolver, rr);
+            for (Resource r : Instances.all(rr)) {
                 if (!Engine.STATUS_RUNNING.equals(r.getValueMap().get("status", ""))) {
                     continue;
                 }
                 for (Resource i : Engine.items(r)) {
                     ValueMap iv = i.getValueMap();
                     if (Engine.ITEM_ACTIVE.equals(iv.get("status", "")) && me.contains(iv.get("assignee", ""))) {
-                        out.add(new ItemImpl(resolver, null, i));
+                        out.add(new ItemImpl(rr, null, i));
                     }
                 }
             }
@@ -417,12 +419,42 @@ final class Objects {
 
         @Override
         public WorkItem getWorkItem(String id) throws WorkflowException {
-            Resource i = resolver.getResource(id);
-            if (i == null || i.getValueMap().get("nodeId") == null) {
+            ResourceResolver rr = reader();
+            Resource i = rr.getResource(id);
+            if (i == null || i.getValueMap().get("nodeId") == null || !mine(i.getParent().getParent(), rr)) {
                 throw new WorkflowException("No work item " + id);
             }
-            Resource m = resolver.getResource(i.getParent().getParent().getValueMap().get("modelId", ""));
-            return new ItemImpl(resolver, m == null ? null : RuntimeModel.read(m), i);
+            return new ItemImpl(rr, Engine.modelOf(i.getParent().getParent()), i);
+        }
+
+        private static final String READER = "io.sensible.studio.workflow.reader";
+
+        /**
+         * What reads the instances. An author's own session may not read {@code /var/workflow}, so
+         * code that asks this session for its work items got none; the engine reads for it, and
+         * {@link #mine} cuts the answer down to what is the user's. The engine's resolver is kept
+         * with the user's and closed with it. Inside a process step, and for an administrator,
+         * the session's own resolver reads.
+         */
+        private ResourceResolver reader() {
+            if (service == null || resolver.getResource(Engine.INSTANCES) != null) {
+                return resolver;
+            }
+            Object kept = resolver.getPropertyMap().get(READER);
+            if (kept instanceof ResourceResolver && ((ResourceResolver) kept).isLive()) {
+                return (ResourceResolver) kept;
+            }
+            try {
+                ResourceResolver engine = service.engineResolver();
+                resolver.getPropertyMap().put(READER, engine);
+                return engine;
+            } catch (org.apache.sling.api.resource.LoginException e) {
+                return resolver;
+            }
+        }
+
+        private boolean mine(Resource instance, ResourceResolver rr) {
+            return rr == resolver || Instances.isAdmin(resolver) || Instances.concerns(instance, Instances.principals(resolver, rr));
         }
 
         @Override

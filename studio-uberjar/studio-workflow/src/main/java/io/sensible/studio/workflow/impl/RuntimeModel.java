@@ -52,8 +52,13 @@ final class RuntimeModel implements WorkflowModel {
 
     /** Reads a stored runtime model. */
     static RuntimeModel read(Resource model) {
+        return read(model, model.getPath());
+    }
+
+    /** Reads a model kept somewhere else than under its id: the copy an instance runs on. */
+    static RuntimeModel read(Resource model, String id) {
         ValueMap vm = model.getValueMap();
-        RuntimeModel m = new RuntimeModel(model.getPath());
+        RuntimeModel m = new RuntimeModel(id);
         m.title = vm.get("title", vm.get("jcr:title", model.getName()));
         m.description = vm.get("description", String.class);
         m.version = vm.get("version", "1.0");

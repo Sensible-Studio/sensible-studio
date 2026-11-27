@@ -120,6 +120,7 @@ final class Engine {
         meta.put("jcr:primaryType", "nt:unstructured");
         resolver.create(instance, "metaData", meta);
         resolver.create(instance, "workItems", Collections.singletonMap("jcr:primaryType", "nt:unstructured"));
+        keep(modelRes, instance, OWN_MODEL);
         resolver.commit();
         return instance.getPath();
     }
@@ -504,12 +505,47 @@ final class Engine {
     }
 
     RuntimeModel model(Resource instance) {
-        String id = instance.getValueMap().get("modelId", "");
-        Resource m = resolver.getResource(id);
+        RuntimeModel m = modelOf(instance);
         if (m == null) {
-            throw new IllegalArgumentException("The model " + id + " of " + instance.getPath() + " is gone");
+            throw new IllegalArgumentException("The model " + instance.getValueMap().get("modelId", "") + " of " + instance.getPath() + " is gone");
         }
-        return RuntimeModel.read(m);
+        return m;
+    }
+
+    /** Under an instance: the model as it was when the instance started. */
+    static final String OWN_MODEL = "model";
+
+    /**
+     * The model an instance runs on: its own copy, made when it started. A sync writes the runtime
+     * model anew, and its steps are numbered by position, so a flow under way would find another step
+     * (or none) under the number it stands on. Instances from before the copy read the runtime model.
+     */
+    static RuntimeModel modelOf(Resource instance) {
+        Resource m = modelResource(instance);
+        return m == null ? null : RuntimeModel.read(m, instance.getValueMap().get("modelId", m.getPath()));
+    }
+
+    static Resource modelResource(Resource instance) {
+        Resource own = instance.getChild(OWN_MODEL);
+        if (own != null && own.getChild("nodes") != null) {
+            return own;
+        }
+        return instance.getResourceResolver().getResource(instance.getValueMap().get("modelId", ""));
+    }
+
+    private void keep(Resource source, Resource parent, String name) throws PersistenceException {
+        Map<String, Object> props = new HashMap<>();
+        for (Map.Entry<String, Object> e : source.getValueMap().entrySet()) {
+            String k = e.getKey();
+            if (!k.startsWith("jcr:") || k.equals("jcr:title") || k.equals("jcr:description")) {
+                props.put(k, e.getValue());
+            }
+        }
+        props.put("jcr:primaryType", "nt:unstructured");
+        Resource copy = resolver.create(parent, name, props);
+        for (Resource child : source.getChildren()) {
+            keep(child, copy, child.getName());
+        }
     }
 
     /** {@code /home/users/a/admin} (as older models store it) -> {@code admin}. */

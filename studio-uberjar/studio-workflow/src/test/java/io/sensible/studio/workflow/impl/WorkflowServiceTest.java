@@ -162,6 +162,16 @@ class WorkflowServiceTest {
         assertEquals("default", listed.get("type"));
         assertEquals("1.0", listed.get("version"));
 
+        // an upgrade changes the design: nobody can press Sync on a default model, so it syncs itself
+        context.create().resource(def + "/jcr:content/flow/participant2", "sling:resourceType", ModelStore.STEP_PARTICIPANT, "jcr:title", "Second look");
+        context.create().resource(def + "/jcr:content/flow/participant2/metaData", "PARTICIPANT", "administrators");
+        context.resourceResolver().commit();
+        service.syncDefaults();
+        service.syncDefaults(); // once is enough: the second finds the design it knows
+        context.resourceResolver().refresh();
+        listed = new ModelStore(context.resourceResolver()).list().stream().filter(m -> "request_for_review".equals(m.get("name"))).findFirst().get();
+        assertEquals("1.1", listed.get("version"));
+
         String copy = store.copyToCustom(def);
         assertEquals(ModelStore.CUSTOM + "/request_for_review", copy);
         listed = store.list().stream().filter(m -> "request_for_review".equals(m.get("name"))).findFirst().get();
@@ -169,6 +179,31 @@ class WorkflowServiceTest {
         assertEquals(Boolean.FALSE, listed.get("synced"));
         assertEquals(copy, store.copyToCustom(def)); // already copied: the same copy
         assertThrows(IllegalArgumentException.class, () -> store.copyToCustom(copy));
+    }
+
+    @Test
+    void aFlowUnderWayKeepsTheModelItStartedOn() throws Exception {
+        ResourceResolver admin = as("admin");
+        String id = service.start(admin, model, null, PAGE, Collections.emptyMap());
+        String waitingAt = activeItem(id).getValueMap().get("nodeTitle", "");
+        assertEquals("Approve", waitingAt);
+
+        // a step is added and the model synced
+        ModelStore store = new ModelStore(context.resourceResolver());
+        String added = String.valueOf(store.addStep(DESIGN + "/jcr:content/flow", ModelStore.STEP_PARTICIPANT, "Look again", null).get("path"));
+        context.resourceResolver().getResource(added + "/metaData").adaptTo(org.apache.sling.api.resource.ModifiableValueMap.class)
+                .put("PARTICIPANT", "editors");
+        context.resourceResolver().commit();
+        store.sync(DESIGN);
+
+        // the running flow goes on as it started: Approve was its last step
+        service.complete(admin, activeItem(id).getPath(), null, "ok");
+        context.resourceResolver().refresh();
+        assertEquals(Engine.STATUS_COMPLETED, context.resourceResolver().getResource(id).getValueMap().get("status", ""));
+        // a new one runs the new model
+        String next = service.start(admin, model, null, PAGE, Collections.emptyMap());
+        service.complete(admin, activeItem(next).getPath(), null, "ok");
+        assertEquals("Look again", activeItem(next).getValueMap().get("nodeTitle", ""));
     }
 
     @Test

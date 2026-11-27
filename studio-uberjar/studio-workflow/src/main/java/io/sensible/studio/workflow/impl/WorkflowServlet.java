@@ -271,11 +271,10 @@ public class WorkflowServlet extends SlingAllMethodsServlet {
 
     private static List<Map<String, Object>> routes(ResourceResolver resolver, Resource instance, Resource item) {
         List<Map<String, Object>> out = new ArrayList<>();
-        Resource m = resolver.getResource(instance.getValueMap().get("modelId", ""));
-        if (m == null) {
+        RuntimeModel model = Engine.modelOf(instance);
+        if (model == null) {
             return out;
         }
-        RuntimeModel model = RuntimeModel.read(m);
         for (com.adobe.granite.workflow.exec.Route route : Objects.routes(model.nodes.get(item.getValueMap().get("nodeId", "")), true)) {
             Map<String, Object> rm = new LinkedHashMap<>();
             rm.put("id", route.getId());
