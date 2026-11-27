@@ -76,9 +76,14 @@ public class TagServlet extends SlingAllMethodsServlet {
             request.getResourceResolver().revert();
             LOG.warn("Tag op {} failed", op, e);
             String message = e.getMessage();
-            int status = message != null && message.contains("AccessDenied") ? HttpServletResponse.SC_FORBIDDEN
-                    : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-            send(response, status, error(message));
+            // "Unable to create node at …" with the refusal as its cause: a 500 for what is a matter of rights
+            boolean refused = false;
+            for (Throwable t = e; t != null && !refused; t = t.getCause() == t ? null : t.getCause()) {
+                String m = String.valueOf(t.getMessage());
+                refused = t instanceof AccessDeniedException || m.contains("AccessDenied") || m.contains("OakAccess0000") || m.contains("Access denied");
+            }
+            send(response, refused ? HttpServletResponse.SC_FORBIDDEN : HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    error(refused ? "You are not allowed to do that here" : message));
         }
     }
 

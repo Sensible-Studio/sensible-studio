@@ -36,8 +36,20 @@ final class DamAccess {
         if (folder) {
             out.put("canCreate", may(session, path + "/studio-probe", "add_node"));
         }
-        out.put("canEdit", may(session, path + "/jcr:content/jcr:title", "set_property"));
+        boolean edit = may(session, path + "/jcr:content/jcr:title", "set_property");
+        out.put("canEdit", edit);
         out.put("canDelete", may(session, path, "remove"));
+        // publishing is a right of its own; where it is not known, whoever may change may publish
+        boolean publish = edit;
+        if (session != null) {
+            try {
+                javax.jcr.security.AccessControlManager acm = session.getAccessControlManager();
+                publish = acm.hasPrivileges(path, new javax.jcr.security.Privilege[] {acm.privilegeFromName("crx:replicate")}) || edit;
+            } catch (RepositoryException | RuntimeException e) {
+                publish = edit;
+            }
+        }
+        out.put("canPublish", publish);
         return out;
     }
 

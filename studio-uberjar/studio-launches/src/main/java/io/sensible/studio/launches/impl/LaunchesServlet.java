@@ -208,6 +208,11 @@ public class LaunchesServlet extends SlingAllMethodsServlet {
             error(response, 400, e.getMessage());
         } catch (RepositoryException | RuntimeException e) {
             refresh(session);
+            if (refused(e)) {
+                // releases are kept under /content/launches: someone with rights on one site only has none there
+                error(response, 403, "You are not allowed to do that here");
+                return;
+            }
             LOG.warn("launches {} failed", op, e);
             error(response, 500, e.getMessage());
         }
@@ -267,5 +272,16 @@ public class LaunchesServlet extends SlingAllMethodsServlet {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("error", message == null ? "failed" : message);
         write(response, status, m);
+    }
+
+    /** Whether a failure is the repository refusing the signed-in user, however deep it is wrapped. */
+    private static boolean refused(Throwable e) {
+        for (Throwable t = e; t != null; t = t.getCause() == t ? null : t.getCause()) {
+            String m = String.valueOf(t.getMessage());
+            if (t instanceof javax.jcr.AccessDeniedException || m.contains("OakAccess0000") || m.contains("Access denied") || m.contains("No write access")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

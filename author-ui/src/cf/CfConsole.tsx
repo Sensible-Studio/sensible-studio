@@ -318,7 +318,13 @@ export function CfConsole({ client, initialPath, studio = STUB_STUDIO, dam: damP
     out.push({ id: 'unpublish', label: 'Unpublish', icon: <GlobeRemove />, run: () => setDialog('unpublish') });
     out.push({ id: 'translate', label: 'Translate', icon: <Globe />, run: () => setDialog('translate') });
     out.push({ id: 'delete', label: 'Delete', icon: <Delete />, separator: true, run: () => setDialog('delete') });
-    return out;
+    // not what the person may not do with these
+    const no = new Set<string>();
+    if (sel.some((f) => f.canEdit === false)) ['move', 'translate'].forEach((id) => no.add(id));
+    if (sel.some((f) => f.canPublish === false)) ['publish', 'unpublish'].forEach((id) => no.add(id));
+    if (sel.some((f) => f.canDelete === false)) ['move', 'delete'].forEach((id) => no.add(id));
+    if (folders.get(path)?.canCreate === false) no.add('copy');
+    return out.filter((x) => !no.has(x.id));
   };
   useRegisterActions(tab?.id, selectedFragments.length ? { subject: selectedFragments.length === 1 ? selectedFragments[0].title : `${selectedFragments.length} content fragments`, actions: actionsFor(selectedFragments) } : null);
   const ctx = useContextMenu();

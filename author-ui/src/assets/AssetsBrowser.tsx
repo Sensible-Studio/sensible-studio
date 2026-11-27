@@ -576,8 +576,10 @@ export function AssetsBrowser({
         setNotice(`${sel.length} item${sel.length > 1 ? "s" : ""} copied. Open a folder and paste.`);
       },
     });
-    out.push({ id: "publish", label: "Publish", icon: <PublishCheck />, run: () => setDialog({ kind: "publish", action: "activate", items: sel }) });
-    out.push({ id: "unpublish", label: "Unpublish", icon: <GlobeRemove />, run: () => setDialog({ kind: "publish", action: "deactivate", items: sel }) });
+    if (sel.every((i) => may(i, "canPublish"))) {
+      out.push({ id: "publish", label: "Publish", icon: <PublishCheck />, run: () => setDialog({ kind: "publish", action: "activate", items: sel }) });
+      out.push({ id: "unpublish", label: "Unpublish", icon: <GlobeRemove />, run: () => setDialog({ kind: "publish", action: "deactivate", items: sel }) });
+    }
     if (assetsConfig.mayShare !== false) out.push({ id: "share", label: "Share Link", icon: <ShareIcon />, run: () => setDialog({ kind: "share", items: sel }) });
     out.push({ id: "collection", label: "Add to Collection", icon: <CollectionAdd />, run: () => setDialog({ kind: "addToCollection", paths }) });
     if (canDelete) out.push({ id: "move", label: "Move", icon: <Move />, run: () => setDialog({ kind: "move", items: sel }) });

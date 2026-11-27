@@ -144,6 +144,10 @@ public class SiteConfigServlet extends SlingAllMethodsServlet {
             send(response, 422, error("Not a number: " + e.getMessage()));
         } catch (RuntimeException e) {
             request.getResourceResolver().revert();
+            if (refused(e)) {
+                send(response, 403, error("You are not allowed to do that here"));
+                return;
+            }
             send(response, 500, error(e.getMessage()));
         }
     }
@@ -444,5 +448,16 @@ public class SiteConfigServlet extends SlingAllMethodsServlet {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Cache-Control", "no-store");
         response.getWriter().write(EditorJson.write(body));
+    }
+
+    /** Whether a failure is the repository refusing the signed-in user, however deep it is wrapped. */
+    private static boolean refused(Throwable e) {
+        for (Throwable t = e; t != null; t = t.getCause() == t ? null : t.getCause()) {
+            String m = String.valueOf(t.getMessage());
+            if (t instanceof javax.jcr.AccessDeniedException || m.contains("OakAccess0000") || m.contains("Access denied") || m.contains("No write access")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

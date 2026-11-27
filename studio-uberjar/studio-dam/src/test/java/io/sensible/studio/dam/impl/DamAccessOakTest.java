@@ -69,11 +69,13 @@ class DamAccessOakTest {
         all.put("canCreate", true);
         all.put("canEdit", true);
         all.put("canDelete", true);
+        all.put("canPublish", true);
         org.junit.jupiter.api.Assertions.assertEquals(all, DamAccess.permissions(resolverOf(ana), "/content/dam", true));
         java.util.Map<String, Object> none = new java.util.LinkedHashMap<>();
         none.put("canCreate", false);
         none.put("canEdit", false);
         none.put("canDelete", false);
+        none.put("canPublish", false);
         org.junit.jupiter.api.Assertions.assertEquals(none, DamAccess.permissions(resolverOf(bob), "/content/dam", true));
         java.util.Map<String, Object> item = new java.util.LinkedHashMap<>();
         DamAccess.putDenied(item, resolverOf(ana), "/content/dam", false);

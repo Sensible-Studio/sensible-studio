@@ -92,6 +92,10 @@ export interface ModelSaveRequest {
 }
 
 export interface CfSummary {
+  /** What the signed-in user may do with it; absent (an older server): offered. */
+  canEdit?: boolean;
+  canDelete?: boolean;
+  canPublish?: boolean;
   path: string;
   name: string;
   title: string;

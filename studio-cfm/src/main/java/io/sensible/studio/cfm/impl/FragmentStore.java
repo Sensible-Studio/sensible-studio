@@ -145,6 +145,11 @@ final class FragmentStore {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("path", asset.getPath());
         m.put("name", asset.getName());
+        // what the signed-in user may do with it: a reader's selection offered Move, Publish and Delete
+        boolean write = may(resolver, asset.getPath() + "/jcr:content/jcr:title", javax.jcr.Session.ACTION_SET_PROPERTY);
+        m.put("canEdit", write);
+        m.put("canDelete", may(resolver, asset.getPath(), javax.jcr.Session.ACTION_REMOVE));
+        m.put("canPublish", mayPublish(resolver, asset.getPath(), write));
         m.put("title", content.get("jcr:title", asset.getName()));
         m.put("description", content.get("jcr:description", ""));
         m.put("model", modelPath);
@@ -507,14 +512,31 @@ final class FragmentStore {
      * let the refusal say so. Without a JCR session (tests on mocks), or when it cannot be told: yes.
      */
     static boolean mayAddBelow(org.apache.sling.api.resource.ResourceResolver resolver, String path) {
+        return may(resolver, path + "/studio-probe", javax.jcr.Session.ACTION_ADD_NODE);
+    }
+
+    static boolean may(org.apache.sling.api.resource.ResourceResolver resolver, String path, String action) {
         javax.jcr.Session session = resolver == null ? null : resolver.adaptTo(javax.jcr.Session.class);
         if (session == null) {
             return true;
         }
         try {
-            return session.hasPermission(path + "/studio-probe", javax.jcr.Session.ACTION_ADD_NODE);
+            return session.hasPermission(path, action);
         } catch (javax.jcr.RepositoryException | RuntimeException e) {
             return true;
+        }
+    }
+
+    static boolean mayPublish(org.apache.sling.api.resource.ResourceResolver resolver, String path, boolean write) {
+        javax.jcr.Session session = resolver == null ? null : resolver.adaptTo(javax.jcr.Session.class);
+        if (session == null) {
+            return true;
+        }
+        try {
+            javax.jcr.security.AccessControlManager acm = session.getAccessControlManager();
+            return acm.hasPrivileges(path, new javax.jcr.security.Privilege[] {acm.privilegeFromName("crx:replicate")}) || write;
+        } catch (javax.jcr.RepositoryException | RuntimeException e) {
+            return write;
         }
     }
 }

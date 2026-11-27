@@ -40,6 +40,7 @@ export interface FolderItem {
   canEdit?: boolean;
   /** false when the user may not delete or move it (absent: allowed) */
   canDelete?: boolean;
+  canPublish?: boolean;
 }
 
 /** `op=similar`: the pictures most like one asset. */
@@ -101,6 +102,7 @@ export interface AssetItem {
   canEdit?: boolean;
   /** false when the user may not delete or move it (absent: allowed) */
   canDelete?: boolean;
+  canPublish?: boolean;
 }
 
 export type DamItem = FolderItem | AssetItem;
@@ -157,15 +159,16 @@ export interface Listing {
   canCreate?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
+  canPublish?: boolean;
 }
 
 /** Whether `item` allows `what` (only an explicit false denies). */
 export const may = (
   item:
-    | { canCreate?: boolean; canEdit?: boolean; canDelete?: boolean }
+    | { canCreate?: boolean; canEdit?: boolean; canDelete?: boolean; canPublish?: boolean }
     | null
     | undefined,
-  what: "canCreate" | "canEdit" | "canDelete",
+  what: "canCreate" | "canEdit" | "canDelete" | "canPublish",
 ) => item?.[what] !== false;
 
 export type SortKey = "none" | "name" | "title" | "modified" | "size" | "type";
