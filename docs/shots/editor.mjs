@@ -1,6 +1,7 @@
 // The pictures of the page editor (author/page-editor.md). The page of the language master is used:
 // a linked copy shows only "Cancel inheritance" on its components.
 const ED = '/editor.html/content/weekender/language-masters/en/magazine/arctic-surfing.html';
+const HOME = '/editor.html/content/weekender/language-masters/en.html';
 const open = [{ goto: ED }, { wait: 3500 }];
 const label = (name) => `[aria-label="${name}"]`;
 const IMAGE = [760, 520];   // a point on the article's first image
@@ -52,10 +53,14 @@ export default [
     { click: label('Styles') }, { wait: 900 }, { shot: 'editor-styles', keepPointer: true },
   ] },
   { name: 'image-editor', steps: [...open, { clickAt: IMAGE }, { wait: 900 }, { click: label('Edit') }, { wait: 2500 }, { shot: 'editor-image-editor' }] },
+  // the home page has a carousel in a container with a grid: handles in Layout mode, and Select panel
   { name: 'layout-selected', steps: [
-    ...open, { click: label('Select another mode') }, { wait: 400 }, { click: { text: 'Layout', last: true } }, { wait: 1800 },
-    { click: label('Content Tree') }, { wait: 900 }, { click: { text: 'Title: By Jacob Wester' } }, { wait: 1200 },
-    { shot: 'editor-layout', keepPointer: true },
+    { goto: HOME }, { wait: 4000 }, { click: label('Select another mode') }, { wait: 400 }, { click: { text: 'Layout', last: true } }, { wait: 1800 },
+    { scroll: [760, 500, 500] }, { clickAt: [600, 500] }, { wait: 1000 }, { shot: 'editor-layout', keepPointer: true },
+  ] },
+  { name: 'select-panel', steps: [
+    { goto: HOME }, { wait: 4000 }, { click: label('Content Tree') }, { wait: 900 }, { click: { text: 'Carousel' } }, { wait: 1200 },
+    { click: label('Select panel') }, { wait: 900 }, { shot: 'editor-select-panel', keepPointer: true },
   ] },
   { name: 'publish', steps: [...open, { click: { text: 'Publish', closest: 'button' } }, { wait: 1800 }, { shot: 'editor-publish' }] },
 ];

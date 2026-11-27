@@ -141,7 +141,11 @@ Some parts of a page cannot be selected: the ones its template keeps fixed, usua
 
 ### Tabs, accordions and carousels
 
-These show one panel at a time. To work on another panel, select the container and choose **Select panel**: click a panel to show it, or drag one to change the order.
+These show one panel at a time. To work on another panel, select the container and choose **Select panel**:
+
+![The panels of a carousel](../images/editor-select-panel.webp)
+
+The list numbers the panels and names each by its component and the start of its text. Click a panel to show it on the page; drag one by the handle at its right to change the order. The `×` closes the list.
 
 ## The viewport ruler
 
@@ -171,9 +175,20 @@ The arrow beside **Edit** changes what the editor is for.
 
 ### Layout
 
-![Layout mode](../images/editor-layout.webp)
+![A carousel selected in Layout mode: the columns of the grid, a handle at each side](../images/editor-layout.webp)
 
-In **Layout** mode the toolbar of a selected component holds only what concerns its place. A component that sits in a container with a grid shows handles at its sides: drag them to make it narrower or wider, or to push it to the right; it snaps to the columns of the grid. The toolbar adds **Float to new line**, **Hide component**, **Show hidden components** and **Revert breakpoint layout**.
+In **Layout** mode the page shows the columns of the grid behind the component you select, and a handle at each of its sides. Drag a handle to make the component narrower or wider, or to push it to the right; it snaps to the columns.
+
+The toolbar holds only what concerns the component's place:
+
+| Action | What it does |
+|---|---|
+| **Parent** | Selects the container around it |
+| **Float to new line** | Starts a new row with this component |
+| **Hide component** | Hides it at this screen size |
+| **Show hidden components**, **Revert breakpoint layout** | On a container: brings back what was hidden, and gives up the layout of this screen size |
+
+A component in a container without a grid, such as a fixed part of the template, has no handles.
 
 A layout belongs to one screen size. Choose a width in the viewport ruler first: what you then change applies to that size only.
 
