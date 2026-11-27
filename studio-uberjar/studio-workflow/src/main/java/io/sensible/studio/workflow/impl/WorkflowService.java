@@ -162,7 +162,7 @@ public class WorkflowService implements JobConsumer {
                 throw new IllegalArgumentException("The step is not active any more");
             }
             String assignee = iv.get("assignee", "");
-            if (!Instances.isAdmin(user) && !Instances.principals(user).contains(assignee)) {
+            if (!Instances.isAdmin(user) && !Instances.principals(user, engineResolver).contains(assignee)) {
                 throw new SecurityException("The step is assigned to " + assignee);
             }
             Resource instance = item.getParent().getParent();
@@ -191,7 +191,7 @@ public class WorkflowService implements JobConsumer {
                 throw new IllegalArgumentException("The step is not active any more");
             }
             String current = iv.get("assignee", "");
-            if (!Instances.isAdmin(user) && !Instances.principals(user).contains(current)) {
+            if (!Instances.isAdmin(user) && !Instances.principals(user, e.resolver()).contains(current)) {
                 throw new SecurityException("The step is assigned to " + current);
             }
             org.apache.sling.api.resource.ModifiableValueMap mv = item.adaptTo(org.apache.sling.api.resource.ModifiableValueMap.class);

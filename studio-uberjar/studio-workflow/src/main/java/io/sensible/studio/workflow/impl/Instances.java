@@ -133,6 +133,15 @@ final class Instances {
 
     /** The user ID and the IDs of all groups the resolver's user belongs to (with {@code everyone}). */
     static List<String> principals(ResourceResolver resolver) {
+        return principals(resolver, resolver);
+    }
+
+    /**
+     * The same, with the groups looked up through {@code lookup}: an author may not read
+     * {@code /home/groups}, so their own session finds no group at all and a step given to a
+     * group never reaches them. The engine's resolver may read it.
+     */
+    static List<String> principals(ResourceResolver resolver, ResourceResolver lookup) {
         List<String> out = new ArrayList<>();
         String user = resolver.getUserID();
         if (user != null) {
@@ -142,7 +151,7 @@ final class Instances {
         if ("admin".equals(user)) {
             out.add(ADMINISTRATORS); // the repository's admin acts for the administrators group even when not a member
         }
-        Session session = resolver.adaptTo(Session.class);
+        Session session = lookup.adaptTo(Session.class);
         if (!(session instanceof JackrabbitSession) || user == null) {
             return out;
         }
@@ -164,6 +173,20 @@ final class Instances {
             // only the user itself
         }
         return out;
+    }
+
+    /** Whether one of {@code me} started the instance or has a step of it waiting. */
+    static boolean concerns(Resource instance, List<String> me) {
+        if (me.contains(instance.getValueMap().get("initiator", ""))) {
+            return true;
+        }
+        for (Resource item : Engine.items(instance)) {
+            ValueMap iv = item.getValueMap();
+            if (Engine.ITEM_ACTIVE.equals(iv.get("status", "")) && me.contains(iv.get("assignee", ""))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Whether the resolver's user is an administrator (admin or member of administrators). */

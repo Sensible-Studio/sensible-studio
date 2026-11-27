@@ -14,9 +14,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A connector for the tests only (it is not part of the bundle): prefixes every text with the target language
- * ({@code [fr] ...}), leaving markup, links and placeholders untouched. Deterministic and offline.
+ * A connector that translates nothing: it prefixes every text with the target language ({@code [fr] ...}) and
+ * leaves markup, links and placeholders untouched. Deterministic, offline, free: for trying the whole way of a
+ * translation (language copies, review, approval, the memory) without a provider that costs, and for the tests.
+ *
+ * Off unless it is configured: it exists only where an OSGi configuration with this class's name does (an empty
+ * {@code io.sensible.studio.translation.impl.PseudoTranslationServiceFactory.cfg.json} in the install folder is
+ * enough), so an installation does not offer its authors a translator that is none.
  */
+@org.osgi.service.component.annotations.Component(
+        service = TranslationServiceFactory.class,
+        configurationPolicy = org.osgi.service.component.annotations.ConfigurationPolicy.REQUIRE,
+        property = "translationFactory=" + PseudoTranslationServiceFactory.NAME)
 public class PseudoTranslationServiceFactory implements TranslationServiceFactory {
 
     static final String NAME = "studio-pseudo";

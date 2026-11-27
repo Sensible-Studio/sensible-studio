@@ -94,26 +94,30 @@ public class WorkflowServlet extends SlingAllMethodsServlet {
         }
     }
 
-    private Object read(String op, SlingHttpServletRequest r, ResourceResolver resolver) {
-        switch (String.valueOf(op)) {
-            case "models":
-                service.syncDefaults();
-                return new ModelStore(resolver).list();
-            case "model":
-                return new ModelStore(resolver).design(r.getParameter("path"));
-            case "runtime": {
-                Resource m = resolver.getResource(String.valueOf(r.getParameter("id")));
-                if (m == null || m.getChild("nodes") == null) {
-                    throw new IllegalArgumentException("No runtime model " + r.getParameter("id"));
-                }
-                return RuntimeModel.read(m).toJson();
+    /** The reads over what is running: an author may not read {@code /var/workflow}, the engine may. */
+    private static final java.util.Set<String> RUNNING = new java.util.HashSet<>(
+            java.util.Arrays.asList("instances", "instance", "inbox", "maintenance"));
+
+    private Object read(String op, SlingHttpServletRequest r, ResourceResolver resolver) throws WorkflowException {
+        if (RUNNING.contains(String.valueOf(op))) {
+            try (ResourceResolver engine = service.engineResolver()) {
+                return running(op, r, resolver, engine);
+            } catch (org.apache.sling.api.resource.LoginException e) {
+                throw new WorkflowException("The workflow engine cannot read its instances", e);
             }
-            case "processes": {
-                Map<String, Object> out = new LinkedHashMap<>();
-                out.put("processes", service.processLabels());
-                out.put("choosers", service.chooserLabels());
-                return out;
-            }
+        }
+        return rest(op, r, resolver);
+    }
+
+    /**
+     * What is running, read as the engine and then cut down to what the asking user has to do
+     * with: the steps given to them or to one of their groups, and the flows they started.
+     * Administrators see all of it.
+     */
+    private Object running(String op, SlingHttpServletRequest r, ResourceResolver user, ResourceResolver resolver) {
+        boolean admin = Instances.isAdmin(user);
+        List<String> me = Instances.principals(user, resolver);
+        switch (op) {
             case "instances": {
                 String status = r.getParameter("status");
                 String model = r.getParameter("model");
@@ -121,6 +125,9 @@ public class WorkflowServlet extends SlingAllMethodsServlet {
                 List<Map<String, Object>> out = new ArrayList<>();
                 for (Resource i : Instances.all(resolver)) {
                     ValueMap vm = i.getValueMap();
+                    if (!admin && !Instances.concerns(i, me)) {
+                        continue;
+                    }
                     if ((status == null || status.isEmpty() || java.util.Arrays.asList(status.split(",")).contains(vm.get("status", "")))
                             && (model == null || model.isEmpty() || model.equals(vm.get("modelId", "")))) {
                         Map<String, Object> summary = Instances.summary(i);
@@ -140,10 +147,12 @@ public class WorkflowServlet extends SlingAllMethodsServlet {
                 if (i == null || i.getValueMap().get("modelId") == null) {
                     throw new IllegalArgumentException("No workflow instance " + r.getParameter("id"));
                 }
+                if (!admin && !Instances.concerns(i, me)) {
+                    throw new SecurityException("This flow is not yours: you neither started it nor have a step of it");
+                }
                 return Instances.summary(i);
             }
             case "inbox": {
-                List<String> me = Instances.principals(resolver);
                 List<Map<String, Object>> out = new ArrayList<>();
                 for (Resource i : Instances.all(resolver)) {
                     if (!Engine.STATUS_RUNNING.equals(i.getValueMap().get("status", ""))) {
@@ -170,6 +179,12 @@ public class WorkflowServlet extends SlingAllMethodsServlet {
                 out.put("purgeDays", maintenance.purgeDays());
                 out.put("lastRun", maintenance.lastPurge() == 0 ? null : java.time.Instant.ofEpochMilli(maintenance.lastPurge()).toString());
                 out.put("lastRemoved", maintenance.lastRemoved());
+                if (!admin) {
+                    out.put("ended", 0);
+                    out.put("oldestEnded", null);
+                    out.put("admin", false);
+                    return out;
+                }
                 int ended = 0;
                 String oldest = null;
                 for (Resource i : Instances.all(resolver)) {
@@ -185,7 +200,33 @@ public class WorkflowServlet extends SlingAllMethodsServlet {
                 }
                 out.put("ended", ended);
                 out.put("oldestEnded", oldest);
-                out.put("admin", Instances.isAdmin(resolver));
+                out.put("admin", admin);
+                return out;
+            }
+            default:
+                return null;
+        }
+    }
+
+    private Object rest(String op, SlingHttpServletRequest r, ResourceResolver resolver) {
+        switch (String.valueOf(op)) {
+
+            case "models":
+                service.syncDefaults();
+                return new ModelStore(resolver).list();
+            case "model":
+                return new ModelStore(resolver).design(r.getParameter("path"));
+            case "runtime": {
+                Resource m = resolver.getResource(String.valueOf(r.getParameter("id")));
+                if (m == null || m.getChild("nodes") == null) {
+                    throw new IllegalArgumentException("No runtime model " + r.getParameter("id"));
+                }
+                return RuntimeModel.read(m).toJson();
+            }
+            case "processes": {
+                Map<String, Object> out = new LinkedHashMap<>();
+                out.put("processes", service.processLabels());
+                out.put("choosers", service.chooserLabels());
                 return out;
             }
             case "launchers": {

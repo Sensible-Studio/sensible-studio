@@ -172,7 +172,8 @@ public class PageTranslationServlet extends SlingAllMethodsServlet {
             send(response, 422, m);
         } catch (IllegalArgumentException e) {
             request.getResourceResolver().revert();
-            send(response, 422, error(e.getMessage()));
+            // a matter of rights is a 403, as everywhere; what is wrong with the request stays a 422
+            send(response, String.valueOf(e.getMessage()).startsWith("You may not change ") ? 403 : 422, error(e.getMessage()));
         } catch (TranslationException e) {
             request.getResourceResolver().revert();
             Map<String, Object> m = error(e.getMessage());
