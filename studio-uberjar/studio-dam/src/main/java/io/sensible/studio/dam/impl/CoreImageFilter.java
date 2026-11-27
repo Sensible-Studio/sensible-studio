@@ -145,8 +145,28 @@ public class CoreImageFilter implements Filter {
                 return;
             }
         }
+        // The Core Components servlet answers GET only, and Sling says 404 to a HEAD for the same address: a link
+        // checker or a CDN that probes with HEAD saw every such image as broken. A HEAD is answered as its GET
+        // is; Sling sends the headers and drops the body.
+        if (req instanceof SlingHttpServletRequest && "HEAD".equals(((SlingHttpServletRequest) req).getMethod())
+                && req.getAttribute(HEAD_AS_GET) == null) {
+            SlingHttpServletRequest request = (SlingHttpServletRequest) req;
+            javax.servlet.RequestDispatcher dispatcher = request.getRequestDispatcher(request.getResource());
+            if (dispatcher != null) {
+                req.setAttribute(HEAD_AS_GET, Boolean.TRUE);
+                dispatcher.forward(new org.apache.sling.api.wrappers.SlingHttpServletRequestWrapper(request) {
+                    @Override
+                    public String getMethod() {
+                        return "GET";
+                    }
+                }, res);
+                return;
+            }
+        }
         chain.doFilter(req, res);
     }
+
+    private static final String HEAD_AS_GET = CoreImageFilter.class.getName() + ".headAsGet";
 
     /** What to fetch from studio-dam for a request, or {@code null} if the servlet should answer it. */
     static final class Plan {
