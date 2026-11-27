@@ -209,7 +209,7 @@ export function PolicyDialog({ client, templates, target, registry, env: hostEnv
               <p className="studio-policy__hint">Inherited from the container. Done gives the component this configuration of its own.</p>
             )}
             <label className="studio-policy__label" htmlFor="studio-policy-title-input">
-              Policy Title *
+              Configuration Title *
             </label>
             <input id="studio-policy-title-input" className="studio-g-input" value={title} onChange={(e) => setTitle(e.target.value)} />
             <label className="studio-policy__label" htmlFor="studio-policy-description">

@@ -128,7 +128,7 @@ studio-uberjar/studio-compat-content/studio-workflow-content
 studio-uberjar/studio-siterail/oak-index
 "
 # Weekender: the demo site of our own (a travel magazine with freely licensed photos), from its releases
-DEMO_VERSION="1.0.1"
+DEMO_VERSION="1.0.2"
 DEMO_URL="https://github.com/Sensible-Studio/weekender/releases/download/v$DEMO_VERSION/weekender.all-$DEMO_VERSION.zip"
 WKND_VERSION="4.0.4"
 WKND_URL="https://github.com/adobe/aem-guides-wknd/releases/download/aem-guides-wknd-$WKND_VERSION/aem-guides-wknd.all-$WKND_VERSION.zip"
