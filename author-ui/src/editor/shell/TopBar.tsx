@@ -89,7 +89,7 @@ export function TopBar(props: Props) {
   const title = template ? template.title : (page?.title ?? pagePath.split('/').pop());
   const templateMode: TemplateMode = mode === 'layout' ? 'layout' : (template?.part ?? 'structure');
   const modeLabel = template ? TEMPLATE_MODE_LABEL[templateMode] : MODE_LABEL[authoringMode];
-  const publication = page?.published ? 'Published' : page?.lastReplicationAction === 'Activate' ? 'Modified' : 'Draft';
+  const publication = page?.pending ? 'Pending' : page?.published ? 'Published' : page?.lastReplicationAction === 'Activate' ? 'Modified' : 'Draft';
 
   return (
     <header className="studio-topbar">
@@ -135,7 +135,9 @@ export function TopBar(props: Props) {
                     <Text slot="description">
                       {scheduledPublication
                         ? `${scheduledPublication.action === 'Deactivate' ? 'Unpublish' : 'Publish'} scheduled for ${new Date(scheduledPublication.when).toLocaleString()}`
-                        : page?.published
+                        : page?.pending
+                          ? 'On its way to the live site: it waits in the publishing queue'
+                          : page?.published
                           ? `Published ${page.lastReplicated ? relativeTime(new Date(page.lastReplicated)) : ''}`
                           : page?.lastReplicationAction === 'Activate'
                             ? 'Modified since it was published'
@@ -179,7 +181,7 @@ export function TopBar(props: Props) {
           <h1 className="studio-topbar__title" title={pagePath}>{title}</h1>
           <div className="studio-topbar__state" aria-label="Page status">
             <span className={`studio-state studio-state--${isBusy ? 'saving' : 'saved'}`} aria-live="polite">{isBusy ? 'Saving…' : 'Saved'}</span>
-            {!template && <span className={`studio-state studio-state--${publication.toLowerCase()}`}>{publication === 'Modified' ? 'Unpublished changes' : publication}</span>}
+            {!template && <span className={`studio-state studio-state--${publication.toLowerCase()}`}>{publication === 'Modified' ? 'Unpublished changes' : publication === 'Pending' ? 'On its way' : publication}</span>}
             {page?.locked && !template && (
               <button type="button" className="studio-state studio-state--locked" onClick={() => onPageAction('unlock')} disabled={!page.canUnlock}>
                 <LockClosed size="S" /> Locked{page.lockOwner ? ` by ${page.lockOwner}` : ''}

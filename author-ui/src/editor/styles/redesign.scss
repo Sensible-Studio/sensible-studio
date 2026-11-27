@@ -397,6 +397,7 @@
 
   &--saving,
   &--modified,
+  &--pending,
   &--locked {
     color: var(--studio-warning);
   }

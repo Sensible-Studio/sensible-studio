@@ -95,6 +95,8 @@ export interface PageInfo {
   lastReplicationAction?: string;
   /** Activated, and not changed since. */
   published?: boolean;
+  /** A publishing request for the page still waits in a queue (the live site is slow, or down). */
+  pending?: boolean;
 }
 
 /** `GET /bin/studio/editor.json?op=page`. */

@@ -210,7 +210,7 @@ public class LaunchesServlet extends SlingAllMethodsServlet {
             refresh(session);
             if (refused(e)) {
                 // releases are kept under /content/launches: someone with rights on one site only has none there
-                error(response, 403, "You are not allowed to do that here");
+                error(response, 403, "You are not allowed to do that: releases are kept under /content/launches, and your account has no right there. An administrator gives it in Permissions.");
                 return;
             }
             LOG.warn("launches {} failed", op, e);

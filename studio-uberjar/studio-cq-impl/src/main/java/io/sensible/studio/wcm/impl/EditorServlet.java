@@ -61,6 +61,14 @@ import com.day.cq.wcm.api.policies.ContentPolicy;
 public class EditorServlet extends SlingAllMethodsServlet {
 
     private static final long serialVersionUID = 1L;
+
+    /** Whether a request for the page still waits in a queue; absent on an instance without publishing. */
+    @org.osgi.service.component.annotations.Reference(
+            cardinality = org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL,
+            policy = org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC,
+            policyOption = org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY)
+    private transient volatile com.day.cq.replication.Replicator replicator;
+
     private static final int MAX_DEPTH = 24;
     private static final int MAX_ASSETS_SCANNED = 5000;
 
@@ -204,7 +212,21 @@ public class EditorServlet extends SlingAllMethodsServlet {
         List<String> styled = new ArrayList<>();
         collectStyled(page.getContentResource(), 0, policies, new java.util.HashMap<>(), styled);
         Map<String, Object> out = new LinkedHashMap<>();
-        out.put("page", page(page));
+        Map<String, Object> info = page(page);
+        // "Published" the moment Publish was pressed, also while the request waited for a live site that was down
+        com.day.cq.replication.Replicator r = replicator;
+        javax.jcr.Session session = resolver.adaptTo(javax.jcr.Session.class);
+        if (r != null && session != null) {
+            try {
+                com.day.cq.replication.ReplicationStatus status = r.getReplicationStatus(session, page.getPath());
+                if (status != null && status.isPending()) {
+                    info.put("pending", true);
+                }
+            } catch (RuntimeException e) {
+                // not known: the page says what its own record says
+            }
+        }
+        out.put("page", info);
         out.put("containers", containers);
         out.put("components", components);
         out.put("assetMappings", assetMappings);
