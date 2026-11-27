@@ -87,7 +87,7 @@ export function TranslationContexts({ client }: { client: TranslationRulesClient
         ) : (
           <>
             <p className="studio-trrules__intro">
-              A page is translated with the rules of the most specific context above it: <code>/content/wknd</code> for the pages of
+              A page is translated with the rules of the most specific context above it: <code>/content/my-site</code> for the pages of
               WKND, <code>/content</code> for the others.
             </p>
             <table className="studio-trrules__table">
@@ -280,7 +280,7 @@ export function TranslationContextEditor({ client, context }: { client: Translat
                 description={
                   loaded?.builtIn
                     ? 'The built-in rules, from the OSGi configuration. Saving keeps them in /conf; Reset in the list brings these back.'
-                    : 'For example /content/wknd.'
+                    : 'For example /content/my-site.'
                 }
               />
             </FormSection>
@@ -392,7 +392,7 @@ function Preview({ client, rules, saved }: { client: TranslationRulesClient; rul
       description="The texts of a page that are sent to translation, with the saved rules of the context that applies to it. Save first to see your changes."
     >
       <div className="studio-trrules__preview-bar">
-        <TextField label="Page" value={page} onChange={setPage} width="size-6000" description="A page path, such as /content/wknd/language-masters/en/faqs" />
+        <TextField label="Page" value={page} onChange={setPage} width="size-6000" description="A page path, such as /content/my-site/language-masters/en/faqs" />
         <Button variant="secondary" onPress={show} isDisabled={!page.trim().startsWith('/content/') || busy}>
           Show the texts
         </Button>

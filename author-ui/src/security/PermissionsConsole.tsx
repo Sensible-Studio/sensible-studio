@@ -317,7 +317,7 @@ function AceDialog({
           <Text>
             Principal: <strong>{principal}</strong>
           </Text>
-          <TextField label="Path" value={path} onChange={setPath} isRequired isReadOnly={!!ace} description={ace ? undefined : 'An existing node, e.g. /content/wknd'} />
+          <TextField label="Path" value={path} onChange={setPath} isRequired isReadOnly={!!ace} description={ace ? undefined : 'An existing node, e.g. /content/my-site'} />
           <RadioGroup label="Permission type" orientation="horizontal" value={allow ? 'allow' : 'deny'} onChange={(v) => setAllow(v === 'allow')}>
             <Radio value="allow">Allow</Radio>
             <Radio value="deny">Deny</Radio>

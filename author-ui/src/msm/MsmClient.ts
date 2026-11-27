@@ -230,3 +230,12 @@ export function stateLabel(s: string): string {
       return s;
   }
 }
+
+/** When a sync rule runs, in words (the trigger names are AEM's: rollout, modification, publish, deactivate). */
+export const TRIGGER_WORDS: Record<string, string> = {
+  rollout: 'when you sync',
+  modification: 'when the source changes',
+  publish: 'when the source is published',
+  deactivate: 'when the source is unpublished',
+};
+export const triggerWords = (trigger: string): string => TRIGGER_WORDS[trigger] ?? trigger;

@@ -47,7 +47,7 @@ export function inputProblems(input: VariationsInput, maxCount = 10): string[] {
   if (!input.request.trim()) out.push('Say what to write about.');
   if (!(input.count >= 1 && input.count <= maxCount)) out.push(`Between 1 and ${maxCount} variations.`);
   const page = (input.page ?? '').trim();
-  if (page && (!page.startsWith('/content/') || page.includes('..'))) out.push('The page is a page under /content, such as /content/wknd/us/en.');
+  if (page && (!page.startsWith('/content/') || page.includes('..'))) out.push('The page is a page under /content, such as /content/my-site/us/en.');
   return out;
 }
 

@@ -1,3 +1,4 @@
+import { triggerWords } from './MsmClient';
 import { Checkbox, CheckboxGroup, ComboBox, Form, Item, ProgressCircle, TextField } from '@adobe/react-spectrum';
 import { useEffect, useMemo, useState } from 'react';
 import type { PageListItem, StudioClient } from '../editor/api/StudioClient';
@@ -134,7 +135,7 @@ export function CreateLiveCopyWizard({ client, msm, parent, parentTitle, onClose
           ) : (
             <Form maxWidth="size-6000" onSubmit={(e) => (e.preventDefault(), void create())}>
               <p className="studio-wizard__context">
-                Live copy of <strong>{source}</strong> below <strong>{parentTitle}</strong>
+                Linked copy of <strong>{source}</strong> below <strong>{parentTitle}</strong>
               </p>
               <TextField label="Title" value={title} onChange={setTitle} isRequired autoFocus />
               <TextField
@@ -157,7 +158,7 @@ export function CreateLiveCopyWizard({ client, msm, parent, parentTitle, onClose
               >
                 {configs.map((c) => (
                   <Checkbox key={c.path} value={c.path}>
-                    {c.title} <span className="studio-msm__muted">({c.trigger})</span>
+                    {c.title} <span className="studio-msm__muted">({triggerWords(c.trigger)})</span>
                   </Checkbox>
                 ))}
               </CheckboxGroup>

@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, Checkbox, Content, Divider, Heading, Text, ToastQueue, useDialogContainer } from '@adobe/react-spectrum';
 import { useState } from 'react';
-import { describeResult, stateLabel, type MsmClient } from './MsmClient';
+import { describeResult, stateLabel, type MsmClient, triggerWords } from './MsmClient';
 import type { LiveCopyInfo, RelationshipInfo, RolloutResult } from './types';
 import { StudioDialog } from '../shell/StudioDialog';
 
@@ -74,7 +74,7 @@ export function RolloutDialog({ msm, path, liveCopies, onDone, component }: Prop
                 {c.targetPath}
               </Checkbox>
               <span className={`studio-msm-state is-${c.status}`}>{stateLabel(c.status)}</span>
-              {!manual(c) && <span className="studio-msm__muted">only {c.liveCopy.rolloutConfigs.map((r) => r.trigger).join(', ')}</span>}
+              {!manual(c) && <span className="studio-msm__muted">only {c.liveCopy.rolloutConfigs.map((r) => triggerWords(r.trigger)).join(', ')}</span>}
             </li>
           ))}
         </ul>

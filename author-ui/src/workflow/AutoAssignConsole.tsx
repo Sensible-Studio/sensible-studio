@@ -34,7 +34,7 @@ export function autoAssignProblems(rule: { template: string; workflow: string; r
   if (!rule.template) out.push('Choose a template.');
   if (!rule.workflow) out.push(`Choose the ${VOCAB.flow.toLowerCase()} to start.`);
   const root = rule.rootPath.trim().replace(/\/+$/, '');
-  if (!/^\/content\/[^/]+(\/[^/]+)*$/.test(root) || root.includes('..')) out.push('The path is a page or folder under /content, such as /content/wknd.');
+  if (!/^\/content\/[^/]+(\/[^/]+)*$/.test(root) || root.includes('..')) out.push('The path is a page or folder under /content, such as /content/my-site.');
   else if (others.some((o) => o.template === rule.template && o.workflow === rule.workflow && o.rootPath === root)) out.push('That rule exists already.');
   return out;
 }
@@ -290,7 +290,7 @@ function RuleDialog({
           value={rootPath}
           onChange={setRootPath}
           width="100%"
-          description="Pages created anywhere below it, such as /content/wknd"
+          description="Pages created anywhere below it, such as /content/my-site"
         />
         {tried && problems.length > 0 && (
           <ul className="studio-autoassign__problems">

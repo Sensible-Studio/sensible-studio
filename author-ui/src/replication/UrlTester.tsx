@@ -91,7 +91,7 @@ export function UrlTesterDialog({ cache, explain, onClose }: Props) {
               if (e.key === 'Enter') void run();
               else e.continuePropagation();
             }}
-            description="e.g. /content/wknd/us/en.html?x=1"
+            description="e.g. /content/my-site/us/en.html?x=1"
             width="size-4600"
             autoFocus
           />

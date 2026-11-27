@@ -1992,5 +1992,8 @@ function relativeTimeOf(iso: string): string {
   const h = Math.round(m / 60);
   if (h < 24) return `${h} h ago`;
   const d = Math.round(h / 24);
-  return d === 1 ? 'yesterday' : `${d} days ago`;
+  if (d === 1) return 'yesterday';
+  // past a month a count of days says little ("2249 days ago"): the date itself
+  if (d <= 30) return `${d} days ago`;
+  return `on ${new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}`;
 }

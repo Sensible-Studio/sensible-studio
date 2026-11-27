@@ -134,7 +134,7 @@ export function ActivityConsole({ fetcher = fetch }: { fetcher?: typeof fetch })
       <main className="studio-activity__main">
         <div className="studio-activity__filters">
           <SearchField aria-label="By person" placeholder="Person (user id)" width="size-3000" value={user} onChange={setUser} onClear={() => setUser('')} />
-          <SearchField aria-label="By place" placeholder="At or below a path, e.g. /content/wknd" width="size-5000" value={path} onChange={setPath} onClear={() => setPath('')} />
+          <SearchField aria-label="By place" placeholder="At or below a path, e.g. /content/my-site" width="size-5000" value={path} onChange={setPath} onClear={() => setPath('')} />
           {loading && <ProgressCircle size="S" isIndeterminate aria-label="Loading" />}
           {data && <span className="studio-activity__muted">Kept for {data.keepDays} days</span>}
         </div>

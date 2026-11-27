@@ -1,3 +1,4 @@
+import { triggerWords } from './MsmClient';
 import { Checkbox, CheckboxGroup, Form, ProgressCircle, TextField } from '@adobe/react-spectrum';
 import { useEffect, useState } from 'react';
 import { nameFromTitle } from '../sites/names';
@@ -145,7 +146,7 @@ export function CreateSiteWizard({ msm, parent, parentTitle, user, onClose, onCr
                       value={bpSite}
                       onChange={setBpSite}
                       isRequired
-                      placeholder="/content/wknd/language-masters"
+                      placeholder="/content/my-site/language-masters"
                       description="Its child pages are the languages. The source is saved below /apps/msm when the site is created."
                     />
                   </Form>
@@ -201,7 +202,7 @@ export function CreateSiteWizard({ msm, parent, parentTitle, user, onClose, onCr
                 >
                   {configs.map((c) => (
                     <Checkbox key={c.path} value={c.path}>
-                      {c.title} <span className="studio-msm__muted">({c.trigger})</span>
+                      {c.title} <span className="studio-msm__muted">({triggerWords(c.trigger)})</span>
                     </Checkbox>
                   ))}
                 </CheckboxGroup>

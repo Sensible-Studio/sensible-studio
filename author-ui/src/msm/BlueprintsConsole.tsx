@@ -45,7 +45,7 @@ export function blueprintName(title: string): string {
 export function blueprintProblems(form: { title: string; sitePath: string; name?: string }, taken: string[]): string[] {
   const out: string[] = [];
   if (!form.title.trim()) out.push('The source needs a title.');
-  if (!/^\/content\/[^/]+(\/[^/]+)*$/.test(form.sitePath.trim()) || form.sitePath.includes('..')) out.push('The site root is a page under /content, such as /content/wknd/language-masters.');
+  if (!/^\/content\/[^/]+(\/[^/]+)*$/.test(form.sitePath.trim()) || form.sitePath.includes('..')) out.push('The site root is a page under /content, such as /content/my-site/language-masters.');
   if (form.name !== undefined) {
     if (!/^[a-z0-9][a-z0-9_-]*$/.test(form.name)) out.push('The name uses a-z, 0-9, _ and -.');
     else if (taken.includes(form.name)) out.push(`A configuration named ${form.name} exists already.`);
@@ -96,7 +96,7 @@ export function BlueprintsConsole({ client }: { client: MsmClient }) {
         ) : !list ? (
           <LoadingState />
         ) : list.length === 0 ? (
-          <EmptyState title="No site source">A source is a site whose pages are its languages, such as /content/wknd/language-masters. Create Site makes new sites from it.</EmptyState>
+          <EmptyState title="No site source">A source is a site whose pages are its languages, such as /content/my-site/language-masters. Create Site makes new sites from it.</EmptyState>
         ) : (
           <>
             <p className="studio-bp__intro">
@@ -270,7 +270,7 @@ function BlueprintDialog({
           isRequired
           isReadOnly={readOnly}
           width="100%"
-          description="The page whose children are the languages, such as /content/wknd/language-masters"
+          description="The page whose children are the languages, such as /content/my-site/language-masters"
         />
         <TextArea label="Description" value={description} onChange={setDescription} isReadOnly={readOnly} width="100%" />
         {readOnly && <p className="studio-bp__muted">This source comes with the product; it is not changed here.</p>}

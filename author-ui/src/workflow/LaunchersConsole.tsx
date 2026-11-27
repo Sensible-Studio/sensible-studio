@@ -388,7 +388,7 @@ export function LauncherDialog({
             onChange={setGlob}
             validationState={showErrors && globError ? 'invalid' : undefined}
             errorMessage={globError ?? undefined}
-            description="A regular expression the whole path of the changed node must match, e.g. /content/wknd(/.*)/jcr:content"
+            description="A regular expression the whole path of the changed node must match, e.g. /content/my-site(/.*)/jcr:content"
             UNSAFE_className="studio-wf__codefield"
           />
           <fieldset className="studio-wf__conditions">

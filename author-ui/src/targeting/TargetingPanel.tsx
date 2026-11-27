@@ -416,7 +416,7 @@ function GoalSection({ client, target, onChanged }: { client: TargetingClient; t
           ))}
         </Picker>
         {type === 'click' && <TextField label="Element (CSS selector, optional)" value={value} onChange={setValue} placeholder="a.cmp-button" width="100%" />}
-        {type === 'pageview' && <TextField label="Page" value={value} onChange={setValue} placeholder="/content/wknd/language-masters/en/adventures" isRequired width="100%" />}
+        {type === 'pageview' && <TextField label="Page" value={value} onChange={setValue} placeholder="/content/my-site/language-masters/en/adventures" isRequired width="100%" />}
         {type === 'custom' && <TextField label="Event name" value={value} onChange={setValue} placeholder="newsletter-signup" isRequired width="100%" />}
       </div>
       <div className="studio-targeting__buttons">
