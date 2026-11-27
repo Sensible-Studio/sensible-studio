@@ -90,7 +90,14 @@ public class ReplicationServlet extends SlingAllMethodsServlet {
         Object out;
         try {
             if ("agents".equals(op)) {
-                out = Collections.singletonMap("agents", agentList());
+                List<Map<String, Object>> list = agentList();
+                if (!mayClearCache(session)) {
+                    // an author needs the targets' names for the Publish dialog, not where they deliver or as whom
+                    for (Map<String, Object> a : list) {
+                        a.keySet().removeAll(java.util.Arrays.asList("transportUri", "transportUser", "lastError", "lastPath"));
+                    }
+                }
+                out = Collections.singletonMap("agents", list);
             } else if ("queue".equals(op)) {
                 out = Collections.singletonMap("jobs", queue(session, request.getParameter("agent")));
             } else if ("status".equals(op)) {
@@ -157,6 +164,13 @@ public class ReplicationServlet extends SlingAllMethodsServlet {
         ResourceResolver rr = request.getResourceResolver();
         Session session = rr.adaptTo(Session.class);
         try {
+            // The targets and their queues belong to whoever runs publishing. These operations work through
+            // services (the job manager, the transport), so the repository does not judge them: we do.
+            // (Until 27.11.2026 any signed-in user could empty a queue.)
+            if (MANAGING.contains(op) && !mayClearCache(session)) {
+                error(response, HttpServletResponse.SC_FORBIDDEN, "Only those who run publishing manage its targets and queues");
+                return;
+            }
             if ("activate".equals(op) || "deactivate".equals(op)) {
                 String[] paths = request.getParameterValues("path");
                 if (paths == null || paths.length == 0) {
@@ -280,6 +294,15 @@ public class ReplicationServlet extends SlingAllMethodsServlet {
             } else if ("unschedule".equals(op)) {
                 try (ResourceResolver srr = agents.serviceResolver()) {
                     Session service = srr.adaptTo(Session.class);
+                    // a waiting request is cancelled by someone who may change what it would publish
+                    String id = request.getParameter("id");
+                    for (ScheduledReplication.Entry e : ScheduledReplication.list(service, null)) {
+                        if (e.id.equals(id) && !mayClearCache(session)
+                                && !(session.nodeExists(e.path) && session.hasPermission(e.path, Session.ACTION_SET_PROPERTY))) {
+                            error(response, HttpServletResponse.SC_FORBIDDEN, "Not allowed to cancel the request for " + e.path);
+                            return;
+                        }
+                    }
                     if (ScheduledReplication.remove(service, request.getParameter("id"))) {
                         service.save();
                     }
@@ -377,6 +400,10 @@ public class ReplicationServlet extends SlingAllMethodsServlet {
      * publish also the transport user an author's request arrives as. Both may write the
      * publishing log; authors may not.
      */
+    /** What only those who run publishing may do. */
+    private static final java.util.Set<String> MANAGING = new java.util.HashSet<>(
+            java.util.Arrays.asList("test", "poll", "agent", "removeAgent", "clear", "retry"));
+
     private static boolean mayClearCache(Session session) {
         try {
             return session != null && session.hasPermission(ReplicationJob.LOG_ROOT, Session.ACTION_SET_PROPERTY);

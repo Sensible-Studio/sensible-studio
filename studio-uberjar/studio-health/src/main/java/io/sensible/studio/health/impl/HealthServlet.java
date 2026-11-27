@@ -100,6 +100,12 @@ public class HealthServlet extends SlingAllMethodsServlet {
             return;
         }
         String op = request.getParameter("op");
+        // Maintenance compacts the repository and removes versions, and its settings decide when: an
+        // administrator's to start or change. (Until 27.11.2026 any signed-in user could.)
+        if (!JobsServlet.isAdmin(request.getResourceResolver())) {
+            send(response, 403, error("Only administrators run maintenance or change its settings"));
+            return;
+        }
         try {
             if ("run".equals(op)) {
                 String kind = request.getParameter("kind");

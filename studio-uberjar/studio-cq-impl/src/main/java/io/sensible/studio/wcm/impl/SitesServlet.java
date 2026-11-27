@@ -155,6 +155,13 @@ public class SitesServlet extends SlingAllMethodsServlet {
         } catch (WCMException | IllegalArgumentException e) {
             resolver.revert();
             send(response, HttpServletResponse.SC_CONFLICT, Collections.singletonMap("error", e.getMessage()));
+        } catch (PersistenceException e) {
+            // The repository refused (most often: no right to write there). Left to travel on as an IOException,
+            // Sling took it for a client that went away and the answer was an empty 200: a failure that read as done.
+            resolver.revert();
+            boolean denied = String.valueOf(e.getMessage()).contains("Access denied") || String.valueOf(e.getCause()).contains("AccessDenied");
+            send(response, denied ? HttpServletResponse.SC_FORBIDDEN : HttpServletResponse.SC_CONFLICT,
+                    Collections.singletonMap("error", denied ? "You are not allowed to do that here" : String.valueOf(e.getMessage())));
         }
     }
 

@@ -65,7 +65,7 @@ public class SubmissionsServlet extends SlingAllMethodsServlet {
                 Resource content = file == null ? null : file.getChild("jcr:content");
                 Resource submission = file == null ? null : file.getParent() == null ? null : file.getParent().getParent() == null ? null : file.getParent().getParent().getParent();
                 if (content == null || submission == null || !submission.isResourceType(SubmissionStore.RESOURCE_TYPE)
-                        || request.getResourceResolver().getResource(submission.getValueMap().get("form", "")) == null) {
+                        || !mayHandle(request, submission.getValueMap().get("form", ""))) {
                     SubmitServlet.send(response, 404, SubmitServlet.error("No file there"));
                     return;
                 }
@@ -94,6 +94,9 @@ public class SubmissionsServlet extends SlingAllMethodsServlet {
                 }
                 Map<String, Object> out = new LinkedHashMap<>();
                 for (Map.Entry<String, int[]> e : store.countsUnder(resolver, under).entrySet()) {
+                    if (!mayHandle(request, e.getKey())) {
+                        continue;
+                    }
                     Map<String, Object> c = new LinkedHashMap<>();
                     c.put("total", e.getValue()[0]);
                     c.put("unseen", e.getValue()[1]);
@@ -104,7 +107,7 @@ public class SubmissionsServlet extends SlingAllMethodsServlet {
             }
             if ("get".equals(op)) {
                 Resource r = resolver.getResource(param(request, "path", ""));
-                if (r == null || !r.isResourceType(SubmissionStore.RESOURCE_TYPE)) {
+                if (r == null || !r.isResourceType(SubmissionStore.RESOURCE_TYPE) || !mayHandle(request, r.getValueMap().get("form", ""))) {
                     SubmitServlet.send(response, 404, SubmitServlet.error("No submission there"));
                     return;
                 }
@@ -114,6 +117,10 @@ public class SubmissionsServlet extends SlingAllMethodsServlet {
             }
             if (form == null || request.getResourceResolver().getResource(form) == null) {
                 SubmitServlet.send(response, 404, SubmitServlet.error("No form at " + form));
+                return;
+            }
+            if (!mayHandle(request, form)) {
+                SubmitServlet.send(response, 403, SubmitServlet.error("The submissions of a form are for those who may edit it"));
                 return;
             }
             FormModel model = FormModel.of(resolver.getResource(form));
@@ -205,7 +212,7 @@ public class SubmissionsServlet extends SlingAllMethodsServlet {
                 for (String p : paths == null ? new String[0] : paths) {
                     Resource r = resolver.getResource(p);
                     if (r == null || !r.isResourceType(SubmissionStore.RESOURCE_TYPE)
-                            || request.getResourceResolver().getResource(r.getValueMap().get("form", "")) == null) {
+                            || !mayHandle(request, r.getValueMap().get("form", ""))) {
                         continue;
                     }
                     org.apache.sling.api.resource.ModifiableValueMap mvm =
@@ -234,8 +241,8 @@ public class SubmissionsServlet extends SlingAllMethodsServlet {
                 Resource r = resolver.getResource(p);
                 if (r != null && r.isResourceType(SubmissionStore.RESOURCE_TYPE)) {
                     String form = r.getValueMap().get("form", "");
-                    // only submissions of forms the author may read
-                    if (request.getResourceResolver().getResource(form) != null) {
+                    // only submissions of forms the author may edit
+                    if (mayHandle(request, form)) {
                         resolver.delete(r);
                         n++;
                     }
@@ -252,6 +259,25 @@ public class SubmissionsServlet extends SlingAllMethodsServlet {
     }
 
     // ------------------------------------------------------------------ helpers
+
+    /**
+     * What visitors sent is personal data. It is read, marked and deleted through a service user, so the
+     * repository does not judge the request: it is for those who may edit the form (and so for administrators),
+     * not for everyone who can see the form's page. (Until 27.11.2026: anyone signed in.)
+     */
+    static boolean mayHandle(SlingHttpServletRequest request, String form) {
+        if (form == null || !form.startsWith("/content/")) {
+            return false;
+        }
+        javax.jcr.Session session = request.getResourceResolver().adaptTo(javax.jcr.Session.class);
+        try {
+            String content = form + "/jcr:content";
+            return session != null && session.nodeExists(content)
+                    && session.hasPermission(content, javax.jcr.Session.ACTION_SET_PROPERTY);
+        } catch (javax.jcr.RepositoryException e) {
+            return false;
+        }
+    }
 
     static boolean signedIn(SlingHttpServletRequest request, SlingHttpServletResponse response) throws IOException {
         String user = request.getResourceResolver().getUserID();
