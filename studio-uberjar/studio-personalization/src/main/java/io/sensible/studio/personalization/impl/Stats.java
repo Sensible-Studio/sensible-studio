@@ -177,11 +177,19 @@ public final class Stats {
         return f.format(c.getTime());
     }
 
+    /**
+     * The node at the path, made with its missing ancestors. It starts at the deepest node that exists, not at the
+     * root: on a publish instance the service user sees its own tree only ("Root node is not accessible"), and
+     * nothing was ever counted on the live site.
+     */
     static Node mkdirs(Session session, String path) throws RepositoryException {
-        Node n = session.getRootNode();
-        for (String seg : path.substring(1).split("/")) {
-            n = n.hasNode(seg) ? n.getNode(seg) : n.addNode(seg, "sling:Folder");
+        if (session.nodeExists(path)) {
+            return session.getNode(path);
         }
-        return n;
+        int cut = path.lastIndexOf('/');
+        if (cut <= 0) {
+            throw new javax.jcr.PathNotFoundException(path);
+        }
+        return mkdirs(session, path.substring(0, cut)).addNode(path.substring(cut + 1), "sling:Folder");
     }
 }
