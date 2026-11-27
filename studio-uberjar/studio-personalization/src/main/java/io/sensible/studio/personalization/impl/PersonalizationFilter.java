@@ -129,10 +129,21 @@ public class PersonalizationFilter implements Filter {
                 at = html.indexOf("<body");
             }
             String out = at < 0 ? head + html : html.substring(0, at) + head + html.substring(at);
-            byte[] data = out.getBytes(StandardCharsets.UTF_8);
-            response.setContentLength(data.length);
-            response.getOutputStream().write(data);
+            write(response, out.getBytes(StandardCharsets.UTF_8));
         } else {
+            write(response, bytes);
+        }
+    }
+
+    /**
+     * Through the writer: the filters around this one (Core Components' table of contents among them) take the
+     * response's writer once the page is rendered, and bytes sent through the stream made that fail with
+     * "IllegalStateException: STREAM" at every such page view. The stream only where it is already in use.
+     */
+    private static void write(HttpServletResponse response, byte[] bytes) throws IOException {
+        try {
+            response.getWriter().write(new String(bytes, StandardCharsets.UTF_8));
+        } catch (IllegalStateException streamInUse) {
             response.getOutputStream().write(bytes);
         }
     }

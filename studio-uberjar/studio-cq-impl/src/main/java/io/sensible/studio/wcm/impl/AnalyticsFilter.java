@@ -80,9 +80,22 @@ public class AnalyticsFilter implements Filter {
         String type = buffer.getContentType();
         if (type != null && type.contains("text/html") && buffer.getStatus() < 300) {
             bytes = inject(new String(bytes, StandardCharsets.UTF_8), tags).getBytes(StandardCharsets.UTF_8);
-            response.setContentLength(bytes.length);
         }
-        response.getOutputStream().write(bytes);
+        write(response, bytes);
+    }
+
+    /**
+     * A page is text, and the filters around this one (Core Components' table of contents among them) take the
+     * response's writer once the page is rendered: bytes sent through the stream here made that fail, with
+     * "IllegalStateException: STREAM" in the log at every page view. The writer, then; the stream only where
+     * the response was already written to through it.
+     */
+    private static void write(HttpServletResponse response, byte[] bytes) throws IOException {
+        try {
+            response.getWriter().write(new String(bytes, StandardCharsets.UTF_8));
+        } catch (IllegalStateException streamInUse) {
+            response.getOutputStream().write(bytes);
+        }
     }
 
     private String tagsFor(SlingHttpServletRequest request) {
