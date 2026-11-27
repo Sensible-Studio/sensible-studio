@@ -173,7 +173,7 @@ A change reaches all of the pages. A deleted fragment leaves an empty place on e
 
 **Generate Variations**, on Home, writes several versions of a short text for you to choose from: a banner, a headline, a tile, an email. A language model writes them, so the screen needs one: an administrator adds a provider of the AI connector under **Translations › Providers**. Without it, the screen says so and **Generate** stays off.
 
-![Generate Variations: the request on the left, the results on the right](../images/xf-generate-variations.webp)
+![Generate Variations: the request on the left, nothing generated yet](../images/xf-generate-variations.webp)
 
 | Field | Meaning |
 |---|---|
@@ -184,13 +184,27 @@ A change reaches all of the pages. A deleted fragment leaves an empty place on e
 | **Page to take facts from** | Optional: a page whose texts are sent to the model with the request, so that it writes from your content |
 | **Variations** | How many versions to write |
 | **Creativity** | From careful to free |
-| **Generate** | Sends the request |
+| **Generate** | Sends the request. The line above it names the model that will write |
+
+![Four variations of a hero, the first one starred](../images/xf-variations-results.webp)
 
 | On the right | Meaning |
 |---|---|
-| **Results** | The versions just written. Each can be copied, and starred to keep it |
+| **Results** | The versions just written, each on a card with the parts of its template: for a hero a title, a subtitle and a call to action. The two buttons of a card copy it and star it |
+| **Use this prompt again** | Puts the request back into the form, to change it and generate again |
 | **Recent** | What you generated before. It is kept for you only |
 | **Favorites** | The versions you starred |
-| **Export to Experience Fragment** | Makes a new experience fragment with the chosen versions as its variants, ready to be placed on pages or used in [personalization](personalization.md) |
+| **Export to Experience Fragment** | Makes an experience fragment from the versions you tick |
+
+![Export to Experience Fragment](../images/xf-variations-export.webp)
+
+| Field | Meaning |
+|---|---|
+| **Variations** | Which versions to export. Each becomes a variant of the fragment, the first one its master, built from the site's Title, Text and Button components |
+| **Title** | The fragment's title. It starts as the first version's title |
+| **Folder** | Where under Experience Fragments the fragment is made |
+| **Template** | The template of the variants |
+
+The fragment is then an ordinary one: place it on pages, or use its variants in [personalization](personalization.md).
 
 A model can be wrong. Check names, prices and facts before you use a text.

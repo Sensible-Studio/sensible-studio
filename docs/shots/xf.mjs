@@ -24,5 +24,7 @@ export default [
   { name: 'component', steps: [...tree('Experience Fragment'), { shot: 'xf-on-page' }, { click: label('Configure') }, { wait: 2000 }, { shot: 'xf-component-dialog' }] },
   { name: 'convert', steps: [...tree('Social Media Sharing'), { click: label('Convert to experience fragment variant') }, { wait: 2000 }, { shot: 'xf-convert' }] },
   { name: 'properties', steps: [{ goto: XFPROPS }, { wait: 3500 }, { shot: 'xf-properties' }, { goto: VPROPS }, { wait: 3500 }, { shot: 'xf-variant-props' }] },
-  { name: 'variations', steps: [{ goto: '/aem/generate-variations.html' }, { wait: 3500 }, { log: `'TPL ' + [...document.querySelectorAll('select option')].map(o=>o.textContent).join(' | ')` }, { shot: 'xf-generate-variations' }] },
+  // needs a provider that answers (the stand-in model of translations.mjs)
+  { name: 'variations', steps: [{ goto: '/aem/generate-variations.html' }, { wait: 3500 }, { eval: `(() => { const e = document.querySelector('textarea'); Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(e, 'Winter swimming in the fjord: a ten-minute dip at four degrees, then a floating sauna. Link to the article A Winter Swim in the Fjord.'); e.dispatchEvent(new Event('input', { bubbles: true })); })()` }, { wait: 500 }, { log: info }, { shot: 'xf-generate-variations' },
+    button('Generate'), { wait: 6000 }, { log: info }, { click: '[aria-label="Star variation 1"]' }, { wait: 800 }, { shot: 'xf-variations-results' }, button('Export to Experience Fragment'), { wait: 2000 }, { shot: 'xf-variations-export' }] },
 ];
