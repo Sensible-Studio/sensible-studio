@@ -80,7 +80,7 @@ final class SiteRail {
                 pv.get("jcr:created", cv.get("jcr:created", Calendar.class)));
         event(out, "activity", "modified", "Page modified", null,
                 cv.get("cq:lastModifiedBy", String.class), cv.get("cq:lastModified", Calendar.class));
-        event(out, "activity", "rolledout", "Rolled out from the blueprint", null,
+        event(out, "activity", "rolledout", "Synchronized from its source", null,
                 cv.get("cq:lastRolledoutBy", String.class), cv.get("cq:lastRolledout", Calendar.class));
         String action = cv.get("cq:lastReplicationAction", String.class);
         if (action != null) {

@@ -17,6 +17,9 @@ interface Props {
   onCreated(path: string, result: RolloutResult): void;
 }
 
+const OWN_TREES = ['/content/forms', '/content/experience-fragments'];
+const OTHER_TREES = [...OWN_TREES, '/content/dam'];
+
 /**
  * Create Live Copy: the blueprint page (source), then title, name, whether child pages are copied and the rollout
  * configurations. Without a configuration the live copy inherits one (the standard rollout).
@@ -35,9 +38,15 @@ export function CreateLiveCopyWizard({ client, msm, parent, parentTitle, onClose
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    client.listPages('/content', 6).then(setPages, (e: unknown) => setError(e instanceof Error ? e.message : String(e)));
+    // the sources of the console the copy is made in: forms for a form, experience fragments for a fragment, and
+    // for a page the pages, without those two trees and without media
+    const own = OWN_TREES.find((tree) => parent === tree || parent.startsWith(tree + '/'));
+    client.listPages(own ?? '/content', 6).then(
+      (all) => setPages(own ? all : all.filter((p) => !OTHER_TREES.some((tree) => p.path === tree || p.path.startsWith(tree + '/')))),
+      (e: unknown) => setError(e instanceof Error ? e.message : String(e)),
+    );
     msm.configs().then(setConfigs, () => setConfigs([]));
-  }, [client, msm]);
+  }, [client, msm, parent]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !saving && onClose();

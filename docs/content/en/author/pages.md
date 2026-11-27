@@ -93,7 +93,7 @@ All of them can be changed later in the [page properties](page-properties.md). C
 
 ![The first step of a linked copy](../images/pages-create-linked-copy.webp)
 
-**Linked copy** asks for the **source page**: type to search, or open the list. The second step, **Linked copy**, sets up the copy itself: its title and name, and how it follows the source.
+**Linked copy** asks for the **source page**: type to search, or open the list. The list holds the pages of the sites; in the Forms and Experience Fragments consoles it holds forms and fragments instead. The second step, **Linked copy**, sets up the copy itself: its title and name, and how it follows the source.
 
 ### A CSV report
 

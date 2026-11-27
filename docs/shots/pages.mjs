@@ -27,7 +27,7 @@ export default [
     { click: { text: 'Article Page Template' } }, { wait: 500 }, button('Next'), { wait: 1200 }, { shot: 'pages-create-page-properties' },
   ] },
   { name: 'create-site', steps: [...create('Languages and chapters from a source'), { shot: 'pages-create-site' }] },
-  { name: 'create-copy', steps: [...create('Pages that follow a source'), { key: 'Escape' }, { wait: 300 }, { shot: 'pages-create-linked-copy' }] },
+  { name: 'create-copy', steps: [...create('Pages that follow a source'), { wait: 600 }, { shot: 'pages-create-linked-copy' }] },
   { name: 'create-csv', steps: [...create('The pages here as a spreadsheet'), { shot: 'pages-csv-report' }] },
   { name: 'selection', steps: [
     ...selected,
@@ -45,8 +45,9 @@ export default [
   // saves a version too, so that the timeline and the restore screens below have something to show
   { name: 'version', steps: [
     ...selected, RIGHT, { click: { text: 'Version', last: true } }, { wait: 1200 }, { type: 'Before the rewrite' }, { shot: 'pages-version' },
-    button('Save'), { wait: 1500 }, { key: 'Alt+4' }, { wait: 1200 }, { shot: 'pages-timeline' },
+    button('Save'), { wait: 1500 },
   ] },
+  { name: 'timeline', steps: [...selected, { key: 'Alt+4' }, { wait: 1200 }, { shot: 'pages-timeline' }] },
   fromMenu('release', 'Release'),
   fromMenu('translation-project', 'Translation Project'),
   // from the folder above, so that the page with the saved version is listed
