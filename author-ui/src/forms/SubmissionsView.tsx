@@ -84,6 +84,17 @@ export function SubmissionsView({ client, form }: Props) {
     }
   };
 
+  /** Opening a submission reads it; this hands the "new" mark back for a colleague. */
+  const markNew = async (s: Submission) => {
+    try {
+      await client.markNew([s.path]);
+      setOpen(null);
+      setData((d) => (d ? { ...d, items: d.items.map((i) => (i.path === s.path ? { ...i, seen: false } : i)) } : d));
+    } catch (e) {
+      ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 });
+    }
+  };
+
   const remove = async () => {
     const paths = [...selected];
     setConfirmDelete(false);
@@ -329,6 +340,9 @@ export function SubmissionsView({ client, form }: Props) {
               </div>
             </dl>
             <div className="studio-submissions__detail-actions">
+              <ActionButton onPress={() => void markNew(open)}>
+                <Text>Mark as new</Text>
+              </ActionButton>
               <ActionButton
                 onPress={() => {
                   setSelected(new Set([open.path]));

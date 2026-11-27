@@ -197,11 +197,37 @@ public class SubmissionsServlet extends SlingAllMethodsServlet {
             return;
         }
         String op = param(request, "op", "");
+        String[] paths = request.getParameterValues("path");
+        if ("unseen".equals(op)) {
+            // hand the "new" mark back, so a colleague still sees the submission as unread
+            try (ResourceResolver resolver = store.serviceResolver()) {
+                int n = 0;
+                for (String p : paths == null ? new String[0] : paths) {
+                    Resource r = resolver.getResource(p);
+                    if (r == null || !r.isResourceType(SubmissionStore.RESOURCE_TYPE)
+                            || request.getResourceResolver().getResource(r.getValueMap().get("form", "")) == null) {
+                        continue;
+                    }
+                    org.apache.sling.api.resource.ModifiableValueMap mvm =
+                            r.adaptTo(org.apache.sling.api.resource.ModifiableValueMap.class);
+                    if (mvm != null && mvm.remove("seen") != null) {
+                        n++;
+                    }
+                }
+                resolver.commit();
+                Map<String, Object> out = new LinkedHashMap<>();
+                out.put("ok", Boolean.TRUE);
+                out.put("changed", n);
+                json(response, out);
+            } catch (Exception e) {
+                SubmitServlet.send(response, 500, SubmitServlet.error(e.getMessage()));
+            }
+            return;
+        }
         if (!"delete".equals(op)) {
             SubmitServlet.send(response, 400, SubmitServlet.error("Unknown op " + op));
             return;
         }
-        String[] paths = request.getParameterValues("path");
         try (ResourceResolver resolver = store.serviceResolver()) {
             int n = 0;
             for (String p : paths == null ? new String[0] : paths) {

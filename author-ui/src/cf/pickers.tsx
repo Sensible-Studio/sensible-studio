@@ -21,13 +21,13 @@ import type { CfClient, CfSummary, DamItem } from './api';
 import { RecordIcon } from '../shell/recordIcons';
 import { StudioPickerDialog } from '../shell/StudioDialog';
 
-function trail(root: string, path: string): Array<{ path: string; title: string }> {
-  const out = [{ path: root, title: root.split('/').pop() || root }];
+function trail(root: string, path: string, titles: Record<string, string> = {}): Array<{ path: string; title: string }> {
+  const out = [{ path: root, title: titles[root] ?? (root === '/content/dam' ? 'Media' : root.split('/').pop() || root) }];
   if (!path.startsWith(root) || path === root) return out;
   let current = root;
   for (const segment of path.slice(root.length).split('/').filter(Boolean)) {
     current = `${current}/${segment}`;
-    out.push({ path: current, title: segment });
+    out.push({ path: current, title: titles[current] ?? segment });
   }
   return out;
 }
@@ -42,13 +42,25 @@ export function AssetPickerDialog({ client, root, initial, onSelect }: { client:
   const [items, setItems] = useState<DamItem[] | null>(null);
   const [selected, setSelected] = useState<string | null>(initial ?? null);
   const [error, setError] = useState<string | null>(null);
+  // folder titles seen so far, so the trail reads like the list does
+  const [titles, setTitles] = useState<Record<string, string>>({});
+  const remember = (list: DamItem[]) => setTitles((t) => ({ ...t, ...Object.fromEntries(list.map((i) => [i.path, i.title])) }));
+
+  useEffect(() => {
+    const parent = root.slice(0, root.lastIndexOf('/'));
+    if (parent.startsWith('/content/dam')) client.listDam(parent).then(remember, () => undefined);
+  }, [client, root]);
 
   useEffect(() => {
     let cancelled = false;
     setItems(null);
     client
       .listDam(path)
-      .then((list) => !cancelled && setItems(list.filter((i) => i.kind !== 'fragment')))
+      .then((list) => {
+        if (cancelled) return;
+        remember(list);
+        setItems(list.filter((i) => i.kind !== 'fragment'));
+      })
       .catch((e: unknown) => !cancelled && setError(String(e)));
     return () => {
       cancelled = true;
@@ -66,7 +78,7 @@ export function AssetPickerDialog({ client, root, initial, onSelect }: { client:
       <Divider />
       <Content>
         <Breadcrumbs onAction={(k: Key) => setPath(String(k))} size="M">
-          {trail(root, path).map((t) => (
+          {trail(root, path, titles).map((t) => (
             <Item key={t.path}>{t.title}</Item>
           ))}
         </Breadcrumbs>

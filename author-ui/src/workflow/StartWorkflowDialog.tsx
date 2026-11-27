@@ -2,6 +2,7 @@ import { Button, ButtonGroup, Content, DialogContainer, Divider, Form, Heading, 
 import { useEffect, useMemo, useState } from 'react';
 import { HttpWorkflowClient, workflowUrl, type ModelSummary, type WorkflowClient } from './api';
 import { inboxChanged } from './InboxBell';
+import { useNavigate } from '../shell/ShellContext';
 import { StudioDialog } from '../shell/StudioDialog';
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
  * comment, and one workflow starts per selected item.
  */
 export function StartWorkflowDialog({ payloads, onClose, onStarted, client }: Props) {
+  const go = useNavigate();
   const wf = useMemo(() => client ?? new HttpWorkflowClient(), [client]);
   const [models, setModels] = useState<ModelSummary[] | null>(null);
   const [model, setModel] = useState<string | null>(null);
@@ -44,7 +46,7 @@ export function StartWorkflowDialog({ payloads, onClose, onStarted, client }: Pr
       ToastQueue.positive(payloads.length === 1 ? `${name} started on ${payloads[0]}` : `${name} started on ${payloads.length} items`, {
         timeout: 5000,
         actionLabel: 'Instances',
-        onAction: () => (window.location.href = workflowUrl.instances()),
+        onAction: () => go(workflowUrl.instances()),
         shouldCloseOnAction: true,
       });
       inboxChanged();

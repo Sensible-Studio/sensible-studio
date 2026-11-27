@@ -55,6 +55,8 @@ export interface SubmissionsClient {
   /** total / unseen per form, for every form under a folder (or the form itself). */
   counts(under: string): Promise<SubmissionCounts>;
   remove(paths: string[]): Promise<number>;
+  /** Put the "new" mark back on submissions that were opened. */
+  markNew(paths: string[]): Promise<number>;
   exportUrl(form: string, format: 'csv' | 'json'): string;
   /** Where an uploaded file can be opened or downloaded. */
   fileUrl(file: SubmissionFile, download?: boolean): string;
@@ -110,6 +112,16 @@ export class HttpSubmissionsClient implements SubmissionsClient {
       await fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'X-Studio-CSRF': '1' }, body }),
     );
     return res.deleted;
+  }
+
+  async markNew(paths: string[]): Promise<number> {
+    const body = new URLSearchParams();
+    body.set('op', 'unseen');
+    for (const p of paths) body.append('path', p);
+    const res = await json<{ changed: number }>(
+      await fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'X-Studio-CSRF': '1' }, body }),
+    );
+    return res.changed;
   }
 
   exportUrl(form: string, format: 'csv' | 'json'): string {
