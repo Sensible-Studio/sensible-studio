@@ -206,9 +206,8 @@ export function ReplicationConsole({ client, studio }: Props) {
                     <tr>
                       <th>Action</th>
                       <th>Path</th>
-                      <th>By</th>
                       <th>Requested</th>
-                      <th>Attempts</th>
+                      <th title="Attempts">Tries</th>
                       <th />
                     </tr>
                   </thead>
@@ -222,8 +221,11 @@ export function ReplicationConsole({ client, studio }: Props) {
                         <td>
                           <code>{j.path}</code>
                         </td>
-                        <td>{j.user}</td>
-                        <td>{j.state === 'SCHEDULED' && j.scheduled ? `Scheduled for ${new Date(j.scheduled).toLocaleString()}` : formatWhen(j.requested)}</td>
+                        {/* who asked goes under when: the panel is narrow, and a column more pushed the attempts and the bin out of it */}
+                        <td>
+                          {j.state === 'SCHEDULED' && j.scheduled ? `Scheduled for ${new Date(j.scheduled).toLocaleString()}` : formatWhen(j.requested)}
+                          {j.user && <div className="studio-replication__muted">by {j.user}</div>}
+                        </td>
                         <td>{j.state === 'SCHEDULED' ? '—' : j.retries}</td>
                         <td>
                           {j.state === 'SCHEDULED' && (

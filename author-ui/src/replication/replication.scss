@@ -148,6 +148,18 @@
     background: var(--spectrum-global-color-gray-50);
     border: 1px solid var(--spectrum-global-color-gray-300);
     border-radius: 6px;
+    // the pane is the narrow column: long paths break instead of pushing the last columns (and the bin) out of it,
+    // and whatever still does not fit can be scrolled to
+    overflow-x: auto;
+
+    table {
+      width: 100%;
+    }
+
+    td code {
+      overflow-wrap: anywhere;
+      word-break: break-all;
+    }
 
     h3 {
       margin: 0 0 8px;

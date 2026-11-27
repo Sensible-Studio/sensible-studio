@@ -396,7 +396,7 @@ public class SitesServlet extends SlingAllMethodsServlet {
         if (folderTitle == null) {
             folderTitle = prop(r, "jcr:title", String.class);
         }
-        return folderTitle != null ? folderTitle : (ROOT.equals(r.getPath()) ? "Sites" : r.getName());
+        return folderTitle != null ? folderTitle : (ROOT.equals(r.getPath()) ? "Pages" : r.getName());
     }
 
     // ------------------------------------------------------------------ search
@@ -500,7 +500,8 @@ public class SitesServlet extends SlingAllMethodsServlet {
             }
             Resource r = queue.poll();
             for (Resource child : r.getChildren()) {
-                if (!isListed(child) || (ROOT.equals(r.getPath()) && "dam".equals(child.getName()))) {
+                // the copies of pages a release holds are never published: a release goes live, and its source pages are published
+                if (!isListed(child) || (ROOT.equals(r.getPath()) && ("dam".equals(child.getName()) || "launches".equals(child.getName())))) {
                     continue;
                 }
                 seen++;
@@ -716,7 +717,9 @@ public class SitesServlet extends SlingAllMethodsServlet {
         String[] allowed = inheritedArray(parent, "cq:allowedTemplates");
         List<Map<String, Object>> out = new ArrayList<>();
         if (conf == null) {
-            return out;
+            // a page that belongs to no site's configuration (the first page of a new installation, made right
+            // under /content) uses the global one, which ships with the Content page template
+            conf = "/conf/global";
         }
         Resource root = resolver.getResource(conf + "/settings/wcm/templates");
         if (root == null) {
