@@ -107,4 +107,16 @@ class SecurityServiceTest {
     private static List<Object> ids(List<Map<String, Object>> list) {
         return list.stream().map(m -> m.get("id")).collect(Collectors.toList());
     }
+
+    @Test
+    void whoIsDeletedLeavesNoRightsBehindForTheNextOfThatName() throws Exception {
+        service.createUser("sorin", "secret-1", Map.of());
+        service.createUser("stays", "secret-2", Map.of());
+        service.saveAce("sorin", "/content/site", true, List.of("jcr:read", "rep:write"), null, null);
+        service.saveAce("stays", "/content/site", true, List.of("jcr:read"), null, null);
+        service.delete("sorin");
+        service.createUser("sorin", "secret-3", Map.of());
+        assertTrue(service.aces("sorin").stream().noneMatch(a -> "/content/site".equals(a.get("path"))));
+        assertTrue(service.aces("stays").stream().anyMatch(a -> "/content/site".equals(a.get("path"))));
+    }
 }

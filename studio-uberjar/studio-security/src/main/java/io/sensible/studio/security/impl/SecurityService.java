@@ -327,8 +327,50 @@ final class SecurityService {
         if (PROTECTED.contains(id) || !a.isGroup() && (((User) a).isSystemUser() || ((User) a).isAdmin())) {
             throw new IllegalArgumentException(id + " cannot be deleted");
         }
+        forget(a);
         a.remove();
         session.save();
+    }
+
+    /**
+     * Takes what a user or group was allowed, anywhere, away with it. The repository keeps the entries of a
+     * principal that is gone, and they would be the rights of whoever is next given the same name.
+     */
+    private void forget(Authorizable a) throws RepositoryException {
+        String name = a.getPrincipal().getName();
+        String home = a.getPath();
+        Set<String> paths = new TreeSet<>();
+        String stmt = "SELECT * FROM [rep:ACE] AS a WHERE a.[rep:principalName] = '" + name.replace("'", "''") + "'";
+        NodeIterator nodes = session.getWorkspace().getQueryManager().createQuery(stmt, Query.JCR_SQL2).execute().getNodes();
+        while (nodes.hasNext()) {
+            Node policy = nodes.nextNode().getParent();
+            if ("rep:policy".equals(policy.getName())) {
+                paths.add(policy.getParent().getPath());
+            } else if ("rep:repoPolicy".equals(policy.getName())) {
+                paths.add("");
+            }
+        }
+        for (String p : paths) {
+            // its own home goes with it
+            if (p.equals(home) || p.startsWith(home + "/")) {
+                continue;
+            }
+            String path = p.isEmpty() ? null : p;
+            JackrabbitAccessControlList acl = acl(path, false);
+            if (acl == null) {
+                continue;
+            }
+            boolean changed = false;
+            for (AccessControlEntry e : acl.getAccessControlEntries()) {
+                if (e.getPrincipal().getName().equals(name)) {
+                    acl.removeAccessControlEntry(e);
+                    changed = true;
+                }
+            }
+            if (changed) {
+                acm.setPolicy(path, acl);
+            }
+        }
     }
 
     // ------------------------------------------------------------------ permissions
