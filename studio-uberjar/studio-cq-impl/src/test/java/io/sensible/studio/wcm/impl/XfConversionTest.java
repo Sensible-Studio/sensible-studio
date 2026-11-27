@@ -6,6 +6,7 @@ package io.sensible.studio.wcm.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -96,5 +97,49 @@ class XfConversionTest {
         assertEquals(r.get("variation"), component.getValueMap().get("fragmentVariationPath", String.class));
         assertNull(resolver.getResource(PAGE + "/jcr:content/root/text"));
         assertTrue(!resolver.hasChanges());
+    }
+
+    @Test
+    void createsAFragmentWithItsMasterAndVariationsBelowIt() throws Exception {
+        PageManagerImpl pm = new PageManagerImpl(resolver);
+        Resource xf = XfConversion.createFragment(resolver, pm, "/content/experience-fragments/site", "Winter Offer", null, TEMPLATE);
+        resolver.commit();
+        assertEquals("/content/experience-fragments/site/winter-offer", xf.getPath());
+        assertTrue(XfConversion.isFragment(xf));
+        Resource master = resolver.getResource(xf.getPath() + "/master/jcr:content");
+        assertEquals(Boolean.TRUE, master.getValueMap().get("cq:xfMasterVariation", Boolean.class));
+        assertEquals("web", master.getValueMap().get("cq:xfVariantType", String.class));
+        assertNotNull(master.getChild("root/container"), "the template's initial content");
+
+        // a page made below the fragment is a variation, not a second master
+        com.day.cq.wcm.api.Page second = pm.create(xf.getPath(), "email", TEMPLATE, "Email", false);
+        Resource v = second.adaptTo(Resource.class);
+        v.getChild("jcr:content").adaptTo(org.apache.sling.api.resource.ModifiableValueMap.class).remove("cq:xfVariantType");
+        XfConversion.markVariation(v);
+        assertEquals("web", v.getChild("jcr:content").getValueMap().get("cq:xfVariantType", String.class));
+        assertNull(v.getChild("jcr:content").getValueMap().get("cq:xfMasterVariation"));
+
+        // a fragment holds variations only; a taken name is refused when it was asked for
+        assertThrows(IllegalArgumentException.class, () -> XfConversion.createFragment(resolver, pm, xf.getPath(), "Inner", null, TEMPLATE));
+        resolver.revert();
+        assertThrows(com.day.cq.wcm.api.WCMException.class,
+                () -> XfConversion.createFragment(resolver, pm, "/content/experience-fragments/site", "Again", "winter-offer", TEMPLATE));
+        resolver.revert();
+        // without a name asked for, the next free one
+        assertEquals("winter-offer_1", XfConversion.createFragment(resolver, pm, "/content/experience-fragments/site", "Winter Offer", null, TEMPLATE).getName());
+        resolver.commit();
+    }
+
+    @Test
+    void aFolderMadeHereIsListedWhileEmpty() throws Exception {
+        Resource f = SitesServlet.createFolder(resolver, "/content/experience-fragments/site", "Campaigns 2027", null);
+        assertEquals("campaigns-2027", f.getName());
+        assertEquals("Campaigns 2027", f.getValueMap().get("jcr:title", String.class));
+        assertTrue(SitesServlet.isListed(f), "empty, and still shown");
+        context.create().resource("/content/experience-fragments/site/silent", "jcr:primaryType", "sling:Folder");
+        assertTrue(!SitesServlet.isListed(resolver.getResource("/content/experience-fragments/site/silent")), "a folder of somebody else stays hidden while empty");
+        assertThrows(IllegalArgumentException.class, () -> SitesServlet.createFolder(resolver, "/content/experience-fragments/site", "Campaigns 2027", null));
+        assertThrows(IllegalArgumentException.class, () -> SitesServlet.createFolder(resolver, PAGE, "In a page", null));
+        assertThrows(IllegalArgumentException.class, () -> SitesServlet.createFolder(resolver, "/content/experience-fragments/site", " ", null));
     }
 }

@@ -255,6 +255,10 @@ export interface StudioClient {
   /** Templates allowed for a new page below `parent`. */
   pageTemplates(parent: string): Promise<TemplateInfo[]>;
   createPage(parent: string, template: string, title: string, name?: string): Promise<SiteItem>;
+  /** An experience fragment: the fragment and its master variation from the template (`master`: the variation's path). */
+  createExperienceFragment?(parent: string, template: string, title: string, name?: string): Promise<SiteItem & { master?: string }>;
+  /** A folder to keep pages or experience fragments in. */
+  createFolder?(parent: string, title: string, name?: string): Promise<SiteItem>;
   /** Properties outside `path` that reference it (or anything below it). */
   references(path: string): Promise<ReferenceInfo[]>;
   /**

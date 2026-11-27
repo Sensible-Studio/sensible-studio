@@ -12,10 +12,18 @@ interface Props {
   parentTitle: string;
   onClose(): void;
   onCreated(page: SiteItem): void;
+  /** What is made: a page (default), an experience fragment with its master variation, or a variation of a fragment. */
+  kind?: 'page' | 'xf' | 'variation';
 }
 
+const WORDS = {
+  page: { title: 'Create Page', label: 'Title' },
+  xf: { title: 'Create Experience Fragment', label: 'Title' },
+  variation: { title: 'Create Variation', label: 'Title' },
+} as const;
+
 /** Create Page: pick one of the templates allowed here, then the page's basic properties. */
-export function CreatePageWizard({ client, parent, parentTitle, onClose, onCreated }: Props) {
+export function CreatePageWizard({ client, parent, parentTitle, onClose, onCreated, kind = 'page' }: Props) {
   const [step, setStep] = useState<0 | 1>(0);
   const [templates, setTemplates] = useState<TemplateInfo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +56,10 @@ export function CreatePageWizard({ client, parent, parentTitle, onClose, onCreat
     setSaving(true);
     setError(null);
     try {
-      const page = await client.createPage(parent, template.path, title.trim(), effectiveName || undefined);
+      const page =
+        kind === 'xf' && client.createExperienceFragment
+          ? await client.createExperienceFragment(parent, template.path, title.trim(), effectiveName || undefined)
+          : await client.createPage(parent, template.path, title.trim(), effectiveName || undefined);
       const props: PostEntry[] = [];
       const add = (n: string, v: string) => v.trim() && props.push({ name: n, value: v.trim() });
       add('./pageTitle', pageTitle);
@@ -66,7 +77,7 @@ export function CreatePageWizard({ client, parent, parentTitle, onClose, onCreat
 
   return (
     <WizardPage
-      title="Create Page"
+      title={WORDS[kind].title}
       path={parent}
       steps={['Template', 'Properties']}
       step={step}
@@ -124,15 +135,26 @@ export function CreatePageWizard({ client, parent, parentTitle, onClose, onCreat
                 placeholder={nameFromTitle(title) || 'from the title'}
                 validationState={nameOk ? undefined : 'invalid'}
                 errorMessage="Letters, digits and - _ . ~ only"
-                description={effectiveName ? `URL: ${parent}/${effectiveName}.html` : undefined}
+                description={effectiveName ? (kind === 'page' ? `URL: ${parent}/${effectiveName}.html` : `Path: ${parent}/${effectiveName}`) : undefined}
               />
-              <TextField label="Page Title" value={pageTitle} onChange={setPageTitle} />
-              <TextField label="Navigation Title" value={navTitle} onChange={setNavTitle} />
-              <TextField label="Subtitle" value={subtitle} onChange={setSubtitle} />
+              {/* a fragment is not a page of the site: it has no titles for the browser or the navigation */}
+              {kind === 'page' ? (
+                <>
+                  <TextField label="Page Title" value={pageTitle} onChange={setPageTitle} />
+                  <TextField label="Navigation Title" value={navTitle} onChange={setNavTitle} />
+                  <TextField label="Subtitle" value={subtitle} onChange={setSubtitle} />
+                </>
+              ) : (
+                <></>
+              )}
               <TextArea label="Description" value={description} onChange={setDescription} />
-              <Checkbox isSelected={hideInNav} onChange={setHideInNav}>
-                Hide in Navigation
-              </Checkbox>
+              {kind === 'page' ? (
+                <Checkbox isSelected={hideInNav} onChange={setHideInNav}>
+                  Hide in Navigation
+                </Checkbox>
+              ) : (
+                <></>
+              )}
             </Form>
           </div>
         )}

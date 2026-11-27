@@ -97,23 +97,9 @@ final class XfConversion {
         }
         PageManagerImpl pm = new PageManagerImpl(resolver);
 
-        // the fragment: a page of the experience fragment type, below which the variations are pages
-        String name = Pages.toValidName(title.trim());
-        Resource parentRes = resolver.getResource(parent);
-        Resource xf = resolver.create(parentRes, uniqueName(parentRes, name), props("jcr:primaryType", NameConstants.NT_PAGE));
-        Map<String, Object> cp = props("jcr:primaryType", "cq:PageContent", "sling:resourceType", XF_TYPE, "cq:template", XF_TEMPLATE,
-                "jcr:title", title.trim());
-        Resource xfContent = resolver.create(xf, NameConstants.NN_CONTENT, cp);
-        stamp(xfContent);
-
-        // the master variation from the template (its initial content gives the root container)
-        Page master = pm.create(xf.getPath(), "master", template, title.trim(), false);
-        Resource masterContent = master.getContentResource();
-        ModifiableValueMap mm = masterContent.adaptTo(ModifiableValueMap.class);
-        mm.put("cq:xfMasterVariation", Boolean.TRUE);
-        if (mm.get("cq:xfVariantType") == null) {
-            mm.put("cq:xfVariantType", "web");
-        }
+        Resource xf = createFragment(resolver, pm, parent, title, null, template);
+        Resource master = xf.getChild("master");
+        Resource masterContent = master.getChild(NameConstants.NN_CONTENT);
         Resource target = masterContent.getChild("root/container");
         if (target == null) {
             target = masterContent.getChild("root");
@@ -158,6 +144,59 @@ final class XfConversion {
         out.put("variation", master.getPath());
         out.put("component", component.getPath());
         return out;
+    }
+
+    /**
+     * A new experience fragment below {@code parent}: the fragment (a page of the experience fragment type, which holds no
+     * content of its own) and its master variation from {@code template}. What Create ▸ Experience Fragment makes.
+     */
+    static Resource createFragment(ResourceResolver resolver, PageManagerImpl pm, String parent, String title, String name,
+            String template) throws WCMException, PersistenceException {
+        Resource parentRes = parent == null ? null : resolver.getResource(parent);
+        if (parentRes == null) {
+            throw new IllegalArgumentException("Parent " + parent + " does not exist");
+        }
+        if (title == null || title.trim().isEmpty() || template == null || template.isEmpty()) {
+            throw new IllegalArgumentException("A title and a template are required");
+        }
+        if (isFragment(parentRes)) {
+            throw new IllegalArgumentException("An experience fragment holds variations, not other fragments");
+        }
+        String wanted = name == null || name.trim().isEmpty() ? Pages.toValidName(title.trim()) : Pages.toValidName(name.trim());
+        if (name != null && !name.trim().isEmpty() && parentRes.getChild(wanted) != null) {
+            throw new WCMException("There is already something named " + wanted + " here");
+        }
+        // the fragment: a page of the experience fragment type, below which the variations are pages
+        Resource xf = resolver.create(parentRes, uniqueName(parentRes, wanted), props("jcr:primaryType", NameConstants.NT_PAGE));
+        Map<String, Object> cp = props("jcr:primaryType", "cq:PageContent", "sling:resourceType", XF_TYPE, "cq:template", XF_TEMPLATE,
+                "jcr:title", title.trim());
+        Resource xfContent = resolver.create(xf, NameConstants.NN_CONTENT, cp);
+        stamp(xfContent);
+
+        // the master variation from the template (its initial content gives the root container)
+        Page master = pm.create(xf.getPath(), "master", template, title.trim(), false);
+        ModifiableValueMap mm = master.getContentResource().adaptTo(ModifiableValueMap.class);
+        mm.put("cq:xfMasterVariation", Boolean.TRUE);
+        if (mm.get("cq:xfVariantType") == null) {
+            mm.put("cq:xfVariantType", "web");
+        }
+        return xf;
+    }
+
+    /** Whether the page is an experience fragment itself (the holder of its variations). */
+    static boolean isFragment(Resource page) {
+        Resource content = page == null ? null : page.getChild(NameConstants.NN_CONTENT);
+        return content != null && XF_TYPE.equals(content.getValueMap().get("sling:resourceType", String.class));
+    }
+
+    /** A page made below a fragment is a variation of it: it says which kind, as the master does. */
+    static void markVariation(Resource page) {
+        Resource parent = page.getParent();
+        Resource content = page.getChild(NameConstants.NN_CONTENT);
+        ModifiableValueMap m = content == null ? null : content.adaptTo(ModifiableValueMap.class);
+        if (m != null && isFragment(parent) && m.get("cq:xfVariantType") == null) {
+            m.put("cq:xfVariantType", "web");
+        }
     }
 
     private static String uniqueName(Resource parent, String name) {

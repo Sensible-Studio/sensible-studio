@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
+import org.apache.sling.api.resource.PersistenceException;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ValueMap;
@@ -117,20 +118,71 @@ public class SitesServlet extends SlingAllMethodsServlet {
             move(request, response);
             return;
         }
-        if (!"create".equals(request.getParameter("op"))) {
-            send(response, HttpServletResponse.SC_NOT_FOUND, Collections.singletonMap("error", "Unknown op"));
-            return;
-        }
-        PageManagerImpl pm = new PageManagerImpl(request.getResourceResolver());
+        String op = request.getParameter("op");
+        ResourceResolver resolver = request.getResourceResolver();
+        PageManagerImpl pm = new PageManagerImpl(resolver);
         String parent = request.getParameter("parent");
         String name = request.getParameter("name");
+        if (parent == null || !(parent.equals(ROOT) || parent.startsWith(ROOT + "/"))) {
+            send(response, HttpServletResponse.SC_BAD_REQUEST, Collections.singletonMap("error", "parent: a path below " + ROOT));
+            return;
+        }
         try {
-            Page page = pm.create(parent, name == null || name.trim().isEmpty() ? null : name.trim(),
-                    request.getParameter("template"), request.getParameter("title"), true);
-            send(response, HttpServletResponse.SC_CREATED, item(page.adaptTo(Resource.class), pm));
-        } catch (WCMException e) {
+            if ("createXf".equals(op)) {
+                // an experience fragment: the fragment and its master variation
+                Resource xf = XfConversion.createFragment(resolver, pm, parent, request.getParameter("title"), name,
+                        request.getParameter("template"));
+                resolver.commit();
+                Map<String, Object> out = item(xf, pm);
+                out.put("master", xf.getPath() + "/master");
+                send(response, HttpServletResponse.SC_CREATED, out);
+            } else if ("createFolder".equals(op)) {
+                send(response, HttpServletResponse.SC_CREATED, item(createFolder(resolver, parent, request.getParameter("title"), name), pm));
+            } else if ("create".equals(op)) {
+                Page page = pm.create(parent, name == null || name.trim().isEmpty() ? null : name.trim(),
+                        request.getParameter("template"), request.getParameter("title"), true);
+                Resource created = page.adaptTo(Resource.class);
+                if (XfConversion.isFragment(created.getParent())) {
+                    XfConversion.markVariation(created);
+                    resolver.commit();
+                }
+                send(response, HttpServletResponse.SC_CREATED, item(created, pm));
+            } else {
+                send(response, HttpServletResponse.SC_NOT_FOUND, Collections.singletonMap("error", "Unknown op"));
+            }
+        } catch (WCMException | IllegalArgumentException e) {
+            resolver.revert();
             send(response, HttpServletResponse.SC_CONFLICT, Collections.singletonMap("error", e.getMessage()));
         }
+    }
+
+    /** Marks a folder made here: it is listed while it is still empty (other folders only once they hold pages). */
+    static final String PN_LISTED = "studio:listed";
+
+    /** A folder to keep pages or experience fragments in. */
+    static Resource createFolder(ResourceResolver resolver, String parent, String title, String name) throws PersistenceException {
+        Resource parentRes = resolver.getResource(parent);
+        if (parentRes == null) {
+            throw new IllegalArgumentException("Parent " + parent + " does not exist");
+        }
+        if (Pages.isPage(parentRes)) {
+            throw new IllegalArgumentException("A folder goes into a folder, not into a page");
+        }
+        String t = title == null ? "" : title.trim();
+        String n = Pages.toValidName(name == null || name.trim().isEmpty() ? t : name.trim());
+        if (t.isEmpty() || n == null || n.isEmpty()) {
+            throw new IllegalArgumentException("A title is required");
+        }
+        if (parentRes.getChild(n) != null) {
+            throw new IllegalArgumentException("There is already something named " + n + " here");
+        }
+        Map<String, Object> props = new LinkedHashMap<>();
+        props.put(Pages.PN_PRIMARY_TYPE, "sling:OrderedFolder");
+        props.put("jcr:title", t);
+        props.put(PN_LISTED, Boolean.TRUE);
+        Resource folder = resolver.create(parentRes, n, props);
+        resolver.commit();
+        return folder;
     }
 
     // ------------------------------------------------------------------ children
@@ -170,7 +222,7 @@ public class SitesServlet extends SlingAllMethodsServlet {
         }
         // folders only when they hold pages (Sling's own /content/starter, /content/htl ... do not); experience
         // fragments sit four folders deep (/content/experience-fragments/<site>/<language-masters>/<lang>/<group>)
-        return isFolder(r) && containsPages(r, 6);
+        return isFolder(r) && (containsPages(r, 6) || r.getValueMap().get(PN_LISTED, false));
     }
 
     private static boolean isFolder(Resource r) {

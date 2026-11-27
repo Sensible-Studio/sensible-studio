@@ -176,6 +176,24 @@ export class HttpClient implements StudioClient {
     return body;
   }
 
+  async createExperienceFragment(parent: string, template: string, title: string, name?: string): Promise<SiteItem & { master?: string }> {
+    const qs = new URLSearchParams({ op: 'createXf', parent, template, title });
+    if (name) qs.set('name', name);
+    const res = await fetch(`${this.base}/bin/studio/sites.json?${qs}`, { method: 'POST', credentials: 'same-origin' });
+    const body = (await res.json().catch(() => ({}))) as SiteItem & { master?: string; error?: string };
+    if (!res.ok) throw new StudioHttpError(res.status, body.error || `Could not create the experience fragment (HTTP ${res.status})`);
+    return body;
+  }
+
+  async createFolder(parent: string, title: string, name?: string): Promise<SiteItem> {
+    const qs = new URLSearchParams({ op: 'createFolder', parent, title });
+    if (name) qs.set('name', name);
+    const res = await fetch(`${this.base}/bin/studio/sites.json?${qs}`, { method: 'POST', credentials: 'same-origin' });
+    const body = (await res.json().catch(() => ({}))) as SiteItem & { error?: string };
+    if (!res.ok) throw new StudioHttpError(res.status, body.error || `Could not create the folder (HTTP ${res.status})`);
+    return body;
+  }
+
   async references(path: string): Promise<ReferenceInfo[]> {
     const res = await this.getJson<{ references: ReferenceInfo[] }>(
       `/bin/studio/sites.json?${new URLSearchParams({ op: 'references', path })}`,

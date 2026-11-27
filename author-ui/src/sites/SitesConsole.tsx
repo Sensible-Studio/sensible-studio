@@ -52,6 +52,7 @@ import { BulkPagePropertiesDialog, BulkVersionDialog, httpBulkPages } from './Bu
 import { ContextMenu, useContextMenu, useRegisterActions, type Action } from '../shell/actions';
 import { SelectionBar } from '../shell/SelectionBar';
 import { CreatePageWizard } from './CreatePageWizard';
+import { CreateFolderDialog } from './CreateFolderDialog';
 import { DeleteDialog } from './DeleteDialog';
 import { MoveDialog } from './MoveDialog';
 import { CardView, ColumnView, ListView, readView, storeView, ViewSwitch, type ViewMode } from './views';
@@ -159,6 +160,9 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
   const [selected, setSelected] = useState<string[]>([]);
   const [clipboard, setClipboard] = useState<SiteItem[] | null>(null);
   const [creating, setCreating] = useState<string | null>(null);
+  // what Create makes there: a page, an experience fragment, or a variation of the fragment one is in
+  const [creatingKind, setCreatingKind] = useState<'page' | 'xf' | 'variation'>('page');
+  const [creatingFolder, setCreatingFolder] = useState<string | null>(null);
   const [startingWorkflow, setStartingWorkflow] = useState<string[] | null>(null);
   const [moving, setMoving] = useState<SiteItem | null>(null);
   // Publish / Unpublish: AEM's dialog, for the selected pages
@@ -637,6 +641,22 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
   // ------------------------------------------------------------------------------------------ render
 
   const canCreate = current?.item.path === '/content' || current?.item.type === 'page' || current?.item.type === 'folder';
+  // Create ▾ follows the place: experience fragments are made as fragments (with their master variation), and
+  // inside one what is made is a variation; folders go into folders
+  const inXf = root.path === '/content/experience-fragments';
+  const inFragment = inXf && current?.item.resourceType === 'cq/experience-fragments/components/experiencefragment';
+  const inFolder = !current || current.item.type === 'folder';
+  const createItems: Array<{ key: string; label: string; description: string }> = [
+    ...(inXf
+      ? inFragment
+        ? [{ key: 'variation', label: 'Variation', description: 'Another version of this fragment, for a channel or an offer' }]
+        : [{ key: 'xf', label: 'Experience Fragment', description: 'A reusable piece of a page, with its master variation' }]
+      : [{ key: 'page', label: root.path === '/content/forms' ? 'Form' : 'Page', description: 'From a template allowed here' }]),
+    ...(inFolder && !inFragment ? [{ key: 'folder', label: 'Folder', description: inXf ? 'To keep experience fragments in' : 'To keep pages in' }] : []),
+    ...(inXf ? [] : [{ key: 'site', label: 'Site', description: 'Languages and chapters from a source' }]),
+    { key: 'livecopy', label: 'Linked copy', description: inXf ? 'Fragments that follow a source' : 'Pages that follow a source' },
+    { key: 'csv', label: 'CSV Report', description: inXf ? 'What is here as a spreadsheet' : 'The pages here as a spreadsheet' },
+  ];
 
   return (
     <div className="studio-sites">
@@ -680,24 +700,23 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
                 Create
               </Button>
               <Menu
-                onAction={(k: Key) => (k === 'page' ? setCreating(path) : k === 'livecopy' ? setCreatingLiveCopy(path) : k === 'csv' ? setCsvReportOf(path) : k === 'site' && setCreatingSite(path))}
+                onAction={(k: Key) => {
+                  if (k === 'page' || k === 'xf' || k === 'variation') {
+                    setCreatingKind(k);
+                    setCreating(path);
+                  } else if (k === 'folder') setCreatingFolder(path);
+                  else if (k === 'livecopy') setCreatingLiveCopy(path);
+                  else if (k === 'csv') setCsvReportOf(path);
+                  else if (k === 'site') setCreatingSite(path);
+                }}
+                disabledKeys={client.createFolder ? [] : ['folder']}
               >
-                <Item key="page" textValue={root.path === '/content/forms' ? 'Form' : 'Page'}>
-                  <Text>{root.path === '/content/forms' ? 'Form' : 'Page'}</Text>
-                  <Text slot="description">From a template allowed here</Text>
-                </Item>
-                <Item key="site" textValue="Site">
-                  <Text>Site</Text>
-                  <Text slot="description">Languages and chapters from a source</Text>
-                </Item>
-                <Item key="livecopy" textValue="Linked copy">
-                  <Text>Linked copy</Text>
-                  <Text slot="description">Pages that follow a source</Text>
-                </Item>
-                <Item key="csv" textValue="CSV Report">
-                  <Text>CSV Report</Text>
-                  <Text slot="description">The pages here as a spreadsheet</Text>
-                </Item>
+                {createItems.map((c) => (
+                  <Item key={c.key} textValue={c.label}>
+                    <Text>{c.label}</Text>
+                    <Text slot="description">{c.description}</Text>
+                  </Item>
+                ))}
               </Menu>
             </MenuTrigger>
           }
@@ -755,17 +774,33 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
 
       {csvReportOf && <CsvReport client={client} parent={csvReportOf} sources={csvSources} onClose={() => setCsvReportOf(null)} />}
 
+      <DialogContainer onDismiss={() => setCreatingFolder(null)}>
+        {creatingFolder && client.createFolder && (
+          <CreateFolderDialog
+            parent={creatingFolder}
+            create={(title, name) => client.createFolder!(creatingFolder, title, name)}
+            onClose={() => setCreatingFolder(null)}
+            onCreated={(folder) => {
+              setCreatingFolder(null);
+              refresh();
+              setSelected([folder.path]);
+              ToastQueue.positive(`Folder ${folder.title} created`, { timeout: 4000 });
+            }}
+          />
+        )}
+      </DialogContainer>
       {creating && (
         <CreatePageWizard
           client={client}
           parent={creating}
           parentTitle={titleAt(creating)}
+          kind={creatingKind}
           onClose={() => setCreating(null)}
           onCreated={(page) => {
             setCreating(null);
             refresh();
             setSelected([page.path]);
-            ToastQueue.positive(`Page ${page.title} created`, {
+            ToastQueue.positive(`${creatingKind === 'xf' ? 'Experience fragment' : creatingKind === 'variation' ? 'Variation' : 'Page'} ${page.title} created`, {
               timeout: 6000,
               actionLabel: 'Open',
               onAction: () => edit(page),
