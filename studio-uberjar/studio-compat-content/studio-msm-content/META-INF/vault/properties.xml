@@ -3,7 +3,7 @@
 <properties>
 <entry key="group">io.sensible.studio</entry>
 <entry key="name">studio-msm-content</entry>
-<entry key="version">0.2.1</entry>
+<entry key="version">0.2.2</entry>
 <entry key="description">Sensible Studio's standard MSM rollout configurations, at the paths live copies made on AEM refer to (/libs/msm/wcm/rolloutconfigs/default ...). Written for Sensible Studio; contains no Adobe content.</entry>
 <entry key="createdBy">Sensible Studio</entry>
 <entry key="packageType">application</entry>

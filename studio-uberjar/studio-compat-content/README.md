@@ -14,7 +14,7 @@ cd cq-platform-content && zip -r ../studio-compat-cq-platform-content-1.3.248.zi
 acțiuni ca în AEM, texte proprii). Are nevoie de tipurile `cq:RolloutConfig` și `cq:LiveSyncAction` din `studio-cq-api`.
 
 ```bash
-cd studio-msm-content && zip -r ../studio-msm-content-0.2.0.zip META-INF jcr_root
+cd studio-msm-content && zip -r ../studio-msm-content-0.2.2.zip META-INF jcr_root
 ```
 
 `studio-workflow-content/`: componentele pașilor de workflow la `/libs/cq/workflow/components/model` (process, participant,

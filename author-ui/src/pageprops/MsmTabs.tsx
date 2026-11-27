@@ -147,11 +147,11 @@ export function BlueprintTab({ msm, page, status, onChanged }: { msm: MsmClient;
         <Section title="Sync rules">
           <div className="studio-g-field">
             <label className="studio-g-visually-hidden" htmlFor={id}>
-              Sync changes configurations of the linked copies
+              Sync rules of the linked copies
             </label>
             <ConfigSelect id={id} configs={configs} value={chosen} onChange={setChosen} />
             <p className="studio-pp-hint">
-              Used by the live copies of this page and the pages below it that name none of their own; without any, they use
+              Used by the linked copies of this page and the pages below it that name none of their own; without any, they use
               the standard sync rules.
             </p>
           </div>
@@ -294,19 +294,19 @@ export function LiveCopyTab({ msm, page, status, onChanged }: { msm: MsmClient; 
         <Section title="Status">
           <dl className="studio-pp-facts">
             <div>
-              <dt>Suspended Linked copy</dt>
+              <dt>Suspended</dt>
               <dd>{suspended ? 'Yes' : 'No'}</dd>
             </div>
             <div>
-              <dt>In Sync with Source</dt>
+              <dt>In sync with its source</dt>
               <dd>{sourceModified === undefined ? '…' : inSync ? 'Yes' : 'No'}</dd>
             </div>
             <div>
-              <dt>Last Sync changes Date</dt>
+              <dt>Last synchronized</dt>
               <dd title={rel.lastRolledOut ? new Date(rel.lastRolledOut).toLocaleString() : undefined}>{ago(rel.lastRolledOut)}</dd>
             </div>
             <div>
-              <dt>Last Rolled Out by</dt>
+              <dt>Last synchronized by</dt>
               <dd>{rel.lastRolledOutBy === 'admin' ? 'Administrator' : (rel.lastRolledOutBy ?? '—')}</dd>
             </div>
           </dl>
@@ -348,7 +348,7 @@ export function LiveCopyTab({ msm, page, status, onChanged }: { msm: MsmClient; 
             </div>
             <div className="studio-g-field">
               <label className="studio-g-visually-hidden" htmlFor={`${ids}-configs`}>
-                Sync changes configurations
+                Sync rules
               </label>
               <ConfigSelect
                 id={`${ids}-configs`}

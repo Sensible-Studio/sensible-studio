@@ -71,7 +71,7 @@ export class HttpMsmClient implements MsmClient {
   }
 
   async configs() {
-    return (await this.get<{ configs: RolloutConfigInfo[] }>({ op: 'configs' }, 'Sync changes configurations')).configs;
+    return (await this.get<{ configs: RolloutConfigInfo[] }>({ op: 'configs' }, 'Sync rules')).configs;
   }
 
   async rollout(path: string, options: { deep: boolean; targets?: string[] }) {
