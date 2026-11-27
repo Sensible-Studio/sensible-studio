@@ -74,6 +74,18 @@ interface Props {
 }
 
 const KINDS: Record<string, string> = { page: 'Page', folder: 'Folder', site: 'Site' };
+const XF_TYPE = 'cq/experience-fragments/components/experiencefragment';
+const XF_TEMPLATE = '/libs/cq/experience-fragments/components/experiencefragment/template';
+/** What the selected item is, in words: a page below Experience Fragments is a fragment or one of its variants. */
+function kindOf(item: { type: string; path: string; resourceType?: string }): string {
+  if (item.type === 'page' && item.path.startsWith('/content/experience-fragments/')) return item.resourceType === XF_TYPE ? 'Experience fragment' : 'Variant';
+  if (item.type === 'page' && item.path.startsWith('/content/forms/')) return 'Form';
+  return KINDS[item.type] ?? item.type;
+}
+/** The template by its title; the fragment itself has a fixed one without a title. */
+function templateOf(item: { template?: string; templateTitle?: string }): string | undefined {
+  return item.templateTitle ?? (item.template === XF_TEMPLATE ? 'Experience Fragment' : item.template);
+}
 const PUBLICATION = { published: 'Published', modified: 'Modified since published', unpublished: 'Unpublished' } as const;
 const PREVIEW = { published: 'On Preview', modified: 'Modified since sent to Preview', unpublished: 'Removed from Preview' } as const;
 const when = (iso?: string) => (iso ? ` · ${new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}` : '');
@@ -122,7 +134,7 @@ export function Inspector({ tab, onTab, onClose, client, siteRail, msm, workflow
 
   return (
     <InspectorShell
-      kind={subject ? KINDS[subject.type] ?? subject.type : 'Selection'}
+      kind={subject ? kindOf(subject) : 'Selection'}
       subject={title}
       path={sub}
       onClose={onClose}
@@ -130,7 +142,7 @@ export function Inspector({ tab, onTab, onClose, client, siteRail, msm, workflow
       pills={subject?.type === 'page' ? (
           <div className="studio-inspector__badges">
             <span className={`studio-pill studio-pill--${subject.publication ?? 'none'}`}>{subject.publication ? PUBLICATION[subject.publication] : 'Not published'}</span>
-            {(subject.templateTitle ?? subject.template) && <span className="studio-pill">{subject.templateTitle ?? subject.template}</span>}
+            {templateOf(subject) && <span className="studio-pill">{templateOf(subject)}</span>}
             {subject.language && <span className="studio-pill studio-pill--accent">{subject.language}</span>}
           </div>
         ) : undefined}
@@ -149,7 +161,7 @@ function PropertiesPane({ client, msm, item, onChanged, onEdit, onProperties, on
   const rows: Array<[string, string | undefined]> = [
     ['Title', item.title],
     ['Name', item.name],
-    ['Template', item.templateTitle ?? item.template],
+    ['Template', templateOf(item)],
     ['Modified', item.lastModified ? new Date(item.lastModified).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : undefined],
     ['Modified by', item.lastModifiedBy],
     ['Language', item.language],

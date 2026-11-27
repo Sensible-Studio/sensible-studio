@@ -566,6 +566,28 @@ public class SitesServlet extends SlingAllMethodsServlet {
 
     // ------------------------------------------------------------------ references
 
+    /**
+     * The name a referring page is shown with. The structure and the initial content of a template are pages named
+     * "structure" and "initial": they are shown as the template they belong to.
+     */
+    static String referrerTitle(ResourceResolver resolver, String pagePath, String pageTitle) {
+        boolean type = pagePath != null && pagePath.contains("/settings/wcm/template-types/");
+        if (pagePath == null || !pagePath.startsWith("/conf/") || !(type || pagePath.contains("/settings/wcm/templates/"))) {
+            return pageTitle;
+        }
+        boolean structure = pagePath.endsWith("/structure");
+        if (!structure && !pagePath.endsWith("/initial")) {
+            return pageTitle;
+        }
+        String template = pagePath.substring(0, pagePath.lastIndexOf('/'));
+        Resource content = resolver.getResource(template + "/jcr:content");
+        String title = content == null ? null : content.getValueMap().get("jcr:title", String.class);
+        if (title == null || title.isEmpty()) {
+            title = template.substring(template.lastIndexOf('/') + 1);
+        }
+        return (type ? "Template type " : "Template ") + title + (structure ? "" : " (initial content)");
+    }
+
     /** Who refers to {@code path} (or anything below it), from outside its own subtree. */
     Map<String, Object> references(ResourceResolver resolver, String path) {
         if (resolver.getResource(path) == null) {
@@ -577,7 +599,7 @@ public class SitesServlet extends SlingAllMethodsServlet {
             m.put("path", r.resourcePath);
             m.put("property", r.property);
             m.put("page", r.pagePath);
-            m.put("pageTitle", r.pageTitle);
+            m.put("pageTitle", referrerTitle(resolver, r.pagePath, r.pageTitle));
             m.put("value", r.value.length() > 200 ? r.value.substring(0, 200) + "…" : r.value);
             refs.add(m);
         }

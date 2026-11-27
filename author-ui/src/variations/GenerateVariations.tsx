@@ -203,7 +203,7 @@ export function GenerateVariations({ client }: { client: VariationsClient }) {
             value={input.page ?? ''}
             onChange={(v) => set({ page: v })}
             description="Optional: its texts are sent to the model with the request"
-            placeholder="/content/wknd/us/en/adventures/..."
+            placeholder="/content/my-site/en/adventures/..."
             width="100%"
           />
           <div className="studio-variations__row">
