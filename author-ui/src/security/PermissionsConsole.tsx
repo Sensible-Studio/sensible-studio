@@ -177,7 +177,7 @@ export function PermissionsConsole({ user, initialPrincipal }: Props) {
                   </ActionButton>
                   <Button variant="accent" onPress={() => setEditing('new')}>
                     <Add />
-                    <Text>Add ACE</Text>
+                    <Text>Add permission</Text>
                   </Button>
                   </>
                   )}
@@ -310,7 +310,7 @@ function AceDialog({
 
   return (
     <StudioDialog size="M">
-      <Heading>{ace ? 'Edit ACE' : 'Add ACE'}</Heading>
+      <Heading>{ace ? 'Edit permission' : 'Add permission'}</Heading>
       <Divider />
       <Content>
         <Form>

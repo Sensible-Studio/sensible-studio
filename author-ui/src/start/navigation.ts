@@ -225,7 +225,7 @@ export const TOOLS: ToolCategory[] = [
     tools: [
       { title: 'Users', description: 'Create and manage users, their profiles and groups', icon: 'users', url: '/security/users.html' },
       { title: 'Groups', description: 'Create and manage groups and their members', icon: 'groups', url: '/security/groups.html' },
-      { title: 'Permissions', description: 'Access control entries of users and groups', icon: 'permissions', url: '/security/permissions.html' },
+      { title: 'Permissions', description: 'What users and groups may do, and where', icon: 'permissions', url: '/security/permissions.html' },
       { title: 'Trust Store', description: "Certificates trusted for this instance's own HTTPS connections", icon: 'truststore', url: '/security/truststore.html' },
       { title: 'OAuth', description: 'Applications that act as a user with a token, and the tokens they hold', icon: 'oauth', url: '/security/oauth.html' },
       { title: 'SSL Configuration', description: "HTTPS for this instance from its own web server: a certificate and a port", icon: 'ssl', url: '/security/ssl.html' },
