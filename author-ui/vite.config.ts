@@ -102,6 +102,7 @@ export default defineConfig(({ mode, command }) => {
     },
     test: {
       environment: 'jsdom',
+      setupFiles: ['src/testing/setup.ts'],
       include: ['src/**/*.test.{ts,tsx}'],
       css: false,
       // Spectrum ships its styles as .css imports inside node_modules; inline those packages so Vite handles them.

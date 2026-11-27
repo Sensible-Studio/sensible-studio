@@ -31,6 +31,8 @@ export default [
   card('Upload Restrictions', 'upload'), card('Usage rights', 'rights'), card('Search', 'search'), card('Duplicate check', 'duplicates'), card('Link Share', 'share'),
   { name: 'schemas', steps: [...open('Metadata Schemas'), button('Create'), { wait: 2000 }, ...field(0, 'Press photos'), { shot: 'mediaadmin-schema-editor' },
     { click: { text: 'Single Line Text', closest: 'button' } }, { wait: 600 }, { shot: 'mediaadmin-schema-types', keepPointer: true }] },
+  { name: 'schema-dropdown', steps: [...open('Metadata Schemas'), button('Create'), { wait: 2000 }, ...field(0, 'Press photos'), { click: { text: 'Single Line Text', closest: 'button', last: true } }, { wait: 600 }, { click: { text: 'Dropdown', last: true } }, { wait: 900 }, { shot: 'mediaadmin-schema-dropdown' }] },
+  { name: 'search-forms-add', steps: [...open('Search Forms'), { scroll: [400, 600, 1500] }, { wait: 600 }, { click: label('Remove Color') }, { wait: 600 }, button('Add filter'), { wait: 700 }, { shot: 'mediaadmin-search-forms-add', keepPointer: true }] },
   { name: 'metadata-profiles', steps: [...open('Metadata Profiles'), button('Create'), { wait: 2000 }, ...field(0, 'Press photos'), { scroll: [700, 600, 700] }, { wait: 800 }, { log: fields }, { shot: 'mediaadmin-metadata-profile' }] },
   { name: 'folder-schemas', steps: [...open('Folder Metadata Schemas'), button('Create'), { wait: 2000 }, ...field(0, 'Campaign folders'), { shot: 'mediaadmin-folder-schema' }] },
   { name: 'search-forms', steps: [...open('Search Forms'), { shot: 'mediaadmin-search-forms' }, { log: `'FORMS ' + [...document.querySelectorAll('select option')].slice(0,6).map(o=>o.textContent).join(' | ')` }] },

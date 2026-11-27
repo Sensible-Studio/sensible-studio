@@ -243,6 +243,24 @@ export function ReplicationConsole({ client, studio }: Props) {
                               <Delete />
                             </ActionButton>
                           )}
+                          {j.state !== 'SCHEDULED' && (
+                            <ActionButton
+                              isQuiet
+                              aria-label={`Remove ${j.path} from the queue`}
+                              onPress={() =>
+                                client.removeJob(j.id, selected ?? undefined).then(
+                                  (jobs) => {
+                                    setQueue(jobs);
+                                    setTick((n) => n + 1);
+                                    ToastQueue.positive('Request removed from the queue', { timeout: 3000 });
+                                  },
+                                  (e: unknown) => ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 }),
+                                )
+                              }
+                            >
+                              <Delete />
+                            </ActionButton>
+                          )}
                         </td>
                       </tr>
                     ))}

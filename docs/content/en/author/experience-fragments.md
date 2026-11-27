@@ -72,7 +72,7 @@ Tick a fragment to select it. The bar at the top and the inspector on the right 
 | Action | What it does |
 |---|---|
 | **Create** | Something new beside or inside the selection |
-| **Edit** | Opens it in the page editor |
+| **Edit** | Opens it in the page editor. For a fragment, that is its master variant |
 | **Properties** | Title, tags, description |
 | **Lock** | Keeps others from changing it while you work |
 | **Copy**, **Move** | As for pages. Moving a fragment updates the pages that show it |
@@ -98,7 +98,7 @@ The wizard is the same: a template, then **Title**, **Name** and **Description**
 
 ![A new variant of Sign In](../images/xf-variant-properties.webp)
 
-The first variant, **master**, is made together with the fragment. The others are for the places where master does not fit.
+The first variant, **master**, is made together with the fragment, and it is what **Edit** opens when the fragment itself is selected. The others are for the places where master does not fit.
 
 ## Edit a variant
 

@@ -181,6 +181,8 @@ export interface ReplicationClient {
   activate(paths: string[], options?: { deep?: boolean; agent?: string; at?: string; tier?: 'preview' }): Promise<ReplicationStatusInfo[]>;
   deactivate(paths: string[], options?: { deep?: boolean; agent?: string; at?: string; tier?: 'preview' }): Promise<ReplicationStatusInfo[]>;
   unschedule(id: string): Promise<QueuedRequest[]>;
+  /** Takes one request out of a target's queue; answers what is still queued for that target. */
+  removeJob(id: string, agent?: string): Promise<QueuedRequest[]>;
   test(agent: string): Promise<{ ok: boolean; message: string }>;
   saveAgent(agent: { id: string; title?: string; description?: string; enabled?: boolean; transportUri?: string; transportUser?: string; transportPassword?: string; retryDelay?: number; serializationType?: string; tier?: 'publish' | 'preview'; publicUrl?: string }): Promise<ReplicationAgent[]>;
   removeAgent(id: string): Promise<ReplicationAgent[]>;
@@ -266,6 +268,10 @@ export class HttpReplicationClient implements ReplicationClient {
 
   async unschedule(id: string) {
     return (await this.post<{ jobs: QueuedRequest[] }>({ op: 'unschedule', id })).jobs;
+  }
+
+  async removeJob(id: string, agent?: string) {
+    return (await this.post<{ jobs: QueuedRequest[] }>({ op: 'removeJob', id, agent })).jobs;
   }
 
   async test(agent: string) {

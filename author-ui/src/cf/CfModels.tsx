@@ -143,7 +143,8 @@ export function CfModels({ client, initialPath, studio = STUB_STUDIO }: Props) {
     Promise.all([client.confs(), client.models()])
       .then(([c, m]) => {
         if (cancelled) return;
-        setConfs(c);
+        // the shared configuration has no title of its own: its node name, "global", is not a word for authors
+        setConfs(c.map((x) => (x.path === '/conf/global' && (!x.title || x.title === 'global') ? { ...x, title: 'Global' } : x)));
         setModels(m);
         setFailure(null);
       })

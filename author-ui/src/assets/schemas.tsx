@@ -482,18 +482,6 @@ function SchemaDialog({
                       <Item key={k}>{l}</Item>
                     ))}
                   </Picker>
-                  {f.type === 'select' && (
-                    <TextField
-                      label="Options"
-                      value={options[key] ?? optionsText(f.options)}
-                      onChange={(v) => {
-                        setOptions((o) => ({ ...o, [key]: v }));
-                        setField(t, i, { options: parseOptions(v) });
-                      }}
-                      description="value=Text, value=Text"
-                      width="size-3600"
-                    />
-                  )}
                   {!kind.defaults && (
                     <Checkbox isSelected={!!f.required} onChange={(v) => setField(t, i, { required: v })}>
                       Required
@@ -506,6 +494,21 @@ function SchemaDialog({
                   >
                     <Delete />
                   </ActionButton>
+                  {f.type === 'select' && (
+                    // a line of its own under the field: beside the type it pushed Required and the bin to the next line
+                    <div style={{ flexBasis: '100%' }}>
+                    <TextField
+                      label="Options"
+                      value={options[key] ?? optionsText(f.options)}
+                      onChange={(v) => {
+                        setOptions((o) => ({ ...o, [key]: v }));
+                        setField(t, i, { options: parseOptions(v) });
+                      }}
+                      description="The choices, separated by commas. value=Text gives a choice a stored value and a text of its own"
+                      width="size-6000"
+                    />
+                    </div>
+                  )}
                 </fieldset>
               );
             })}

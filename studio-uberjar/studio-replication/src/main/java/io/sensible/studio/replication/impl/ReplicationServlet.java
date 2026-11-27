@@ -291,6 +291,22 @@ public class ReplicationServlet extends SlingAllMethodsServlet {
                     jobManager.removeJobById(j.getId());
                 }
                 send(response, Collections.singletonMap("agents", agentList()));
+            } else if ("removeJob".equals(op)) {
+                // one request out of the queue: a request that can never succeed (a path the target refuses) otherwise
+                // holds back everything queued behind it, and clearing the queue loses the rest
+                String id = request.getParameter("id");
+                boolean found = false;
+                for (Job j : jobs(null)) {
+                    if (j.getId().equals(id)) {
+                        found = jobManager.removeJobById(j.getId());
+                        break;
+                    }
+                }
+                if (!found) {
+                    error(response, HttpServletResponse.SC_NOT_FOUND, "No such request in the queue");
+                    return;
+                }
+                send(response, Collections.singletonMap("jobs", queue(session, request.getParameter("agent"))));
             } else if ("unschedule".equals(op)) {
                 try (ResourceResolver srr = agents.serviceResolver()) {
                     Session service = srr.adaptTo(Session.class);
@@ -402,7 +418,7 @@ public class ReplicationServlet extends SlingAllMethodsServlet {
      */
     /** What only those who run publishing may do. */
     private static final java.util.Set<String> MANAGING = new java.util.HashSet<>(
-            java.util.Arrays.asList("test", "poll", "agent", "removeAgent", "clear", "retry"));
+            java.util.Arrays.asList("test", "poll", "agent", "removeAgent", "clear", "retry", "removeJob"));
 
     private static boolean mayClearCache(Session session) {
         try {

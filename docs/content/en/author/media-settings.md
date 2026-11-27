@@ -45,7 +45,11 @@ A metadata schema decides which fields the **Properties** of a file show. Withou
 | **Number** | A number |
 | **Date** | A date picker |
 | **Checkbox** | Yes or no |
-| **Dropdown** | One of a list of choices you give |
+| **Dropdown** | One of a list of choices. The choices are typed in **Options**, which appears under the field |
+
+A dropdown's **Options** are separated by commas. Written as `value=Text`, a choice stores `value` and shows *Text*: `eu=Europe, na=North America`. A dropdown without options cannot be saved.
+
+![A field of the type Dropdown, with its Options](../images/mediaadmin-schema-dropdown.webp)
 
 **Save**, at the top right, keeps the schema. To use it, open the properties of a folder in Media and choose it as the folder's **Metadata Schema**: the files of that folder and of the folders below it then show this form.
 
@@ -78,12 +82,20 @@ A search form is the list of filters that a search shows beside its results. The
 | A filter's box | Its **Label**, an optional **Description** shown under it, and settings of its own: the **Tags** filter has **Start at tag**, the tag where its picker opens |
 | The arrows | Move the filter up or down. The order here is the order in the search |
 | The bin | Removes the filter from the form |
-| **Add filter** | At the end of the list: adds one of the filters that are not in the form |
+| **Add filter** | At the end of the list: a filter on a metadata property of your own, or one of the built-in filters that is not in the form |
 | **Preview** | The form as a search shows it. You can try the filters; nothing is searched |
 | **Reset to default** | Goes back to the form Sensible Studio starts with |
 | **Save** | Keeps the form. Searches use it from then on |
 
 The Media search starts with **File type**, **Tags**, **Modified**, **File size**, **Orientation** and **Color**.
+
+![The Add filter menu, after Color was removed from the form](../images/mediaadmin-search-forms-add.webp)
+
+| Filter you can add | What it gives the search |
+|---|---|
+| **Values of a property** | Boxes to tick, one per value of a metadata property, such as `dam:status` |
+| **Text in a property** | A field for a text that a metadata property contains, such as a name in `dc:creator` |
+| **Built in** | The filters of the default form that are not in the form now |
 
 ## Media configurations
 
