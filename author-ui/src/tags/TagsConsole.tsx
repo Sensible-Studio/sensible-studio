@@ -437,7 +437,7 @@ function DeleteTagsDialog({ client, items, onDelete }: { client: TagsClient; ite
     <StudioConfirmDialog
       title={used ? 'Delete tags in use' : 'Delete'}
       variant="destructive"
-      primaryActionLabel={used ? 'Force Delete' : 'Delete'}
+      primaryActionLabel={used ? 'Delete anyway' : 'Delete'}
       cancelLabel="Cancel"
       isPrimaryActionDisabled={!refs && !error}
       onPrimaryAction={onDelete}

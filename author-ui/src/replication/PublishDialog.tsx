@@ -153,7 +153,8 @@ export function PublishDialog({ client, paths, title, action = 'activate', offer
             </RadioGroup>
           </div>
         )}
-        <Text>
+        {/* a line of its own: with nothing after it (a tag has no references to list) the Now / Later choice ran into it */}
+        <Text UNSAFE_style={{ display: 'block' }}>
           <strong>{title}</strong>{' '}
           {tier
             ? publishing

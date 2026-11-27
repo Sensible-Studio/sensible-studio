@@ -35,7 +35,7 @@ export function useTagReferences(client: TagsClient, paths: string[]) {
   return state.key === key ? state : { key, refs: null, error: null };
 }
 
-const KIND_LABEL: Record<TagReference['kind'], string> = { page: 'Page', asset: 'Asset', content: 'Content' };
+const KIND_LABEL: Record<TagReference['kind'], string> = { page: 'Page', asset: 'File', content: 'Content' };
 
 function referenceHref(r: TagReference): string {
   if (r.kind === 'page') return `/sites.html${r.owner.slice(0, r.owner.lastIndexOf('/'))}`;

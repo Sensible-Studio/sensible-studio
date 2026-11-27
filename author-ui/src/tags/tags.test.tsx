@@ -210,14 +210,14 @@ describe('Tags console', () => {
     await waitFor(() => expect(tags.calls).toContain(`update ${TAG_ROOT}/wknd/activity/hiking {"fr":""}`));
   });
 
-  it('asks for Force Delete when the tag is used', async () => {
+  it('asks for Delete anyway when the tag is used', async () => {
     mount(`${TAG_ROOT}/wknd/activity`);
     const select = await screen.findByRole('checkbox', { name: 'Select Hiking' });
     act(() => {
       fireEvent.click(select);
     });
     await moreAction(/Delete/);
-    const force = await screen.findByRole('button', { name: 'Force Delete' });
+    const force = await screen.findByRole('button', { name: 'Delete anyway' });
     await waitFor(() => expect((force as HTMLButtonElement).disabled).toBe(false));
     act(() => {
       fireEvent.click(force);
