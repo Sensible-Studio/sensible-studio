@@ -62,6 +62,10 @@ public class TargetingServlet extends SlingAllMethodsServlet {
     static final String PERSONAS = "/settings/contexthub/personas";
     static final String[] STORES = {"profile", "geolocation", "surferinfo"};
 
+    /** What the live instances counted: the reports of an author add it to the author's own counters. */
+    @org.osgi.service.component.annotations.Reference
+    private transient LiveStats live;
+
     @Override
     protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws IOException {
         String op = request.getParameter("op");
@@ -92,16 +96,22 @@ public class TargetingServlet extends SlingAllMethodsServlet {
                     return;
                 }
                 target(out, session.getNode(path));
-                out.put("stats", Stats.read(session, path));
+                out.put("stats", live.withLive(Stats.read(session, path), path));
+                out.put("statsSources", live.sources());
             } else if ("stats".equals(op)) {
-                out.put("stats", Stats.read(rr.adaptTo(Session.class), path));
+                out.put("stats", live.withLive(Stats.read(rr.adaptTo(Session.class), path), path));
+                out.put("statsSources", live.sources());
+            } else if ("allStats".equals(op)) {
+                // this instance's own counters, as they are: what an author asks a publish instance for
+                out.put("stats", Stats.all(rr.adaptTo(Session.class)));
             } else if ("activities".equals(op)) {
                 Session session = rr.adaptTo(Session.class);
                 List<Map<String, Object>> targets = Targeting.findTargets(session, path, 500);
                 for (Map<String, Object> t : targets) {
-                    t.put("stats", Stats.read(session, String.valueOf(t.get("path"))));
+                    t.put("stats", live.withLive(Stats.read(session, String.valueOf(t.get("path"))), String.valueOf(t.get("path"))));
                 }
                 out.put("activities", targets);
+                out.put("statsSources", live.sources());
             } else if ("redirects".equals(op)) {
                 Session session = rr.adaptTo(Session.class);
                 if (path == null || !session.nodeExists(path + "/jcr:content")) {
@@ -205,7 +215,10 @@ public class TargetingServlet extends SlingAllMethodsServlet {
                 case "resetStats": {
                     Stats.reset(session, path);
                     session.save();
+                    // and where the counting is done: on the live instances
+                    List<String> failed = live.reset(path);
                     out.put("stats", new LinkedHashMap<>());
+                    out.put("notReset", failed);
                     break;
                 }
                 case "removeExperience": {
