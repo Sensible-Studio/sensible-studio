@@ -352,7 +352,7 @@ export function BulkPropertiesDialog({ client, paths, onDone, close }: { client:
 
   return (
     <StudioDialog size="L">
-      <Heading>Properties of {paths.length} assets</Heading>
+      <Heading>Properties of {paths.length} files</Heading>
       <Divider />
       <Content>
         {!assets && !error && <ProgressCircle isIndeterminate aria-label="Loading" />}

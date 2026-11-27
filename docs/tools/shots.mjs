@@ -13,6 +13,7 @@
 //                                         the last one in the document instead, which is where menus are)
 //   { rightClick: ... } { hover: ... } { dblClick: ... }      the same targets ({ clickAt: [x, y] } for a point, { moveAt: [x, y] } to hover one,
 //                                         { scroll: [x, y, pixels] } for the wheel there)
+//   { files: { selector, paths } }        files of this computer into a file field (an upload)
 //   { key: 'Alt+T' }                      a key with its modifiers (Alt, Ctrl, Meta, Shift)
 //   { type: 'some text' }                 text into the focused field
 //   { wait: 400 } { waitFor: 'selector' } { waitFor: { text: '...' } }
@@ -246,6 +247,12 @@ async function run(step) {
   } else if (step.moveAt !== undefined) {
     await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: step.moveAt[0], y: step.moveAt[1] });
     await sleep(step.settle ?? 500);
+  } else if (step.files !== undefined) {
+    // gives files of this computer to a file field of the page, as if they were chosen in the file dialog
+    const found = await send('Runtime.evaluate', { expression: `document.querySelector(${JSON.stringify(step.files.selector)})` });
+    if (!found.result.objectId) throw new Error('no file field: ' + step.files.selector);
+    await send('DOM.setFileInputFiles', { objectId: found.result.objectId, files: step.files.paths });
+    await sleep(step.settle ?? 400);
   } else if (step.clickAt !== undefined) {
     const [x, y] = step.clickAt;
     await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });

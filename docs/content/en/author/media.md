@@ -64,9 +64,29 @@ The filters apply to the folder you are in. Click **Filters** again to close the
 | **Files** | Choose files from your computer to upload here |
 | **Linked copy** | A folder that follows another folder: its files stay in step with the source. See [Several sites](sync.md) |
 
-You can also drop files anywhere on a folder. A panel shows the progress.
+You can also drop files anywhere on a folder. A panel at the bottom right shows each file and how far it is:
 
-When a file of the same name is already there, you decide for each file:
+![A file just uploaded: the panel, and the card that is still being processed](../images/media-upload.webp)
+
+The card of a new file says **Processing** while its thumbnails and web sizes are made, its metadata is read, its main colours are found, and the text inside a document is taken out for the search. A moment later it has its picture and its dimensions, and a **New** badge:
+
+![The same file, processed](../images/media-upload-done.webp)
+
+See [Images and delivery](media-delivery.md) for what is made.
+
+### The same file again
+
+Before anything is sent, the console checks whether the *same file*, under any name, is already somewhere in Media, and says where:
+
+![The panel reports a duplicate](../images/media-upload-duplicate.webp)
+
+**Upload anyway** goes on; **Skip** leaves the file out.
+
+### The same name again
+
+When a file of the same *name* is already in the folder, you decide for each file:
+
+![The panel reports a name conflict](../images/media-upload-conflict.webp)
 
 | Choice | Result |
 |---|---|
@@ -74,10 +94,6 @@ When a file of the same name is already there, you decide for each file:
 | **Replace** | The new file takes the place of the old one |
 | **Create version** | The old file becomes a version of the new one, so you can go back |
 | **Skip** | Nothing is uploaded |
-
-The console also tells you when the same file, under any name, is already somewhere in Media, and where.
-
-After the upload, each file is processed in the background: thumbnails and web sizes are made, its metadata is read, its main colours are found, and the text inside documents is taken out for the search. See [Images and delivery](media-delivery.md).
 
 You see only the actions you are allowed to perform in a folder. A folder you may only read says so, instead of inviting you to drop files into it.
 
@@ -92,8 +108,8 @@ You see only the actions you are allowed to perform in a folder. A folder you ma
 | **Properties** | Opens the properties form. With several files, you change them together |
 | **Edit** | Opens the image editor |
 | **Download** | One file downloads as it is. Several files or folders download as a ZIP, with their renditions if you want |
-| **Share Link** | Makes a link to the files for someone without an account, with an end date |
-| **Find Similar** | Shows the images that look like this one |
+| **Share Link** | Makes a link with which anyone can download the files without signing in, for a time you set |
+| **Find Similar** | Shows the images that look like this one, when the instance has the model for it |
 | **Checkout** | Keeps the file to yourself: nobody else can change, move, replace or delete it until you **Check In** |
 | **Publish**, **Unpublish** | Puts the file on the live site, or takes it off |
 | **Annotate** | Opens the file to draw and write notes on it |
@@ -113,6 +129,68 @@ You see only the actions you are allowed to perform in a folder. A folder you ma
 | **Image Set** | Groups the selected images into a set that is delivered as one |
 | **Reprocess files** | Makes the thumbnails and web sizes again, and reads the metadata again |
 | **Delete** | Warns when pages still use the files, and lists those pages |
+
+### Move or rename
+
+![Move or rename a file](../images/media-move.webp)
+
+| Field | What it is |
+|---|---|
+| **Name** | The file's name at its new place. Change only this to rename it |
+| **Destination** | Click through the path, and the sub-folders listed below it, to choose the folder |
+| **Adjust references** | The pages and fragments that use the file, each with the property that names it. Leave them ticked, and they keep working |
+
+### Share a link
+
+![Share Link](../images/media-share-link.webp)
+
+Anyone with the link can download the files without signing in.
+
+| Field | What it is |
+|---|---|
+| **Expires after** | How long the link works: a week by default |
+| **Include originals** | The files as they were uploaded |
+| **Include renditions** | Their smaller sizes as well |
+
+**Create Link** makes the link and shows it, ready to copy.
+
+### Download
+
+![Download two files](../images/media-download.webp)
+
+One file downloads as it is. Several files or folders come as a ZIP archive; the originals are always in it.
+
+| Option | What it does |
+|---|---|
+| **Create separate folder for each file** | Puts each file, with its renditions, in a folder of its own inside the archive |
+| **Renditions** | Adds the smaller sizes |
+| **Prepare in the background** | For a large download: the archive is made while you go on working, and you are told when it is ready |
+
+### Collections
+
+![Add to Collection](../images/media-add-to-collection.webp)
+
+A collection is a list of files from anywhere in Media: the files stay where they are. Choose a collection, or **New Collection**, then **Add**.
+
+### Image sets
+
+![Image Set](../images/media-image-set.webp)
+
+An image set keeps the selected files together, in an order, as one file that a page can show as **a gallery** (one picture or video at a time, picked by thumbnails) or as an object visitors turn. The files stay where they are. Give it a **Title** and choose how it is **shown**.
+
+### Annotate
+
+![Annotating an image](../images/media-annotate.webp)
+
+**Annotate** opens the file with drawing tools above it and the comments at the left. Choose a rectangle, a circle or an arrow, drag on the picture, then write the note; `@` names someone to tell. **Comments** at the left takes notes about the file as a whole, and below it the **Timeline** saves a version with a label and a comment.
+
+### Start a flow, language versions
+
+**Start Flow** asks for the flow model, a title and a comment, as for a page. **Language versions** shows the file in the site's other languages and translates its title and description; see [Translations](translations.md).
+
+### Find similar
+
+**Find Similar**, and the **Similar** panel of a file's page, list the images that look like this one. It needs the model that compares pictures to be installed on the instance; without it, the panel says so.
 
 Right-click a file for the same actions as a menu:
 
@@ -147,7 +225,7 @@ The versions of the file and what happened to it. **Save as Version** takes a la
 ![The Related panel](../images/media-file-related.webp)
 
 - **Related**: the files linked to this one, and **Relate** to link another.
-- **Similar**: images that look like it, found by their colours and shapes.
+- **Similar**: images that look like it. See *Find similar* above.
 - **References**: the pages and fragments that use the file. Look here before you replace or delete it.
 
 ![The References panel](../images/media-file-references.webp)
@@ -199,7 +277,9 @@ Facts about the file that you cannot change here: its name and path, type, size,
 
 ### Several files at once
 
-Select several files and choose **Properties** to change them together. Fields whose values differ say **Mixed values**; only what you change is written.
+![Properties of two files](../images/media-properties-several.webp)
+
+Select several files and choose **Properties** to change them together. Fields whose values differ say **Mixed values**: a value you set there replaces theirs, and what you leave alone stays as each file has it. For **Tags**, **Keywords** and the other lists, **Append** adds your values to each file's own; untick it to replace them.
 
 ### Edit metadata in a spreadsheet
 

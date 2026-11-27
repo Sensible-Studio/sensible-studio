@@ -322,7 +322,7 @@ public class DamApiServlet extends SlingAllMethodsServlet {
                 send(response, 200, DamSimilar.similar(resolver, c, embeddingIndex, r, clamp(intParam(request, "limit", 24), 1, 100)));
             } catch (DamClient.DamProcessingException e) {
                 boolean noModel = e.getStatus() == 409;
-                send(response, noModel ? 409 : 502, error(noModel ? "the model that compares pictures is not installed" : "studio-dam: " + e.getMessage()));
+                send(response, noModel ? 409 : 502, error(noModel ? "Similar pictures are not available: the model that compares them is not installed on this instance." : "studio-dam: " + e.getMessage()));
             } catch (IOException e) {
                 send(response, 503, error("studio-dam: " + e.getMessage()));
             }

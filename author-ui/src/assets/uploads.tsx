@@ -200,7 +200,7 @@ export function UploadPanel({
             </div>
             {u.status === 'conflict' ? (
               <>
-                <div className="studio-assets__upload-error">An file named {u.name} already exists.</div>
+                <div className="studio-assets__upload-error">A file named {u.name} already exists.</div>
                 {onResolve && (
                   <div className="studio-assets__upload-choices" role="group" aria-label={`Conflict for ${u.name}`}>
                     {CHOICES.map(([c, label]) => (
@@ -214,7 +214,7 @@ export function UploadPanel({
             ) : u.status === 'duplicate' ? (
               <>
                 <div className="studio-assets__upload-error">
-                  The same file is already in the DAM: {(u.duplicates ?? []).slice(0, 3).join(', ')}
+                  The same file is already in Media: {(u.duplicates ?? []).slice(0, 3).join(', ')}
                   {(u.duplicates ?? []).length > 3 ? ` and ${(u.duplicates ?? []).length - 3} more` : ''}
                 </div>
                 {onResolve && (

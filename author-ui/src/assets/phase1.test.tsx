@@ -252,7 +252,7 @@ describe('duplicate detection', () => {
       dataTransfer: { files: [new File(['x'], 'copy.jpg', { type: 'image/jpeg' }), new File(['y'], 'new.jpg', { type: 'image/jpeg' })], types: ['Files'] },
     });
     const group = await screen.findByRole('group', { name: 'Duplicate copy.jpg' });
-    expect(screen.getByText(/already in the DAM: \/content\/dam\/wknd\/surf.jpg/)).toBeTruthy();
+    expect(screen.getByText(/already in Media: \/content\/dam\/wknd\/surf.jpg/)).toBeTruthy();
     await waitFor(() => expect(dam.calls).toContain('upload /content/dam/wknd/new.jpg'));
     expect(dam.calls).not.toContain('upload /content/dam/wknd/copy.jpg');
     fireEvent.click(within(group).getByRole('button', { name: 'Upload anyway' }));

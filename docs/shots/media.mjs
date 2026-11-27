@@ -2,6 +2,8 @@
 const DIR = '/assets.html/content/dam/weekender-shared/en/magazine/arctic-surfing';
 const UP = '/assets.html/content/dam/weekender-shared/en/magazine';
 const FILE = '/assetdetails.html/content/dam/weekender-shared/en/magazine/arctic-surfing/arctic-surfing-4.jpg';
+// two photos for the upload pictures: SHOTS_UPLOADS is their folder (one is a copy of a file of the demo, one is not)
+const UPLOADS = process.env.SHOTS_UPLOADS || '';
 const label = (name) => `[aria-label="${name}"]`;
 const button = (text) => ({ click: { text, closest: 'button' } });
 const open = [{ goto: DIR }, { wait: 2500 }];
@@ -42,4 +44,33 @@ export default [
   tab('All Metadata', 'all'),
   { name: 'folder-properties', steps: [{ goto: UP }, { wait: 2500 }, { moveAt: CARD }, { click: label('Properties') }, { wait: 2500 }, { shot: 'media-folder-properties' },
     { scroll: [720, 600, 700] }, { wait: 600 }, { shot: 'media-folder-properties-2' }] },
+  // --- dialogs of the actions ---
+  { name: 'move', steps: [...selected, button('More'), { wait: 400 }, { click: { text: 'Move', last: true } }, { wait: 1500 }, { shot: 'media-move' }] },
+  { name: 'share', steps: [...selected, button('Share Link'), { wait: 1500 }, { shot: 'media-share-link' }] },
+  { name: 'collection', steps: [...selected, button('Add to Collection'), { wait: 1500 }, { shot: 'media-add-to-collection' }] },
+  { name: 'similar', steps: [...selected, button('Find Similar'), { wait: 2500 }, { shot: 'media-find-similar' }] },
+  { name: 'flow', steps: [...selected, button('More'), { wait: 400 }, { click: { text: 'Start Flow', last: true } }, { wait: 1500 }, { shot: 'media-start-flow' }] },
+  { name: 'languages', steps: [...selected, button('More'), { wait: 400 }, { click: { text: 'Language versions', last: true } }, { wait: 1500 }, { shot: 'media-language-versions' }] },
+  { name: 'annotate', steps: [...selected, button('Annotate'), { wait: 3000 }, { shot: 'media-annotate' }] },
+  { name: 'two', steps: [
+    ...selected, { moveAt: [560, 220] }, { click: label('Select') }, { wait: 900 }, { shot: 'media-selected-two' },
+    button('Download'), { wait: 1500 }, { shot: 'media-download' }, { key: 'Escape' }, { wait: 500 },
+    button('Properties'), { wait: 2500 }, { shot: 'media-properties-several' },
+  ] },
+  { name: 'image-set', steps: [
+    ...selected, { moveAt: [560, 220] }, { click: label('Select') }, { wait: 900 },
+    button('More'), { wait: 400 }, { click: { text: 'Image Set', last: true } }, { wait: 1500 }, { shot: 'media-image-set' },
+  ] },
+  // --- upload: a file is given to the console's own file field, into a folder made for it ---
+  { name: 'upload', steps: [
+    { goto: '/assets.html/content/dam/docs-uploads' }, { wait: 2500 },
+    { files: { selector: 'input[type="file"]', paths: [UPLOADS + '/shore-at-dusk.jpg'] }, settle: 250 }, { shot: 'media-upload', keepPointer: true },
+    { wait: 7000 }, { shot: 'media-upload-done' },
+    // the same name again: what to do with it
+    { goto: '/assets.html/content/dam/docs-uploads' }, { wait: 2500 },
+    { files: { selector: 'input[type="file"]', paths: [UPLOADS + '/shore-at-dusk.jpg'] } }, { wait: 2000 }, { click: { text: 'Upload anyway' } }, { wait: 1800 }, { shot: 'media-upload-conflict' },
+    { key: 'Escape' }, { goto: '/assets.html/content/dam/docs-uploads' }, { wait: 2500 },
+    // a file that is in Media already, under another name
+    { files: { selector: 'input[type="file"]', paths: [UPLOADS + '/northern-shore.jpg'] } }, { wait: 2500 }, { shot: 'media-upload-duplicate' },
+  ] },
 ];

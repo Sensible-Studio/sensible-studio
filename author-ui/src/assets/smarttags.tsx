@@ -362,7 +362,7 @@ export function SmartTagsPage({
           Tag what is already there
         </Heading>
         <p className="studio-assets__muted">
-          New uploads are tagged by themselves. For assets already in the DAM,
+          New uploads are tagged by themselves. For files already in Media,
           choose a folder: its images are tagged in the background, from their
           renditions.
         </p>

@@ -103,7 +103,7 @@ export function ImagePresetsPage({
         }
       />
       <p className="studio-assets__dm-intro">
-        Every image in the DAM is served at <code>/is/image/&lt;path&gt;</code>{" "}
+        Every image in Media is served at <code>/is/image/&lt;path&gt;</code>{" "}
         with parameters such as <code>wid</code>, <code>hei</code>,{" "}
         <code>fmt</code>, <code>qlt</code>, <code>fit</code>, <code>crop</code>,{" "}
         <code>rotate</code> and <code>op_usm</code>. A preset names a set of
