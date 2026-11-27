@@ -1,6 +1,6 @@
 ---
 title: Media
-description: Upload, organise, describe, find and share images, video and documents in the Media console of Sensible Studio.
+description: The Media console of Sensible Studio in detail - its views and bar, filters, upload, every action on a file, a file's page with its panels, the properties form tab by tab, and folder settings.
 order: 50
 ---
 
@@ -8,17 +8,63 @@ Media is where the files of your sites live: images, video, audio, documents. Ev
 
 Open it from **Home › Media**.
 
-## Browse
+## The console
 
-Folders and files are shown as **cards**, as a **list** or in **columns**. Sort by name, title, date, size or type. The console remembers the view and the order you chose.
+![The Media console with the parts of its bar numbered](../images/media-console.webp)
 
-Select files with the checkbox on each. The bar then shows what you can do with the selection; right-click shows the same as a menu. `Esc` clears the selection.
+| | Part | What it does |
+|---|---|---|
+| 1 | **Filters** | Opens the rail at the left that narrows what is shown |
+| 2 | **Copy path** | Copies the path of the folder. Left of it are the breadcrumbs; when the path is long, an arrow scrolls it |
+| 3 | **Metadata** | **Export Metadata (CSV)** and **Import Metadata (CSV)** for the folder |
+| 4 | **View** | Card View, List View or Column View |
+| 5 | **Search** | Finds files in this folder and below it, by name, title and the text inside documents |
+| 6 | **Select All** | Selects everything shown; beside it, how many items are shown |
+| 7 | **Sort** | **Sort by** name, title, date, size or type, and the direction |
+| 8 | **Create** | A folder, files (an upload), or a linked copy |
 
-You see only the actions you are allowed to perform in that folder. A folder you may only read says so, instead of inviting you to drop files into it.
+The console remembers the view and the order you chose.
 
-## Upload
+### What a card shows
 
-Drop files anywhere on a folder, or choose **Create › Files**. A panel shows the progress.
+A card has the picture of the file, its title, its kind and file name, when it was last changed, its size, and for an image its dimensions in pixels. A **New** badge marks what was added recently. Folders are cards too, with pictures from the files inside:
+
+![Folders in Card View](../images/media-folders.webp)
+
+Content fragments kept in Media appear among the files, marked **Content Fragment**; they are described in [Content fragments](content-fragments.md).
+
+Move the pointer over a card for its two buttons: **Select**, and **Properties**. Click the card itself to open the file or go into the folder.
+
+### List and columns
+
+![List View](../images/media-list.webp)
+
+**List View** is a table; click a heading to sort. **Column View** shows one column per folder level, as in Pages:
+
+![Column View](../images/media-columns.webp)
+
+### Filters
+
+![The Filters rail, set to images](../images/media-filters.webp)
+
+| Filter | Finds |
+|---|---|
+| **Name or title** | Files whose name or title contains the text |
+| **Type** | Folders, Content Fragments, Images, Documents, PDF, Video. Tick one or several |
+
+The filters apply to the folder you are in. Click **Filters** again to close the rail.
+
+## Create and upload
+
+![The Create menu](../images/media-create-menu.webp)
+
+| Create | What you get |
+|---|---|
+| **Folder** | A new folder. Its name in the address is made from its title |
+| **Files** | Choose files from your computer to upload here |
+| **Linked copy** | A folder that follows another folder: its files stay in step with the source. See [Several sites](sync.md) |
+
+You can also drop files anywhere on a folder. A panel shows the progress.
 
 When a file of the same name is already there, you decide for each file:
 
@@ -31,90 +77,154 @@ When a file of the same name is already there, you decide for each file:
 
 The console also tells you when the same file, under any name, is already somewhere in Media, and where.
 
-After the upload, each file is processed in the background: thumbnails and web sizes are made, its metadata is read, and the text inside documents is taken out for the search. See [Images and delivery](media-delivery.md).
+After the upload, each file is processed in the background: thumbnails and web sizes are made, its metadata is read, its main colours are found, and the text inside documents is taken out for the search. See [Images and delivery](media-delivery.md).
 
-## Organise
+You see only the actions you are allowed to perform in a folder. A folder you may only read says so, instead of inviting you to drop files into it.
+
+## Select files
+
+![A selected file: the action bar, and the inspector at the right](../images/media-selected.webp)
+
+**Select** on a card ticks it. The bar becomes the action bar, and the inspector at the right shows the file: a preview, the buttons **Details** (the file's page) and **All properties**, and its title, name, type, dimensions, size, when it was modified and its description. Its tabs **Timeline** and **References** show its versions and the pages that use it.
 
 | Action | What it does |
 |---|---|
-| **Create › Folder** | A new folder. Its name in the address is made from its title |
-| **Move** | Moves or renames. The pages that use the files are listed, and their references are rewritten so they keep working |
-| **Copy**, then **Paste** | A copy in another folder |
-| **Delete** | Warns when pages still use the files, and lists those pages |
+| **Properties** | Opens the properties form. With several files, you change them together |
+| **Edit** | Opens the image editor |
 | **Download** | One file downloads as it is. Several files or folders download as a ZIP, with their renditions if you want |
-| **Extract Archive** | Unpacks a ZIP into a new folder or beside the archive |
-| **Relate** | Links files to each other, such as a photo and the release form signed for it |
+| **Share Link** | Makes a link to the files for someone without an account, with an end date |
+| **Find Similar** | Shows the images that look like this one |
+| **Checkout** | Keeps the file to yourself: nobody else can change, move, replace or delete it until you **Check In** |
+| **Publish**, **Unpublish** | Puts the file on the live site, or takes it off |
+| **Annotate** | Opens the file to draw and write notes on it |
+| **Copy** | Remembers the selection; **Create › Paste** puts a copy in another folder |
+| **Add to Collection** | Adds the files to a collection: a list of files from anywhere in Media |
 
-### Folder settings
+**More** holds the rest:
 
-**Properties** on a folder sets what applies to every file in it and in the folders below:
+![The More menu](../images/media-more-menu.webp)
 
-- the folder's title and the thumbnail on its card;
-- the **processing profile**: extra renditions to make;
-- the **image profile**: the focus crops to make;
-- whether **Auto tags** are proposed for its images;
-- the **metadata schema**: which fields the Properties form of its files shows;
-- a **metadata profile**: values new files start with, such as a copyright line.
+| Action | What it does |
+|---|---|
+| **Move** | Moves or renames. The pages that use the files are listed, and their references are rewritten so they keep working |
+| **Translation Project** | Sends the files' metadata, or the text of documents, to be [translated](translations.md) |
+| **Language versions** | The file in the site's other languages |
+| **Start Flow** | Sends the files through a [flow](flows.md), such as an approval |
+| **Image Set** | Groups the selected images into a set that is delivered as one |
+| **Reprocess files** | Makes the thumbnails and web sizes again, and reads the metadata again |
+| **Delete** | Warns when pages still use the files, and lists those pages |
+
+Right-click a file for the same actions as a menu:
+
+![The right-click menu of a file](../images/media-context-menu.webp)
+
+On a ZIP file, **Extract Archive** unpacks it into a new folder or beside the archive. **Relate**, on a file's page, links files to each other, such as a photo and the release form signed for it.
 
 ## A file's page
 
-Double-click a file to open it. You see a preview (a player for video and audio), the actions, and panels at the side:
+Click a file to open it.
 
-- **Renditions**: every size of the file, each with a download. For images, also the focus crops and the delivery addresses, ready to copy.
-- **Timeline**: its versions.
-- **Related**: the files linked to it.
-- **References**: the pages that use it.
+![The page of an image](../images/media-file.webp)
 
-`p` opens the properties, `e` the image editor, and the arrow keys move to the previous and next file.
+The bar has, from the left: the buttons of the side panels, the file's title, **Copy link**, **Related**, **Similar**, the arrows to the previous and next file of the folder, then **Download**, **Properties**, **Reprocess**, **Auto tags**, **Checkout**, **Delete** and **Edit**. `p` opens the properties, `e` the image editor, and the arrow keys move to the previous and next file. A video or a sound file has a player in place of the picture.
 
-## Describe: properties and metadata
+### Renditions
 
-**Properties** (`p`) holds what is known about a file: title, description, keywords, creator, copyright, language, tags. Much of it is read from the file itself when it is uploaded: the size of an image, camera data, dates, the page count and author of a PDF.
+![The Renditions panel](../images/media-file-renditions.webp)
+
+Every size of the file that was made, each with its dimensions, its weight and a download button: the **original**, the thumbnails, and the web sizes.
+
+For an image, **Image delivery** below lists the ready-made delivery addresses, such as *Open Graph (1200×630)* or *Web (1200, WebP)*, each with what it asks for and a button that copies the address. See [Images and delivery](media-delivery.md).
+
+### Timeline
+
+![The Timeline panel](../images/media-file-timeline.webp)
+
+The versions of the file and what happened to it. **Save as Version** takes a label and a comment. **Revert** goes back to a version; the current state is saved as a version first. A version is also made before the image editor changes a file, and when you choose **Create version** at upload.
+
+### Related, Similar, References
+
+![The Related panel](../images/media-file-related.webp)
+
+- **Related**: the files linked to this one, and **Relate** to link another.
+- **Similar**: images that look like it, found by their colours and shapes.
+- **References**: the pages and fragments that use the file. Look here before you replace or delete it.
+
+![The References panel](../images/media-file-references.webp)
+
+### The image editor
+
+![The image editor](../images/media-image-editor.webp)
+
+**Edit** opens the image editor: crop, rotate and flip, and draw the areas of an image map. Unlike the crop of an Image component on a page, this changes the file itself; the state before is kept as a version.
+
+## Properties
+
+**Properties** (`p`) holds what is known about a file. The form has the file's picture, title and name at the top, and five tabs.
+
+![The Basic tab of a file's properties](../images/media-properties.webp)
+
+### Basic
+
+| Field | What it is |
+|---|---|
+| **Title**, **Description** | What the file is called and what it shows. A page can take its alternative text from the description |
+| **Tags** | The [tags](tags.md) that classify it. **Add tag** opens the tag picker |
+| **Color tags** | The main colours of an image, found when it was processed, each with its share |
+| **Keywords** | Free words. Type one and press `Enter` |
+| **Creator**, **Contributor** | Who made it, and who helped. Several values each |
+| **Language** | The language of the file, as a code such as `en` or `de-CH` |
+| **Copyright** | The rights line or licence |
+| **Expires** | After this day the file is marked *Expired*, and its page says where it is still used |
+
+![The lower part of the Basic tab](../images/media-properties-2.webp)
+
+Much of this is read from the file itself when it is uploaded.
+
+### Advanced
+
+![The Advanced tab](../images/media-properties-advanced.webp)
+
+Facts about the file that you cannot change here: its name and path, type, size, dimensions, bits per pixel, a checksum (SHA-1), when it was created, modified and processed, and the metadata schema its form uses.
+
+### Camera Data, All Metadata, References
+
+- **Camera Data**: what the camera wrote into a photo: maker and model, lens, exposure, date, position.
+- **All Metadata**: every property stored with the file, with its technical name.
+- **References**: the pages that use the file.
+
+![The Camera Data tab](../images/media-properties-camera.webp)
+
+![The All Metadata tab](../images/media-properties-all.webp)
+
+### Several files at once
 
 Select several files and choose **Properties** to change them together. Fields whose values differ say **Mixed values**; only what you change is written.
 
-An administrator can design the form: which tabs and fields it has, which are required, which are dropdowns. That is a **metadata schema**, set per folder. See **Home › Media › Metadata Schemas**.
-
 ### Edit metadata in a spreadsheet
 
-**Export metadata** on a folder gives you a CSV file with one row per file and one column per property. Edit it in a spreadsheet, then **Import metadata**. The result lists what was written and which rows failed.
+**Metadata › Export Metadata (CSV)** gives you a file with one row per file and one column per property. Edit it in a spreadsheet, then **Import Metadata (CSV)**. The result lists what was written and which rows failed.
 
-### Versions
+An administrator can design the properties form: which tabs and fields it has, which are required, which are dropdowns. That is a **metadata schema**, set per folder. See **Home › System › Media**.
 
-The **Timeline** of a file lists its versions. **Save as Version** takes a label and a comment. **Revert** goes back to a version; the current state is saved as a version first. A version is also made before the image editor changes a file, and when you choose **Create version** at upload.
+## Folder settings
 
-## Work together
+**Properties** on a folder's card sets what applies to every file in it and in the folders below.
 
-- **Checkout** keeps a file to yourself while you work on it: nobody else can change, move, replace or delete it until you **Check In**. An administrator can check in for someone who is away.
-- **Start Flow** sends files through a [flow](flows.md), such as an approval.
-- **Translation Project** sends their metadata, or the text of documents, to be [translated](translations.md).
+![The properties of a folder](../images/media-folder-properties.webp)
 
-## Find
+| Section | Field | What it does |
+|---|---|---|
+| **Basic** | **Title** | The folder's name in Media |
+| | **Name**, **Path** | Its place in the address. Use **Move** to rename |
+| | **Thumbnail** | The image on the folder's card. *Automatic* shows up to three files from inside |
+| **Processing** | **Processing Profile** | Extra renditions to make for the files uploaded or reprocessed here |
+| | **Image Profile (Focus crop)** | The crops around the subject to make for the images here |
+| **Metadata** | **Metadata Schema** | Which Properties form the files here get |
+| | **Metadata Profile** | Values new files start with, such as a copyright line, for what a file does not bring itself |
+| | **Folder Metadata Schema** | Fields of its own for this folder and the folders below |
+| **Members** | **Make folder private** | Limits the folder to its members. Everyone who works in Media sees a folder that is not private; members get more than that |
 
-The search field at the top of a folder searches that folder and everything below it: names, titles, descriptions, keywords, tags, every metadata value, the tags proposed by the image model, and the text inside PDFs and office documents.
+![The lower part of a folder's properties](../images/media-folder-properties-2.webp)
 
-**Filters** narrows the results by type, tag, date, size, orientation and colour. An administrator can change which filters are offered (**Home › Media › Search Forms**).
-
-A search has an address, so you can bookmark it, or save it as a **smart collection**.
-
-## Collections
-
-A collection gathers files from anywhere in Media without moving or copying them: the pictures of a campaign, a shortlist for a page.
-
-- **Add to Collection** from any selection.
-- A collection is private to you, or public.
-- A **smart collection** is a saved search. It stays up to date as files change.
-
-Find them under **Home › Media › Collections**.
-
-## Share with people outside
-
-**Share Link** makes an address that anyone can open, without an account, to view and download the files you selected. You choose how long it stays valid, from 1 to 90 days. **Home › Media › Shared Links** lists the links you made, what each gives access to and until when, and lets you **Unshare** one at any time.
-
-## Publish
-
-Files are published like pages: select them and choose **Publish**. When you publish a page, the files it uses that are not yet on the live site are offered to be published with it. See [Publishing](publishing.md).
-
-## Reports
-
-**Home › Media › Reports** makes a table over a folder and a period, which you can download as CSV: what was uploaded, modified or published, what is about to expire, how much space each folder takes, which links are shared.
+Members are users and groups with a role in the folder and everything in it: an **Owner** may do everything, including choosing the members; an **Editor** adds, edits, moves and deletes files and folders; a **Viewer** sees and downloads.

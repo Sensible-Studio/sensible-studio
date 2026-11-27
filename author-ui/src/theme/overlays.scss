@@ -183,6 +183,12 @@
     min-height: 44px;
     border-bottom-color: var(--studio-border);
   }
+
+  // a tag of a tag group is a row with one cell as well, and it is not a table row: at 44px its text
+  // stood below its own 24px frame, which then ran through the words
+  [role='row'][class*='spectrum-Tag'] [role='gridcell'] {
+    min-height: 0;
+  }
 }
 
 .studio-theme div[class*='spectrum-Modal']:not([class*='spectrum-Modal-wrapper']):has(> section:is(.studio-dialog-standard--s, [class*='spectrum-Dialog--small'])) {

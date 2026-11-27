@@ -584,7 +584,7 @@ export function AssetsBrowser({
     if (all && assets.every((a) => languageOf(a.path))) out.push({ id: "translate", label: "Translation Project", icon: <ProjectAdd />, run: () => setTranslationProjectFor(assets.map((a) => a.path)) });
     // one file in a language folder: its copies in the other languages, translated (title, description) on request
     if (all && assets.length === 1 && !assets[0].contentFragment && languageOf(assets[0].path))
-      out.push({ id: "languages", label: "Language Copies", icon: <Globe />, run: () => setLanguagesFor(assets[0].path) });
+      out.push({ id: "languages", label: "Language versions", icon: <Globe />, run: () => setLanguagesFor(assets[0].path) });
     if (all) out.push({ id: "flow", label: "Start Flow", icon: <WorkflowIcon />, run: () => setStartingWorkflow(assets.map((a) => a.path)) });
     if (all && canEdit && assets.every((a) => !a.checkedOutBy)) {
       out.push({
