@@ -752,6 +752,13 @@ $sel: color-mix(in srgb, var(--spectrum-blue-900) 12%, transparent);
   &--unpublished {
     background: var(--spectrum-global-color-gray-500);
   }
+
+  // asked for, not delivered yet: a ring, not a dot
+  &--pending {
+    box-sizing: border-box;
+    border: 2px solid var(--spectrum-global-color-blue-500);
+    background: transparent;
+  }
 }
 
 .studio-submissions-badge {

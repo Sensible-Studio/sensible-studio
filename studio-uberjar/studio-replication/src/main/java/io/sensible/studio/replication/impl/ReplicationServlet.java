@@ -107,6 +107,16 @@ public class ReplicationServlet extends SlingAllMethodsServlet {
                     list.add(status(session, p));
                 }
                 out = Collections.singletonMap("status", list);
+            } else if ("pending".equals(op)) {
+                // what waits in a queue, for a list to mark: one question for the whole list, not one per row
+                java.util.Set<String> paths = new java.util.TreeSet<>();
+                for (org.apache.sling.event.jobs.Job j : ReplicationJob.find(jobManager, null, null, 2000)) {
+                    String p = j.getProperty(ReplicationJob.PROP_PATH, String.class);
+                    if (p != null && session != null && session.hasPermission(p, Session.ACTION_READ)) {
+                        paths.add(p);
+                    }
+                }
+                out = Collections.singletonMap("paths", paths);
             } else if ("history".equals(op)) {
                 String limit = request.getParameter("limit");
                 try (ResourceResolver service = agents.serviceResolver()) {

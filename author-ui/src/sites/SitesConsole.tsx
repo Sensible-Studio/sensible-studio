@@ -1,3 +1,4 @@
+import { refreshPending, usePendingPaths } from './pending';
 import { VOCAB } from '../shell/vocabulary';
 import {
   ActionButton,
@@ -874,6 +875,7 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
               setPublishing(null);
               setSelected([]);
               refresh();
+              refreshPending();
             }}
           />
         )}
@@ -1062,6 +1064,10 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
 
 /** Where a page stands with publishing: a green dot published, orange changed since, grey taken down; nothing when never published. */
 export function PublicationDot({ item }: { item: SiteItem }) {
+  const waiting = usePendingPaths().has(item.path);
+  if (waiting) {
+    return <span className="studio-pubdot studio-pubdot--pending" role="img" aria-label="On its way" title="On its way: the request waits in the publishing queue" />;
+  }
   if (!item.publication) return null;
   const label = { published: 'Published', modified: 'Modified since published', unpublished: 'Unpublished' }[item.publication];
   const when = item.lastPublished ? ` ${new Date(item.lastPublished).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}` : '';
