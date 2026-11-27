@@ -83,7 +83,8 @@ export function PublishDialog({ client, paths, title, action = 'activate', offer
       // a page that is itself being published is not its own reference
       for (const p of paths) all.delete(p);
       setReferences([...all.values()]);
-      setSelected(new Set(all.keys()));
+      // what this person may not publish (a template, for an author) is shown and left for who may
+      setSelected(new Set([...all.values()].filter((r) => r.canPublish !== false).map((r) => r.path)));
     })();
     return () => {
       live = false;
@@ -183,10 +184,11 @@ export function PublishDialog({ client, paths, title, action = 'activate', offer
             <ul>
               {references.map((r) => (
                 <li key={r.path}>
-                  <Checkbox isSelected={selected.has(r.path)} onChange={(on) => toggle(r.path, on)} isDisabled={busy}>
+                  <Checkbox isSelected={selected.has(r.path)} onChange={(on) => toggle(r.path, on)} isDisabled={busy || r.canPublish === false}>
                     <span className="studio-publish__title">{r.title}</span>
                     <span className="studio-publish__meta">
                       {TYPE_LABEL[r.type]} · {STATUS_LABEL[r.status]}
+                      {r.canPublish === false ? ' · yours to ask for: an administrator publishes it' : ''}
                     </span>
                   </Checkbox>
                   <code className="studio-publish__path">{r.path}</code>

@@ -55,4 +55,14 @@ class RootHomeFilterTest {
     void no_site_leaves_the_answer_alone() {
         assertNull(RootHomeFilter.target("", RootHomeFilter.sites(context.resourceResolver())));
     }
+
+    @Test
+    void a_site_of_one_page_is_home_when_there_is_no_other_and_an_empty_instance_says_so() {
+        assertTrue(RootHomeFilter.list("", RootHomeFilter.sites(context.resourceResolver())).contains("Nothing is published here yet"));
+        context.create().resource("/content/shop/jcr:content", "jcr:title", "Shop", "sling:resourceType", "studio/starter/components/page");
+        context.create().resource("/content/holder/jcr:content", "jcr:title", "Holds things");
+        Map<String, String> sites = RootHomeFilter.sites(context.resourceResolver());
+        assertEquals("{/content/shop=Shop}", sites.toString());
+        assertEquals("/content/shop.html", RootHomeFilter.target("", sites));
+    }
 }

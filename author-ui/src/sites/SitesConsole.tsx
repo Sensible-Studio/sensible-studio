@@ -64,6 +64,7 @@ import { CsvReport, type CsvSources } from './CsvReport';
 import { HttpWorkflowClient } from '../workflow/api';
 import FileTxt from '@spectrum-icons/workflow/FileTxt';
 import { CreateSiteWizard } from '../msm/CreateSiteWizard';
+import { HttpSiteConfigClient } from '../siteconfig/api';
 import { LiveCopyOverview } from '../msm/LiveCopyOverview';
 import { useMsmStatus } from '../msm/LiveCopyStatus';
 import { describeResult, HttpMsmClient, type MsmClient } from '../msm/MsmClient';
@@ -673,7 +674,7 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
         : [{ key: 'xf', label: 'Experience Fragment', description: 'A reusable piece of a page, with its master variant' }]
       : [{ key: 'page', label: root.path === '/content/forms' ? 'Form' : 'Page', description: 'From a template allowed here' }]),
     ...(inFolder && !inFragment ? [{ key: 'folder', label: 'Folder', description: inXf ? 'To keep experience fragments in' : 'To keep pages in' }] : []),
-    ...(inXf ? [] : [{ key: 'site', label: 'Site', description: 'Languages and chapters from a source' }]),
+    ...(inXf ? [] : [{ key: 'site', label: 'Site', description: 'A new one, or languages and chapters from a source' }]),
     { key: 'livecopy', label: 'Linked copy', description: inXf ? 'Fragments that follow a source' : 'Pages that follow a source' },
     { key: 'csv', label: 'CSV Report', description: inXf ? 'What is here as a spreadsheet' : 'The pages here as a spreadsheet' },
   ];
@@ -916,6 +917,26 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
             refresh();
             if (created) setSelected([created]);
             ToastQueue.positive(`Site created: ${describeResult(result)}`, { timeout: 6000 });
+          }}
+          // a site is a page right below Pages: only there can one start from nothing
+          blank={
+            creatingSite === '/content'
+              ? {
+                  templates: () => client.pageTemplates('/content'),
+                  create: async (title, name, template) => {
+                    const page = await client.createPage('/content', template, title, name);
+                    // its own configuration, for the data layer and the like; the site stands without it
+                    await new HttpSiteConfigClient().createContext(page.path).catch(() => undefined);
+                    return page.path;
+                  },
+                }
+              : undefined
+          }
+          onBlankCreated={(created) => {
+            setCreatingSite(null);
+            refresh();
+            setSelected([created]);
+            ToastQueue.positive('Site created', { timeout: 6000, actionLabel: 'Open', onAction: () => go({ kind: 'editor', path: created }), shouldCloseOnAction: true });
           }}
         />
       )}

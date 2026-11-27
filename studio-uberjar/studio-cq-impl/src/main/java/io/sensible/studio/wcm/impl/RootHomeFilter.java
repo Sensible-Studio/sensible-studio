@@ -96,12 +96,11 @@ public class RootHomeFilter implements Filter {
                     response.sendRedirect(request.getContextPath() + target);
                     return;
                 }
-                if (sites.size() > 1) {
-                    response.setContentType("text/html;charset=UTF-8");
-                    response.setHeader("Cache-Control", "no-cache");
-                    response.getWriter().write(list(request.getContextPath(), sites));
-                    return;
-                }
+                // several sites: their list; none yet: a word about it, not Sling's own start page
+                response.setContentType("text/html;charset=UTF-8");
+                response.setHeader("Cache-Control", "no-cache");
+                response.getWriter().write(list(request.getContextPath(), sites));
+                return;
             }
         }
         chain.doFilter(req, res);
@@ -122,6 +121,8 @@ public class RootHomeFilter implements Filter {
     /** The sites this session can see: the pages right under /content that are not hidden, path → title. */
     static Map<String, String> sites(ResourceResolver resolver) {
         Map<String, String> sites = new LinkedHashMap<>();
+        // a site of one page (a home page, nothing below it yet) is a site when there is no other
+        Map<String, String> single = new LinkedHashMap<>();
         Resource content = resolver.getResource(CONTENT);
         if (content == null) {
             return sites;
@@ -133,12 +134,18 @@ public class RootHomeFilter implements Filter {
             }
             ValueMap vm = jcrContent.getValueMap();
             // a page that only holds things (forms, fragments) has no pages of its own to show and says so
-            if (vm.get("hideInNav", false) || !hasPages(child)) {
+            if (vm.get("hideInNav", false)) {
+                continue;
+            }
+            if (!hasPages(child)) {
+                if (vm.get("sling:resourceType", String.class) != null) {
+                    single.put(child.getPath(), vm.get("jcr:title", child.getName()));
+                }
                 continue;
             }
             sites.put(child.getPath(), vm.get("jcr:title", child.getName()));
         }
-        return sites;
+        return sites.isEmpty() ? single : sites;
     }
 
     private static boolean hasPages(Resource site) {
@@ -157,7 +164,12 @@ public class RootHomeFilter implements Filter {
                 + "background:#f6f6f4;color:#1c1c1a}main{width:min(28rem,calc(100% - 2rem))}h1{font-size:1.25rem;margin:0 0 1rem}"
                 + "ul{list-style:none;margin:0;padding:0}a{display:block;padding:.75rem 1rem;margin-bottom:.5rem;background:#fff;"
                 + "border:1px solid #deded9;border-radius:8px;color:inherit;text-decoration:none}a:hover,a:focus{border-color:#1c1c1a}"
-                + "</style></head><body><main><h1>Sites</h1><ul>");
+                + "p{margin:0;color:#5c5c57}</style></head><body><main>");
+        if (sites.isEmpty()) {
+            return sb.append("<h1>Nothing is published here yet</h1><p>Pages appear here once they are published from the author.</p>"
+                    + "</main></body></html>").toString();
+        }
+        sb.append("<h1>Sites</h1><ul>");
         for (Map.Entry<String, String> e : sites.entrySet()) {
             sb.append("<li><a href=\"").append(esc(contextPath + address(e.getKey()))).append("\">").append(esc(e.getValue()))
                     .append("</a></li>");

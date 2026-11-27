@@ -91,6 +91,14 @@ final class References {
             }
             m.put("title", title != null ? title : top.substring(top.lastIndexOf('/') + 1));
             m.put("status", s == null ? "never" : s.isActivated() ? "modified" : "deactivated");
+            // an author's first publish offered the page's template, ticked, and failed on it: he may not publish /conf
+            boolean may = true;
+            try {
+                replicator.checkPermission(session, com.day.cq.replication.ReplicationActionType.ACTIVATE, top);
+            } catch (com.day.cq.replication.ReplicationException e) {
+                may = false;
+            }
+            m.put("canPublish", may);
             out.add(m);
         }
         return out;

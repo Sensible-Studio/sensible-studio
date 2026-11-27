@@ -86,6 +86,8 @@ export interface UnpublishedReference {
   type: 'asset' | 'experience-fragment' | 'template' | 'segment' | 'page';
   title: string;
   status: 'never' | 'modified' | 'deactivated';
+  /** Whether the signed-in user may publish it; absent (an older server): offered. */
+  canPublish?: boolean;
 }
 
 /** A cache in front of the published site (the Live cache), as the publish instance behind it reports it. */
