@@ -1,0 +1,67 @@
+/*
+ * Sensible Studio Starter: a plain, readable look for a first site. A site of its own brings its own
+ * stylesheet (a client library named in the page policy) and drops this one.
+ */
+:root {
+  --starter-text: #1c1c1a;
+  --starter-muted: #5f5f5a;
+  --starter-line: #deded9;
+  --starter-ground: #ffffff;
+  --starter-accent: #1c1c1a;
+  --starter-measure: 68rem;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--starter-text);
+  background: var(--starter-ground);
+}
+body > .root, body > .cmp-container { display: block; }
+.root > .cmp-container, body > .container > .cmp-container {
+  max-width: var(--starter-measure);
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+h1, h2, h3, h4 { line-height: 1.2; margin: 1.6em 0 .5em; }
+h1 { font-size: 2.4rem; letter-spacing: -.01em; }
+h2 { font-size: 1.7rem; }
+h3 { font-size: 1.3rem; }
+p { margin: 0 0 1em; }
+a { color: inherit; text-underline-offset: .15em; }
+a:hover { text-decoration-thickness: 2px; }
+img { max-width: 100%; height: auto; display: block; }
+.cmp-image__image { border-radius: 6px; }
+.cmp-button {
+  display: inline-block;
+  padding: .65rem 1.2rem;
+  border: 1px solid var(--starter-accent);
+  border-radius: 6px;
+  background: var(--starter-accent);
+  color: var(--starter-ground);
+  text-decoration: none;
+  font-weight: 600;
+}
+.cmp-button:hover, .cmp-button:focus-visible { background: var(--starter-ground); color: var(--starter-accent); }
+.cmp-separator__horizontal-rule { border: 0; border-top: 1px solid var(--starter-line); margin: 2rem 0; }
+.cmp-navigation__group, .cmp-breadcrumb__list, .cmp-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cmp-navigation > .cmp-navigation__group { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; }
+.cmp-navigation__item-link { text-decoration: none; font-weight: 600; }
+.cmp-navigation__item--active > .cmp-navigation__item-link { text-decoration: underline; }
+.cmp-navigation__item .cmp-navigation__group { display: none; }
+.cmp-breadcrumb__list { display: flex; flex-wrap: wrap; gap: .4rem; color: var(--starter-muted); font-size: .9rem; }
+.cmp-breadcrumb__item + .cmp-breadcrumb__item::before { content: "/"; margin-right: .4rem; }
+.cmp-list__item { padding: .6rem 0; border-bottom: 1px solid var(--starter-line); }
+.cmp-list__item-title { font-weight: 600; }
+.cmp-list__item-description, .cmp-list__item-date { display: block; color: var(--starter-muted); font-size: .92rem; }
+.cmp-teaser { display: grid; gap: .75rem; padding: 0 0 1.5rem; }
+.cmp-teaser__title { margin: 0; font-size: 1.4rem; }
+.cmp-teaser__title-link { text-decoration: none; }
+.cmp-teaser__description { color: var(--starter-muted); }
+.cmp-teaser__action-link { font-weight: 600; margin-right: 1rem; }
+.cmp-embed iframe { max-width: 100%; }

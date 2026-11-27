@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="group">io.sensible.studio</entry>
+<entry key="name">studio-starter-content</entry>
+<entry key="version">0.1.0</entry>
+<entry key="description">Sensible Studio Starter: what a new installation needs to make its first page without a sample site. A page type (Templates › Create), the Content page template, the Core Components under names of their own with a plain stylesheet, and the Experience Fragments root. Written for Sensible Studio; contains no Adobe content (the components are Apache-licensed Core Components, referred to, not copied).</entry>
+<entry key="createdBy">Sensible Studio</entry>
+<entry key="packageType">mixed</entry>
+<entry key="requiresRoot">false</entry>
+</properties>

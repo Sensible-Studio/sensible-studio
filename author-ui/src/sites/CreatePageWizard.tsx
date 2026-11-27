@@ -94,8 +94,8 @@ export function CreatePageWizard({ client, parent, parentTitle, onClose, onCreat
             error ? null : <ProgressCircle isIndeterminate aria-label="Loading templates" />
           ) : templates.length === 0 ? (
             <p className="studio-wizard__empty">
-              No template is allowed below <strong>{parentTitle}</strong>. Templates come from the site's configuration (
-              <code>cq:conf</code>), must be enabled, and may be limited by <code>cq:allowedTemplates</code>.
+              No template can be used below <strong>{parentTitle}</strong>. Enable one in Templates, or make one there; a site can also limit which of them its pages
+              may use.
             </p>
           ) : (
             <ul className="studio-templates" aria-label="Templates">

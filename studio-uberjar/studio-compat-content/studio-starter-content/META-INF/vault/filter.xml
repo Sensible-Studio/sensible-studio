@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/libs/studio/starter"/>
+    <filter root="/libs/settings/wcm/template-types/page"/>
+    <filter root="/conf/global/settings/wcm/templates/page" mode="merge"/>
+    <filter root="/conf/global/settings/wcm/policies/studio/starter" mode="merge"/>
+    <filter root="/content/experience-fragments" mode="merge"/>
+</workspaceFilter>

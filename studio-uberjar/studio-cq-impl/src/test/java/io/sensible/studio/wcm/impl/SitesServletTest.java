@@ -49,7 +49,7 @@ class SitesServletTest {
         List<Map<String, Object>> trail = (List<Map<String, Object>>) en.get("trail");
         assertEquals(List.of("/content", "/content/wknd", "/content/wknd/us", EN),
                 trail.stream().map(t -> t.get("path")).collect(Collectors.toList()));
-        assertEquals("Sites", trail.get(0).get("title"));
+        assertEquals("Pages", trail.get(0).get("title"));
         assertNull(servlet.children(context.resourceResolver(), "/content/nope"));
     }
 
@@ -64,6 +64,23 @@ class SitesServletTest {
         context.resourceResolver().getResource("/content/wknd/jcr:content").adaptTo(ModifiableValueMap.class)
                 .put("cq:allowedTemplates", new String[] {"/conf/wknd/settings/wcm/templates/nothing-.*"});
         assertTrue(servlet.templates(context.resourceResolver(), EN).isEmpty());
+    }
+
+    @Test
+    void aPageOfNoSiteUsesTheGlobalTemplates() {
+        context.create().resource("/conf/global/settings/wcm/templates/page", "jcr:primaryType", "cq:Template",
+                "allowedPaths", new String[] {"/content(/.*)?"});
+        context.create().resource("/conf/global/settings/wcm/templates/page/jcr:content", "jcr:title", "Content page",
+                "status", "enabled");
+        context.create().resource("/conf/global/settings/wcm/templates/form", "jcr:primaryType", "cq:Template",
+                "allowedPaths", new String[] {"/content/forms(/.*)?"});
+        context.create().resource("/conf/global/settings/wcm/templates/form/jcr:content", "status", "enabled");
+        List<Object> atRoot = servlet.templates(context.resourceResolver(), "/content").stream().map(m -> m.get("path"))
+                .collect(Collectors.toList());
+        assertEquals(List.of("/conf/global/settings/wcm/templates/page"), atRoot);
+        // a site with a configuration of its own keeps to it
+        assertFalse(servlet.templates(context.resourceResolver(), EN).stream().map(m -> m.get("path"))
+                .collect(Collectors.toList()).contains("/conf/global/settings/wcm/templates/page"));
     }
 
     @Test
