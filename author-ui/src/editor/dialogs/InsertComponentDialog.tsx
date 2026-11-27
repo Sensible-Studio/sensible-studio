@@ -31,7 +31,19 @@ export function InsertComponentDialog({ components, onPick }: Props) {
       <Heading>Insert New Component</Heading>
       <Divider />
       <Content>
-        <SearchField aria-label="Filter components" placeholder="Enter Keyword" width="100%" value={filter} onChange={setFilter} autoFocus marginBottom="size-150" />
+        <SearchField aria-label="Filter components" placeholder="Enter Keyword" width="100%" value={filter}
+          onChange={setFilter}
+          // Enter takes the first match: type "tex", Enter, and the Text is in
+          onSubmit={() => {
+            const first = filter.trim() ? sections[0]?.items[0] : undefined;
+            if (first) {
+              container.dismiss();
+              onPick(first);
+            }
+          }}
+          autoFocus
+          marginBottom="size-150"
+        />
         {sections.length === 0 ? (
           <Text>{components.length ? 'No component matches.' : 'This container does not allow any component.'}</Text>
         ) : (

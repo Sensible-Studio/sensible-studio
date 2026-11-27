@@ -257,6 +257,8 @@ export interface StudioClient {
   createPage(parent: string, template: string, title: string, name?: string): Promise<SiteItem>;
   /** An experience fragment: the fragment and its master variation from the template (`master`: the variation's path). */
   createExperienceFragment?(parent: string, template: string, title: string, name?: string): Promise<SiteItem & { master?: string }>;
+  /** A copy of a page (with the pages below it) under `parent`; the copy does not carry the original's publication state. */
+  copyPage?(path: string, parent: string): Promise<SiteItem>;
   /** A folder to keep pages or experience fragments in. */
   createFolder?(parent: string, title: string, name?: string): Promise<SiteItem>;
   /** Properties outside `path` that reference it (or anything below it). */

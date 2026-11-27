@@ -45,8 +45,8 @@ export function DeleteDialog({ client, items, onDelete }: Props) {
         </p>
       )}
       <div className="studio-delete__refs">
-        {referenced && <Text>These pages refer to it; their links will break:</Text>}
-        <ReferenceList pages={refs.pages} error={refs.error} empty="No other page refers to it." />
+        {referenced && <Text>These pages refer to {items.length === 1 ? 'it' : 'them'}; their links will break:</Text>}
+        <ReferenceList pages={refs.pages} error={refs.error} empty={`No other page refers to ${items.length === 1 ? 'it' : 'them'}.`} />
       </div>
     </StudioConfirmDialog>
   );

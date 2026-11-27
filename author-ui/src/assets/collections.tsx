@@ -67,7 +67,7 @@ export function CollectionsPage({ client, navigate }: { client: DamClient; navig
         primary={
           <Button variant="accent" onPress={() => setDialog({ kind: 'create' })}>
             <Add />
-            Create
+            <Text>Create</Text>
           </Button>
         }
       />
@@ -154,7 +154,7 @@ export function CollectionsPage({ client, navigate }: { client: DamClient; navig
             }}
             onCancel={() => setDialog(null)}
           >
-            The collection <strong>{dialog.collection.title}</strong> goes; its assets stay where they are.
+            The collection <strong>{dialog.collection.title}</strong> goes; its files stay where they are.
           </StudioConfirmDialog>
         )}
       </DialogContainer>

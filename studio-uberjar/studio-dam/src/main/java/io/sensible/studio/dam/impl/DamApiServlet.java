@@ -1583,7 +1583,8 @@ public class DamApiServlet extends SlingAllMethodsServlet {
             throws PersistenceException {
         Map<String, Object> props = new HashMap<>();
         for (Map.Entry<String, Object> e : src.getValueMap().entrySet()) {
-            if (!SKIP.contains(e.getKey())) {
+            // a copy has not been published: it does not inherit the original's publication state
+            if (!SKIP.contains(e.getKey()) && !e.getKey().startsWith("cq:lastReplicat")) {
                 props.put(e.getKey(), e.getValue());
             }
         }

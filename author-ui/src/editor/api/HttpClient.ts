@@ -185,6 +185,14 @@ export class HttpClient implements StudioClient {
     return body;
   }
 
+  async copyPage(path: string, parent: string): Promise<SiteItem> {
+    const qs = new URLSearchParams({ op: 'copy', path, parent });
+    const res = await fetch(`${this.base}/bin/studio/sites.json?${qs}`, { method: 'POST', credentials: 'same-origin' });
+    const body = (await res.json().catch(() => ({}))) as SiteItem & { error?: string };
+    if (!res.ok) throw new StudioHttpError(res.status, body.error || `Could not copy ${path} (HTTP ${res.status})`);
+    return body;
+  }
+
   async createFolder(parent: string, title: string, name?: string): Promise<SiteItem> {
     const qs = new URLSearchParams({ op: 'createFolder', parent, title });
     if (name) qs.set('name', name);

@@ -169,8 +169,8 @@ function InfoDialog({ heading, confirm, project, onSave }: { heading: string; co
             save();
           }}
         >
-          <TextField label="Title" isRequired autoFocus value={title} onChange={setTitle} />
-          <TextArea label="What it is about" value={description} onChange={setDescription} />
+          <TextField label="Title" isRequired autoFocus value={title} onChange={setTitle} width="100%" />
+          <TextArea label="What it is about" value={description} onChange={setDescription} width="100%" />
           <TextField label="Due" type="date" value={due} onChange={setDue} description="Optional" />
           {project && (
             <Checkbox isSelected={active} onChange={setActive}>
@@ -435,8 +435,8 @@ function TaskDialog({ task, members, onSave, onRemove }: { task: Task | null; me
             save();
           }}
         >
-          <TextField label="What is to be done" isRequired autoFocus value={title} onChange={setTitle} />
-          <TextArea label="Notes" value={description} onChange={setDescription} />
+          <TextField label="What is to be done" isRequired autoFocus value={title} onChange={setTitle} width="100%" />
+          <TextArea label="Notes" value={description} onChange={setDescription} width="100%" />
           <Picker label="For" selectedKey={assignee || '-'} onSelectionChange={(k: Key | null) => setAssignee(k === '-' || k === null ? '' : String(k))}>
             {[<Item key="-">Nobody yet</Item>, ...[...new Set([...members, ...(assignee ? [assignee] : [])])].map((m) => <Item key={m}>{m}</Item>)]}
           </Picker>

@@ -200,7 +200,7 @@ export function PublishDialog({ client, paths, title, action = 'activate', offer
           // on its own line: beside the Now / Later choice the two read as one muddled row
           <div className="studio-publish__row">
             <Checkbox isSelected={deep} onChange={setDeep} isDisabled={busy} marginTop="size-150">
-              Also the {below} below it
+              Also the {below} below {paths.length === 1 ? 'it' : 'them'}
             </Checkbox>
           </div>
         )}

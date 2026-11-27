@@ -439,7 +439,10 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
     const items = clipboard;
     if (!items) return;
     void run(async () => {
-      for (const it of items) await client.copyResource(it.path, { container: path, before: null });
+      for (const it of items) {
+        if (client.copyPage) await client.copyPage(it.path, path);
+        else await client.copyResource(it.path, { container: path, before: null });
+      }
     }, items.length === 1 ? `${items[0].title} pasted` : `${items.length} items pasted`);
   };
 
@@ -649,8 +652,8 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
   const createItems: Array<{ key: string; label: string; description: string }> = [
     ...(inXf
       ? inFragment
-        ? [{ key: 'variation', label: 'Variation', description: 'Another version of this fragment, for a channel or an offer' }]
-        : [{ key: 'xf', label: 'Experience Fragment', description: 'A reusable piece of a page, with its master variation' }]
+        ? [{ key: 'variation', label: 'Variant', description: 'Another version of this fragment, for a channel or an offer' }]
+        : [{ key: 'xf', label: 'Experience Fragment', description: 'A reusable piece of a page, with its master variant' }]
       : [{ key: 'page', label: root.path === '/content/forms' ? 'Form' : 'Page', description: 'From a template allowed here' }]),
     ...(inFolder && !inFragment ? [{ key: 'folder', label: 'Folder', description: inXf ? 'To keep experience fragments in' : 'To keep pages in' }] : []),
     ...(inXf ? [] : [{ key: 'site', label: 'Site', description: 'Languages and chapters from a source' }]),
@@ -800,7 +803,7 @@ export function SitesConsole({ client, initialPath, msm: msmClient, siteRail: si
             setCreating(null);
             refresh();
             setSelected([page.path]);
-            ToastQueue.positive(`${creatingKind === 'xf' ? 'Experience fragment' : creatingKind === 'variation' ? 'Variation' : 'Page'} ${page.title} created`, {
+            ToastQueue.positive(`${creatingKind === 'xf' ? 'Experience fragment' : creatingKind === 'variation' ? 'Variant' : 'Page'} ${page.title} created`, {
               timeout: 6000,
               actionLabel: 'Open',
               onAction: () => edit(page),

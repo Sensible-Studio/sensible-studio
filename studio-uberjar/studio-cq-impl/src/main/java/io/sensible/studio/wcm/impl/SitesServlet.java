@@ -136,6 +136,8 @@ public class SitesServlet extends SlingAllMethodsServlet {
                 Map<String, Object> out = item(xf, pm);
                 out.put("master", xf.getPath() + "/master");
                 send(response, HttpServletResponse.SC_CREATED, out);
+            } else if ("copy".equals(op)) {
+                send(response, HttpServletResponse.SC_CREATED, item(copy(resolver, request.getParameter("path"), parent), pm));
             } else if ("createFolder".equals(op)) {
                 send(response, HttpServletResponse.SC_CREATED, item(createFolder(resolver, parent, request.getParameter("title"), name), pm));
             } else if ("create".equals(op)) {
@@ -153,6 +155,58 @@ public class SitesServlet extends SlingAllMethodsServlet {
         } catch (WCMException | IllegalArgumentException e) {
             resolver.revert();
             send(response, HttpServletResponse.SC_CONFLICT, Collections.singletonMap("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * A copy of a page (with the pages below it) or folder under {@code parent}, named like the original or with the next
+     * free number. The copy has not been published: it does not carry the original's publication state.
+     */
+    static Resource copy(ResourceResolver resolver, String path, String parent) throws PersistenceException {
+        Resource src = path == null ? null : resolver.getResource(path);
+        Resource target = resolver.getResource(parent);
+        if (src == null || target == null || !(path.equals(ROOT) || path.startsWith(ROOT + "/"))) {
+            throw new IllegalArgumentException("Nothing to copy at " + path);
+        }
+        if (parent.equals(path) || parent.startsWith(path + "/")) {
+            throw new IllegalArgumentException("A page cannot be copied into itself");
+        }
+        String name = src.getName();
+        for (int i = 1; target.getChild(name) != null; i++) {
+            name = src.getName() + "_" + i;
+        }
+        javax.jcr.Session session = resolver.adaptTo(javax.jcr.Session.class);
+        if (session == null) {
+            throw new PersistenceException("No repository session to copy with");
+        }
+        try {
+            session.getWorkspace().copy(path, parent + "/" + name);
+        } catch (javax.jcr.RepositoryException e) {
+            throw new PersistenceException("Could not copy " + path + ": " + e.getMessage(), e);
+        }
+        resolver.refresh();
+        Resource copy = resolver.getResource(parent + "/" + name);
+        if (copy == null) {
+            throw new PersistenceException("The copy of " + path + " is not there");
+        }
+        forgetPublication(copy);
+        resolver.commit();
+        return copy;
+    }
+
+    private static void forgetPublication(Resource r) {
+        org.apache.sling.api.resource.ModifiableValueMap m = r.adaptTo(org.apache.sling.api.resource.ModifiableValueMap.class);
+        if (m != null) {
+            for (String key : new ArrayList<>(m.keySet())) {
+                if (key.startsWith("cq:lastReplicat")) {
+                    m.remove(key);
+                }
+            }
+        }
+        for (Resource c : r.getChildren()) {
+            if (Pages.isPage(c) || isFolder(c) || "jcr:content".equals(c.getName())) {
+                forgetPublication(c);
+            }
         }
     }
 

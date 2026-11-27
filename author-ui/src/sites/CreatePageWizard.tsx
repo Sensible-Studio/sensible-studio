@@ -19,7 +19,7 @@ interface Props {
 const WORDS = {
   page: { title: 'Create Page', label: 'Title' },
   xf: { title: 'Create Experience Fragment', label: 'Title' },
-  variation: { title: 'Create Variation', label: 'Title' },
+  variation: { title: 'Create Variant', label: 'Title' },
 } as const;
 
 /** Create Page: pick one of the templates allowed here, then the page's basic properties. */

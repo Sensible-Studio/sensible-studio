@@ -142,4 +142,22 @@ class XfConversionTest {
         assertThrows(IllegalArgumentException.class, () -> SitesServlet.createFolder(resolver, PAGE, "In a page", null));
         assertThrows(IllegalArgumentException.class, () -> SitesServlet.createFolder(resolver, "/content/experience-fragments/site", " ", null));
     }
+
+    @Test
+    void aCopyOfAPublishedPageIsNotPublished() throws Exception {
+        context.create().resource(PAGE + "/below", "jcr:primaryType", "cq:Page");
+        context.create().resource(PAGE + "/below/jcr:content", "jcr:primaryType", "cq:PageContent", "cq:lastReplicationAction", "Activate");
+        org.apache.sling.api.resource.ModifiableValueMap m = resolver.getResource(PAGE + "/jcr:content").adaptTo(org.apache.sling.api.resource.ModifiableValueMap.class);
+        m.put("cq:lastReplicationAction", "Activate");
+        m.put("cq:lastReplicatedBy", "admin");
+        resolver.commit();
+        Resource copy = SitesServlet.copy(resolver, PAGE, "/content/site/en");
+        assertEquals("/content/site/en/page_1", copy.getPath(), "the next free name beside the original");
+        assertNull(copy.getChild("jcr:content").getValueMap().get("cq:lastReplicationAction"));
+        assertNull(copy.getChild("jcr:content").getValueMap().get("cq:lastReplicatedBy"));
+        assertNull(copy.getChild("below/jcr:content").getValueMap().get("cq:lastReplicationAction"), "the pages below too");
+        assertEquals("title", copy.getChild("jcr:content/root/title").getValueMap().get("p", String.class), "the content came along");
+        assertEquals("Activate", resolver.getResource(PAGE + "/jcr:content").getValueMap().get("cq:lastReplicationAction"), "the original keeps its state");
+        assertThrows(IllegalArgumentException.class, () -> SitesServlet.copy(resolver, PAGE, PAGE + "/below"));
+    }
 }
