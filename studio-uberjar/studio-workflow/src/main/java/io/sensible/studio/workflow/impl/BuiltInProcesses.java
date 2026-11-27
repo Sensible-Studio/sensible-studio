@@ -29,6 +29,19 @@ final class BuiltInProcesses {
         return a == null ? "" : a.trim();
     }
 
+    /**
+     * Gives a step to whoever started the flow: the way a decision comes back to the person who
+     * asked for it. Without it a reviewer's "Request changes" ended the flow and told nobody.
+     */
+    @Component(service = com.adobe.granite.workflow.exec.ParticipantStepChooser.class, property = "chooser.label=Workflow Initiator")
+    public static class Initiator implements com.adobe.granite.workflow.exec.ParticipantStepChooser {
+        @Override
+        public String getParticipant(com.adobe.granite.workflow.exec.WorkItem item, com.adobe.granite.workflow.WorkflowSession session,
+                com.adobe.granite.workflow.metadata.MetaDataMap args) {
+            return item.getWorkflow().getInitiator();
+        }
+    }
+
     /** Does nothing; useful as a placeholder or to end a branch. */
     @Component(service = WorkflowProcess.class, property = "process.label=No Operation")
     public static class Noop implements WorkflowProcess {

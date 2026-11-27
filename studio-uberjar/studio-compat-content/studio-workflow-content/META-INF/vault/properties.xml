@@ -3,7 +3,7 @@
 <properties>
 <entry key="group">io.sensible.studio</entry>
 <entry key="name">studio-workflow-content</entry>
-<entry key="version">0.1.5</entry>
+<entry key="version">0.1.6</entry>
 <entry key="description">Sensible Studio's workflow model step components (process, participant, dynamic participant, OR/AND split, goto) with their dialogs, and the default model Request for Review. Written for Sensible Studio; contains no Adobe content.</entry>
 <entry key="createdBy">Sensible Studio</entry>
 <entry key="packageType">application</entry>

@@ -26,6 +26,7 @@ import ViewCard from '@spectrum-icons/workflow/ViewCard';
 import ViewList from '@spectrum-icons/workflow/ViewList';
 import WorkflowIcon from '@spectrum-icons/workflow/Workflow';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useIsAdmin } from '../start/audience';
 import type { StudioClient } from '../editor/api/StudioClient';
 import { studioGraniteEnv } from '../editor/dialogs/graniteEnv';
 import { createDefaultRegistry, GraniteForm, useGraniteForm, type GraniteNode } from '../granite';
@@ -131,7 +132,9 @@ export function ModelsConsole({ client, studio, user }: Props) {
     load();
   };
 
-  const deletable = selection.length > 0 && selection.every((m) => m.type === 'custom');
+  // flow models are kept under /conf/global/settings/workflow, which only administrators may write
+  const admin = useIsAdmin();
+  const deletable = admin && selection.length > 0 && selection.every((m) => m.type === 'custom');
   const startable = (m: ModelSummary | null) => !!m && !!m.version;
 
   return (
@@ -179,7 +182,7 @@ export function ModelsConsole({ client, studio, user }: Props) {
               <Tooltip>{view === 'list' ? 'Card view' : 'List view'}</Tooltip>
             </TooltipTrigger>
           </>}
-          primary={<Button variant="accent" aria-label="Create" onPress={() => setCreating(true)}>Create flow model</Button>}
+          primary={admin ? <Button variant="accent" aria-label="Create" onPress={() => setCreating(true)}>Create flow model</Button> : undefined}
         />
       )}
 

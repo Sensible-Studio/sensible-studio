@@ -50,6 +50,8 @@ final class ModelStore {
     static final String GOTO_PROCESS = "com.adobe.granite.workflow.core.process.GotoProcess";
     static final String DIRTY = "studio:modified";
     static final String SYNCED = "studio:synced";
+    /** On a runtime model: the fingerprint of the design it was made from. */
+    static final String DESIGN = "studio:design";
 
     private static final Pattern NAME = Pattern.compile("[A-Za-z0-9_][A-Za-z0-9_.\\-]*");
 
@@ -400,6 +402,11 @@ final class ModelStore {
         }
         model.version = version;
         write(model, page.getPath());
+        Resource written = resolver.getResource(model.id);
+        ModifiableValueMap wv = written == null ? null : written.adaptTo(ModifiableValueMap.class);
+        if (wv != null) {
+            wv.put(DESIGN, fingerprint(content));
+        }
         ModifiableValueMap cv = page.getPath().startsWith(CUSTOM + "/") ? content.adaptTo(ModifiableValueMap.class) : null;
         if (cv != null) {
             cv.remove(DIRTY);
@@ -409,16 +416,63 @@ final class ModelStore {
         return model;
     }
 
-    /** Syncs the default models (shipped below {@code /libs}) that have no runtime model yet; returns how many. */
+    /**
+     * Syncs the default models (shipped below {@code /libs}) that have no runtime model yet, and those
+     * whose design is not the one their runtime model was made from: nobody can press Sync on a model
+     * that came with the product, so a model changed by an upgrade went on running as it was before
+     * (28.11.2026). Returns how many.
+     */
     int syncDefaults() throws PersistenceException {
         int n = 0;
         for (Map<String, Object> m : list()) {
-            if ("default".equals(m.get("type")) && m.get("version") == null && m.get("designPath") != null) {
+            if (!"default".equals(m.get("type")) || m.get("designPath") == null) {
+                continue;
+            }
+            boolean stale = m.get("version") == null;
+            if (!stale) {
+                Resource design = resolver.getResource(m.get("designPath") + "/jcr:content");
+                Resource runtime = resolver.getResource(String.valueOf(m.get("id")));
+                stale = design != null && runtime != null && !fingerprint(design).equals(runtime.getValueMap().get(DESIGN, ""));
+            }
+            if (stale) {
                 sync(String.valueOf(m.get("designPath")));
                 n++;
             }
         }
         return n;
+    }
+
+    /** What a design says, in one line: names, and every property that is not the repository's own. */
+    static String fingerprint(Resource design) {
+        StringBuilder sb = new StringBuilder();
+        dump(design, sb);
+        try {
+            byte[] d = java.security.MessageDigest.getInstance("SHA-256").digest(sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder();
+            for (int i = 0; i < 12; i++) {
+                hex.append(String.format("%02x", d[i]));
+            }
+            return hex.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            return Integer.toHexString(sb.toString().hashCode());
+        }
+    }
+
+    private static void dump(Resource r, StringBuilder sb) {
+        sb.append('{').append(r.getName());
+        for (Map.Entry<String, Object> e : new java.util.TreeMap<>(r.getValueMap()).entrySet()) {
+            String k = e.getKey();
+            if (k.startsWith("jcr:created") || k.startsWith("jcr:lastModified") || k.startsWith("cq:lastModified") || k.equals("jcr:uuid")
+                    || k.startsWith("studio:")) {
+                continue;
+            }
+            Object v = e.getValue();
+            sb.append('|').append(k).append('=').append(v instanceof Object[] ? java.util.Arrays.toString((Object[]) v) : String.valueOf(v));
+        }
+        for (Resource c : r.getChildren()) {
+            dump(c, sb);
+        }
+        sb.append('}');
     }
 
     /**

@@ -89,6 +89,10 @@ public class WorkflowServlet extends SlingAllMethodsServlet {
             send(response, HttpServletResponse.SC_FORBIDDEN, error(e.getMessage()));
         } catch (WorkflowException | PersistenceException | RepositoryException | RuntimeException e) {
             resolver.revert();
+            if (denied(e)) {
+                send(response, HttpServletResponse.SC_FORBIDDEN, error("You are not allowed to do that here"));
+                return;
+            }
             LOG.warn("Workflow op {} failed", op, e);
             send(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, error(e.getMessage()));
         }
@@ -97,6 +101,20 @@ public class WorkflowServlet extends SlingAllMethodsServlet {
     /** The reads over what is running: an author may not read {@code /var/workflow}, the engine may. */
     private static final java.util.Set<String> RUNNING = new java.util.HashSet<>(
             java.util.Arrays.asList("instances", "instance", "inbox", "maintenance"));
+
+    /** The writes that change what starts flows by itself, kept under {@code /conf/global/settings/workflow}. */
+    private static final java.util.Set<String> SETTINGS = new java.util.HashSet<>(java.util.Arrays.asList(
+            "saveLauncher", "enableLauncher", "deleteLauncher", "saveAutoAssign", "deleteAutoAssign"));
+
+    /** Whether the repository refused: a save that failed for want of rights is a refusal, not a fault. */
+    static boolean denied(Throwable e) {
+        for (Throwable t = e; t != null; t = t.getCause() == t ? null : t.getCause()) {
+            if (t instanceof javax.jcr.AccessDeniedException || t instanceof java.security.AccessControlException) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private Object read(String op, SlingHttpServletRequest r, ResourceResolver resolver) throws WorkflowException {
         if (RUNNING.contains(String.valueOf(op))) {
@@ -271,6 +289,14 @@ public class WorkflowServlet extends SlingAllMethodsServlet {
     private Object write(String op, SlingHttpServletRequest r, ResourceResolver resolver)
             throws PersistenceException, RepositoryException, WorkflowException {
         ModelStore models = new ModelStore(resolver);
+        if (SETTINGS.contains(String.valueOf(op))) {
+            // asked first: without the right, the checks below fail on what the user cannot read
+            // ("No runtime model… sync the model first") and say nothing of the real reason
+            javax.jcr.Session session = resolver.adaptTo(javax.jcr.Session.class);
+            if (session != null && !session.hasPermission("/conf/global/settings/workflow/x", javax.jcr.Session.ACTION_ADD_NODE)) {
+                throw new SecurityException("You are not allowed to do that here");
+            }
+        }
         switch (String.valueOf(op)) {
             case "createModel":
                 return models.create(r.getParameter("title"), r.getParameter("name"), r.getParameter("description"));

@@ -307,6 +307,8 @@ function CompleteDialog({ entry, onClose, onComplete }: { entry: InboxEntry; onC
   const [comment, setComment] = useState('');
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
+  // what the last person wrote when they passed the flow on: the reason this step is here
+  const said = [...(entry.workflow.history ?? [])].reverse().find((h) => h.id !== entry.id && !!h.comment?.trim()) ?? null;
   const submit = async () => {
     setBusy(true);
     setFailure(null);
@@ -322,9 +324,13 @@ function CompleteDialog({ entry, onClose, onComplete }: { entry: InboxEntry; onC
       <Heading>Complete step</Heading>
       <Divider />
       <Content>
-        <p className="studio-wf__runmodel">
-          {entry.title} <span className="studio-listview__muted">· {instanceTitle(entry.workflow)}</span>
-        </p>
+        <p className="studio-wf__runmodel">{entry.title}</p>
+        <p className="studio-listview__muted studio-wf__nextstep">Flow: {instanceTitle(entry.workflow)}</p>
+        {said && (
+          <p className="studio-wf__said">
+            <strong>{said.completedBy ?? 'Someone'}</strong> wrote at “{said.title}”: {said.comment}
+          </p>
+        )}
         {routes.length === 1 && (
           <p className="studio-listview__muted studio-wf__nextstep">
             Next step: <strong>{routes[0].name}</strong>

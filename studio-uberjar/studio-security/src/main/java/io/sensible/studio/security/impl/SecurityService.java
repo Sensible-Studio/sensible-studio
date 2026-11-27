@@ -528,6 +528,9 @@ final class SecurityService {
      * {@code everyone}.
      */
     Map<String, Object> effective(String principalName, String path) throws RepositoryException {
+        if (path == null || !path.startsWith("/")) {
+            throw new IllegalArgumentException("Say where: a path is needed");
+        }
         if (!session.nodeExists(path)) {
             throw new IllegalArgumentException(path + " does not exist");
         }

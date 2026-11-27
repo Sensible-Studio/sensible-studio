@@ -12,6 +12,8 @@ const ADMIN_ONLY: RegExp[] = [
   /^\/replication\.html/,
   /^\/system\/mail\.html/,
   /^\/security\//,
+  /^\/workflow\/launchers\.html/,
+  /^\/workflow\/autoassign\.html/,
   /^\/studio\/activity\.html/,
   /^\/studio\/health\.html/,
   /^\/mnt\/overlay\/granite\/async\/content\/asyncjobs\.html/,

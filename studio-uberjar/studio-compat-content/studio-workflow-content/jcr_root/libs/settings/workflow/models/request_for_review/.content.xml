@@ -4,7 +4,7 @@
     <jcr:content
         jcr:primaryType="nt:unstructured"
         jcr:title="Request for Review"
-        jcr:description="An administrator reviews the content and approves it or asks for changes; the decision is kept on the content as studioReviewStatus."
+        jcr:description="An administrator reviews the content and approves it or asks for changes; a request for changes comes back to whoever started the flow, as a step in their Inbox. The decision is kept on the content as studioReviewStatus."
         cq:template="/libs/cq/workflow/templates/model"
         sling:resourceType="cq/workflow/components/pages/model">
         <flow
@@ -56,6 +56,15 @@
                             PROCESS_ARGS="studioReviewStatus=changes-requested"
                             PROCESS_AUTO_ADVANCE="true"/>
                     </process>
+                    <dynamic_participant
+                        jcr:primaryType="nt:unstructured"
+                        jcr:title="Make the requested changes"
+                        jcr:description="The reviewer asked for changes (their comment is in the flow's history). Complete this when you have read it; start a new review when the content is ready."
+                        sling:resourceType="cq/workflow/components/model/dynamic_participant">
+                        <metaData
+                            jcr:primaryType="nt:unstructured"
+                            DYNAMIC_PARTICIPANT="io.sensible.studio.workflow.impl.BuiltInProcesses$Initiator"/>
+                    </dynamic_participant>
                 </_x0032_>
             </or>
         </flow>
