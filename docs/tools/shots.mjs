@@ -9,8 +9,9 @@
 //
 //   { goto: '/studio/start.html' }        open an address and wait until the screen is quiet
 //   { click: 'css selector' }             a real mouse click in the middle of the element
-//   { click: { text: 'Pages' } }          ... of the smallest visible element with exactly this text
-//   { rightClick: ... } { hover: ... } { dblClick: ... }      the same targets
+//   { click: { text: 'Pages' } }          ... of the smallest visible element with exactly this text (last: true takes
+//                                         the last one in the document instead, which is where menus are)
+//   { rightClick: ... } { hover: ... } { dblClick: ... }      the same targets ({ clickAt: [x, y] } for a point)
 //   { key: 'Alt+T' }                      a key with its modifiers (Alt, Ctrl, Meta, Shift)
 //   { type: 'some text' }                 text into the focused field
 //   { wait: 400 } { waitFor: 'selector' } { waitFor: { text: '...' } }
@@ -105,7 +106,7 @@ async function evaluate(expression) {
 }
 
 /** Waits until the page has stopped changing: no pending fetches we can see, and the same size of DOM twice. */
-async function quiet(limit = 15000) {
+async function quiet(limit = 8000) {
   const until = Date.now() + limit;
   let before = -1;
   let same = 0;
@@ -119,7 +120,7 @@ async function quiet(limit = 15000) {
     }
     same = now === before && now > 0 ? same + 1 : 0;
     before = now;
-    if (same >= 3) return;
+    if (same >= 2) return;
   }
 }
 
@@ -149,7 +150,7 @@ const FIND = `
       if (!hit || !visible(el)) continue;
       const r = el.getBoundingClientRect();
       const area = r.width * r.height;
-      if (area < best) { best = area; found = el; }
+      if (target.last) found = el; else if (area < best) { best = area; found = el; }
     }
     if (found && target.closest) found = found.closest(target.closest) || found;
   }
@@ -241,6 +242,12 @@ async function run(step) {
   } else if (step.click !== undefined) {
     await mouse(step.click);
     await quiet(step.settle ?? 4000);
+  } else if (step.clickAt !== undefined) {
+    const [x, y] = step.clickAt;
+    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+    await send('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: step.button || 'left', clickCount: 1 });
+    await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: step.button || 'left', clickCount: 1 });
+    await quiet(step.settle ?? 3000);
   } else if (step.dblClick !== undefined) {
     await mouse(step.dblClick, 'left', 2);
     await quiet(step.settle ?? 4000);
