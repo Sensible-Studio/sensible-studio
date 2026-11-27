@@ -59,7 +59,13 @@ final class SecurityService {
 
     /** Authorizables that must never be deleted or disabled from the consoles. */
     static final Set<String> PROTECTED = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            "admin", "anonymous", "everyone", "administrators")));
+            "admin", "anonymous", "everyone", "administrators", "studio-compat-groups-root")));
+
+    /**
+     * Made by the installation only so that the place where groups are kept exists; it is nobody's group, and it
+     * stood in Groups, and in every list of groups to choose from, as a bare id.
+     */
+    static final String PLUMBING = "studio-compat-groups-root";
 
     private final Session session;
     private final UserManager userManager;
@@ -88,6 +94,9 @@ final class SecurityService {
         while (it.hasNext()) {
             Authorizable a = it.next();
             if (!includeSystem && !a.isGroup() && ((User) a).isSystemUser()) {
+                continue;
+            }
+            if (PLUMBING.equals(a.getID())) {
                 continue;
             }
             Map<String, Object> s = summary(a);
