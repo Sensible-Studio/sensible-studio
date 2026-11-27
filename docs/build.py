@@ -112,7 +112,8 @@ class Studio:
 # /apps: the folders of docs/site/apps as they are; .node.json says what a folder is
 
 MIME = {".html": "text/html", ".css": "text/css", ".js": "application/javascript", ".txt": "text/plain", ".svg": "image/svg+xml",
-        ".png": "image/png", ".json": "application/json"}
+        ".png": "image/png", ".json": "application/json", ".webp": "image/webp", ".jpg": "image/jpeg", ".gif": "image/gif"}
+IMAGES = (".webp", ".png", ".jpg", ".gif", ".svg")
 
 
 def push_apps(studio):
@@ -237,7 +238,9 @@ class Markdown:
                 out.append("<code>%s</code>" % html.escape(piece[1:-1], quote=False))
                 continue
             piece = html.escape(piece, quote=False)
-            piece = re.sub(r"!\[([^\]]*)\]\(([^)\s]+)\)", lambda m: '<img alt="%s" src="%s">' % (m.group(1), self.link(m.group(2))), piece)
+            # a picture opens at its full size when clicked
+            piece = re.sub(r"!\[([^\]]*)\]\(([^)\s]+)\)", lambda m: '<a class="docs-figure" href="%s"><img alt="%s" src="%s" loading="lazy"></a>'
+                           % (self.link(m.group(2)), m.group(1), self.link(m.group(2))), piece)
             piece = re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", lambda m: '<a href="%s">%s</a>' % (self.link(m.group(2)), m.group(1)), piece)
             piece = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", piece)
             piece = re.sub(r"(?<![\w*])\*([^*\s][^*]*?)\*(?![\w*])", r"<em>\1</em>", piece)
@@ -370,6 +373,10 @@ def page_content(page, pages, lang_root):
             return target
         file, _, anchor = target.partition("#")
         resolved = os.path.normpath(os.path.join(os.path.dirname(page.relative), file)).replace(os.sep, "/")
+        if resolved.lower().endswith(IMAGES):
+            if not os.path.isfile(os.path.join(HERE, "content", lang_root.rsplit("/", 1)[1], resolved)):
+                sys.exit("%s: shows %s, which is not a file" % (page.relative, target))
+            return lang_root + "/" + resolved
         if resolved not in by_file:
             sys.exit("%s: links to %s, which is not a page" % (page.relative, target))
         return by_file[resolved].path(lang_root) + ".html" + ("#" + anchor if anchor else "")
@@ -489,6 +496,36 @@ def existing_pages(studio, path):
     return found
 
 
+def image_files(lang):
+    """The pictures of a language: the files of its images folder, as (name, path on disk)."""
+    folder = os.path.join(HERE, "content", lang, "images")
+    if not os.path.isdir(folder):
+        return []
+    return [(name, os.path.join(folder, name)) for name in sorted(os.listdir(folder)) if name.lower().endswith(IMAGES)]
+
+
+def push_images(studio, lang):
+    """The pictures, as files in <language>/images; one that did not change is left alone, one that is gone is removed."""
+    folder = SITE + "/" + lang + "/images"
+    files = image_files(lang)
+    if not files and not studio.exists(folder):
+        return 0
+    if not studio.exists(folder):
+        studio.post(folder, [("jcr:primaryType", "sling:Folder")])
+    there = studio.json(folder + ".2.json") or {}
+    for name, path in files:
+        with open(path, "rb") as handle:
+            data = handle.read()
+        known = there.get(name, {}).get("jcr:content", {}) if isinstance(there.get(name), dict) else {}
+        if known.get(":jcr:data") != len(data):
+            studio.upload(folder, name, data, MIME[os.path.splitext(name)[1].lower()])
+    names = set(name for name, _ in files)
+    for name, child in there.items():
+        if isinstance(child, dict) and child.get("jcr:primaryType") == "nt:file" and name not in names:
+            studio.delete(folder + "/" + name)
+    return len(files)
+
+
 def push_content(studio, lang):
     lang_root = SITE + "/" + lang
     pages = read_pages(lang)
@@ -512,11 +549,12 @@ def push_content(studio, lang):
     for page in pages:
         if page.segments:
             studio.post(page.path(lang_root), [(":order", "last")])
+    pictures = push_images(studio, lang)
     stale = [p for p in existing_pages(studio, lang_root) if p not in wanted]
     for path in sorted(stale, key=len):
         if not any(path.startswith(other + "/") for other in stale):
             studio.delete(path)
-    print("content  %s: %d pages%s" % (lang_root, len(pages), ", %d removed" % len(stale) if stale else ""))
+    print("content  %s: %d pages, %d pictures%s" % (lang_root, len(pages), pictures, ", %d removed" % len(stale) if stale else ""))
     return pages
 
 
@@ -526,9 +564,12 @@ def push_content(studio, lang):
 def publish(studio, lang):
     lang_root = SITE + "/" + lang
     paths = [SITE] + [p.path(lang_root) for p in read_pages(lang)]
+    pictures = image_files(lang)
+    if pictures:
+        paths += [lang_root + "/images"] + [lang_root + "/images/" + name for name, _ in pictures]
     for start in range(0, len(paths), 40):
         studio.post("/bin/studio/replication.json", [("op", "activate")] + [("path", p) for p in paths[start:start + 40]])
-    print("publish  %d pages handed to the Publishing agents" % len(paths))
+    print("publish  %d pages and pictures handed to the Publishing agents" % len(paths))
 
 
 def check(studio, lang):
@@ -546,7 +587,7 @@ def check(studio, lang):
             failed.append("%s: the title is not on the page" % path)
         if "studio-docs.site" not in text and "/etc.clientlibs/studio-docs" not in text:
             failed.append("%s: the theme is not included" % path)
-        for href in re.findall(r'href="([^"#]+)', text):
+        for href in re.findall(r'(?:href|src)="([^"#]+)', text):
             if href.startswith("/content/") or href.startswith("/etc.clientlibs/"):
                 links.setdefault(href, path)
     for href, source in sorted(links.items()):
