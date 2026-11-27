@@ -311,7 +311,8 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
     [template, part],
   );
   // MSM: the page as a live copy or blueprint (page menu), and its inherited page properties
-  const pageMsm = useMsmStatus(msm, pagePath);
+  // only content follows a source: a template's structure is not asked about (the answer would be a 404)
+  const pageMsm = useMsmStatus(msm, pagePath.startsWith('/content/') ? pagePath : null);
   const pageInheritance = usePageInheritance(msm, dialog?.variant === 'page' ? dialog.path : null);
   const frameMode = mode === 'preview' || mode === 'timewarp' ? 'disabled' : 'edit';
   const annotations = useMemo(() => collectAnnotations(content, contentRoot), [content, contentRoot]);
@@ -1643,11 +1644,20 @@ export function App({ client, initialPage, msm: msmClient, templates: templatesC
           {emulatorOpen && (
             <PresetRuler device={device} orientation={orientation} onDevice={setDevice} viewportWidth={viewportWidth} />
           )}
-          {loadError && (
-            <div className="studio-stage__error" role="alert">
-              <strong>Could not open {pagePath}</strong>
-              <span>{loadError}</span>
+          {loadError && /HTTP 404/.test(loadError) ? (
+            // a page that is gone (deleted, moved, a tab kept from before): said plainly, in place of the server's own error page
+            <div className="studio-stage__missing" role="alert">
+              <strong>This page is not there any more</strong>
+              <span>{pagePath}</span>
+              <span>It was deleted or moved. Close the tab, or find it again in Pages.</span>
             </div>
+          ) : (
+            loadError && (
+              <div className="studio-stage__error" role="alert">
+                <strong>Could not open {pagePath}</strong>
+                <span>{loadError}</span>
+              </div>
+            )
           )}
           <div
             className={`studio-stage__scaler${emulatedWidth ? ' is-emulated' : ''}`}

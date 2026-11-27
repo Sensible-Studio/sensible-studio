@@ -677,3 +677,33 @@
   .studio-topbar__title { max-width: 160px; }
   .studio-topbar { overflow-x: auto; scrollbar-width: none; }
 }
+
+// A page that is gone: the message takes the stage, the frame (which would show the server's own 404) does not.
+.studio-stage__missing {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px;
+  text-align: center;
+  color: var(--studio-text-muted);
+  background: var(--studio-surface, #fff);
+
+  strong {
+    font-size: 16px;
+    color: var(--studio-text-strong);
+  }
+
+  span:first-of-type {
+    font-family: var(--studio-font-mono, ui-monospace, monospace);
+    font-size: 12px;
+  }
+}
+
+.studio-stage__missing ~ .studio-stage__scaler {
+  visibility: hidden;
+}

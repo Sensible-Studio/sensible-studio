@@ -139,6 +139,7 @@ export function AuthorizableEditor({ kind, id, user }: Props) {
       if (!isUser) await security.setMembers(target, members.map((m) => m.id));
       if (isUser) await security.setImpersonators(target, impersonators);
       if (isNew) {
+        ToastQueue.positive(`${isUser ? 'User' : 'Group'} ${target} created`, { timeout: 3000 });
         go(isUser ? securityUrl.user(target) : securityUrl.group(target));
         return;
       }
@@ -152,6 +153,8 @@ export function AuthorizableEditor({ kind, id, user }: Props) {
       ToastQueue.positive(`${isUser ? 'User' : 'Group'} saved`, { timeout: 3000 });
     } catch (e) {
       ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 8000 });
+    } finally {
+      // also after a save that went well: it used to stay "Saving", and nothing could be saved a second time
       setSaving(false);
     }
   };

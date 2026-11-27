@@ -116,8 +116,8 @@ export function CreateTemplateWizard({ client, conf, go: goProp }: Props) {
         ) : (
           <div className="studio-wizard__form studio-tpl-wizard__form">
             <Form maxWidth="size-6000" aria-label={`${type?.title ?? 'Template'} in ${conf}`} onSubmit={(e) => (e.preventDefault(), void create())}>
-              <TextField label="Template Title" value={title} onChange={setTitle} isRequired autoFocus />
-              <TextArea label="Description" value={description} onChange={setDescription} />
+              <TextField label="Template Title" value={title} onChange={setTitle} isRequired autoFocus width="100%" />
+              <TextArea label="Description" value={description} onChange={setDescription} width="100%" />
             </Form>
           </div>
         )}

@@ -151,12 +151,11 @@ export function QueryEditor({ client, endpoint: wanted, query: wantedQuery }: { 
   const insert = (snippet: string) => {
     const t = editor.current;
     if (!t) return setText((v) => `${v}${snippet}`);
-    const { selectionStart: s, selectionEnd: end, value } = t;
-    const next = `${value.slice(0, s)}${snippet}${value.slice(end)}`;
+    const { text: next, caret } = insertField(t.value, t.selectionStart, t.selectionEnd, snippet);
     setText(next);
     requestAnimationFrame(() => {
       t.focus();
-      t.setSelectionRange(s + snippet.length, s + snippet.length);
+      t.setSelectionRange(caret, caret);
     });
   };
 
@@ -414,6 +413,61 @@ function SaveDialog({ conf, initial, existing, onCancel, onSave }: { conf: strin
       </div>
     </StudioDialog>
   );
+}
+
+/** How deep in braces a position is; comments (# to the end of the line) and strings do not count. */
+function depthAt(value: string, pos: number): number {
+  let depth = 0;
+  let inString = false;
+  for (let i = 0; i < pos && i < value.length; i++) {
+    const c = value[i];
+    if (inString) {
+      if (c === '\\') i++;
+      else if (c === '"') inString = false;
+    } else if (c === '"') inString = true;
+    else if (c === '#') {
+      const nl = value.indexOf('\n', i);
+      if (nl < 0 || nl >= pos) break;
+      i = nl;
+    } else if (c === '{') depth++;
+    else if (c === '}') depth = Math.max(0, depth - 1);
+  }
+  return depth;
+}
+
+/**
+ * A field from the Schema panel goes where it makes a query: at the caret when that is inside the braces of the query,
+ * otherwise inside the query's own braces (before the last one), or in braces of its own when there are none. Before,
+ * a click with the caret at the start put the field outside the query, which then did not parse.
+ */
+export function insertField(value: string, start: number, end: number, snippet: string): { text: string; caret: number } {
+  if (depthAt(value, start) > 0) {
+    return { text: `${value.slice(0, start)}${snippet}${value.slice(end)}`, caret: start + snippet.length };
+  }
+  // the last closing brace that is not in a comment
+  let close = -1;
+  for (let i = value.length - 1; i >= 0; i--) {
+    if (value[i] !== '}') continue;
+    const lineStart = value.lastIndexOf('\n', i) + 1;
+    if (!value.slice(lineStart, i).includes('#')) {
+      close = i;
+      break;
+    }
+  }
+  const lines = snippet
+    .replace(/\n+$/, '')
+    .split('\n')
+    .map((l) => (l ? `  ${l}` : l))
+    .join('\n');
+  if (close < 0) {
+    const sep = value.trim() ? `${value.replace(/\s+$/, '')}\n` : '';
+    const text = `${sep}{\n${lines}\n}\n`;
+    return { text, caret: text.length - 3 };
+  }
+  const before = value.slice(0, close).replace(/[ \t]+$/, '');
+  const head = before.endsWith('\n') || before === '' ? before : `${before}\n`;
+  const text = `${head}${lines}\n${value.slice(close)}`;
+  return { text, caret: head.length + lines.length };
 }
 
 /** The queries the schema offers; a type opens to its fields; a click adds the name at the caret. */

@@ -525,7 +525,12 @@ function TabStrip({ state, dispatch, newTab }: { state: ShellApi['state']; dispa
                 Close Split
               </button>
             ) : (
-              <button type="button" role="menuitem" onClick={() => act({ type: 'split', tab: menuTab.id })}>
+              <button type="button" role="menuitem" onClick={() => {
+                  // splitting a tab one is not looking at would show nothing: go to it
+                  dispatch({ type: 'activate', tab: menuTab.id });
+                  act({ type: 'split', tab: menuTab.id });
+                }}
+              >
                 Split View
               </button>
             )}

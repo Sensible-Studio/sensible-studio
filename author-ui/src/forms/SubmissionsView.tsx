@@ -106,17 +106,32 @@ export function SubmissionsView({ client, form }: Props) {
       return next;
     });
 
+  // the folders above the form by their titles, as the Forms console shows them (a name only until they are known)
+  const [titles, setTitles] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/bin/studio/sites.json?op=children&path=${encodeURIComponent(form)}`, { credentials: 'same-origin' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { trail?: Array<{ path: string; title: string }> } | null) => {
+        if (!cancelled && d?.trail) setTitles(Object.fromEntries(d.trail.map((t) => [t.path, t.title])));
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [form]);
+
   const crumbs = useMemo(() => {
     const rel = form.replace(/^\/content\/forms\/?/, '').split('/').filter(Boolean);
     const out: Array<{ path: string; title: string }> = [{ path: '/content/forms', title: VOCAB.forms }];
     let acc = '/content/forms';
     rel.forEach((seg, i) => {
       acc += `/${seg}`;
-      out.push({ path: acc, title: i === rel.length - 1 && data ? data.title : seg });
+      out.push({ path: acc, title: i === rel.length - 1 && data ? data.title : titles[acc] ?? seg });
     });
     out.push({ path: `${form}#submissions`, title: 'Submissions' });
     return out;
-  }, [form, data]);
+  }, [form, data, titles]);
 
   const fields = data?.fields ?? [];
   const allSelected = !!data && data.items.length > 0 && data.items.every((i) => selected.has(i.path));

@@ -279,7 +279,16 @@ function ReviewQueue({ client, workflow, onOpen }: { client: PageTranslationClie
               if (item.kind === 'content-fragment') go(editorUrl(item.path, item.kind));
               else onOpen(item.path);
             }}
-            renderEmptyState={() => <EmptyState title="Nothing here">Translations made in Pages (language versions) or the Content Fragments console show up here.</EmptyState>}
+            renderEmptyState={() =>
+              // nothing under this choice is not nothing at all: say where the rest is
+              (items?.length ?? 0) > 0 ? (
+                <EmptyState title="Nothing under this choice">
+                  {items!.length} translation{items!.length === 1 ? '' : 's'} in other states or languages: choose All to see {items!.length === 1 ? 'it' : 'them'}.
+                </EmptyState>
+              ) : (
+                <EmptyState title="Nothing here">Translations made in Pages (language versions) or the Content Fragments console show up here.</EmptyState>
+              )
+            }
           >
             <TableHeader>
               <Column key="title" isRowHeader width="3fr">
