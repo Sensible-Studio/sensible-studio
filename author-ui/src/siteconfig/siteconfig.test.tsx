@@ -89,4 +89,32 @@ describe('site configurations', () => {
     fireEvent.change(field, { target: { value: 'x' } });
     expect((screen.getByRole('button', { name: 'Save' }) as HTMLButtonElement).disabled).toBe(true);
   });
+  it('says whether a configuration is on the live site and publishes it', async () => {
+    const off = { path: DETAIL.resourcePath!, published: false, pending: false };
+    const on = { ...off, published: true, activated: true };
+    const replication = { status: vi.fn(() => Promise.resolve([off])), activate: vi.fn(() => Promise.resolve([on])), deactivate: vi.fn(() => Promise.resolve([off])) };
+    render(
+      <Provider theme={defaultTheme}>
+        <SiteConfigConsole client={client()} path="/content/wknd/en" onPath={() => undefined} replication={replication} />
+      </Provider>,
+    );
+    expect(await screen.findByText(/Not published from this author/)).toBeTruthy();
+    expect((screen.getByRole('button', { name: 'Unpublish' }) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Publish' }));
+    await waitFor(() => expect(replication.activate).toHaveBeenCalledWith(['/conf/wknd/sling:configs/com.acme.Seo']));
+    expect(await screen.findByText(/On the live site as it is here/)).toBeTruthy();
+    expect((screen.getByRole('button', { name: 'Publish' }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('offers no publishing for what is inherited', async () => {
+    const replication = { status: vi.fn(() => Promise.resolve([])), activate: vi.fn(), deactivate: vi.fn() };
+    render(
+      <Provider theme={defaultTheme}>
+        <SiteConfigConsole client={client({ get: vi.fn(() => Promise.resolve({ ...DETAIL, inherited: true })) })} path="/content/wknd/en" onPath={() => undefined} replication={replication} />
+      </Provider>,
+    );
+    await screen.findByLabelText('Site name');
+    expect(screen.queryByRole('button', { name: 'Publish' })).toBeNull();
+    expect(replication.status).not.toHaveBeenCalled();
+  });
 });

@@ -155,7 +155,7 @@ export function View({ place, client }: { place: Place; client: StudioClient }) 
     case 'projects':
       return <ProjectsConsole client={projectsClient} name={place.name} />;
     case 'siteconfig':
-      return <SiteConfigConsole client={new HttpSiteConfigClient()} path={place.path} />;
+      return <SiteConfigConsole client={new HttpSiteConfigClient()} path={place.path} replication={graphqlReplication} />;
     case 'health':
       return <HealthConsole client={new HttpHealthClient()} currentUser={() => client.currentUser()} />;
     case 'jobs':

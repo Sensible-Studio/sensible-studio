@@ -151,6 +151,7 @@
                     <bnd><![CDATA[
 Bundle-SymbolicName: io.sensible.studio.cq.impl
 -privatepackage: io.sensible.studio.wcm.impl.*
+Sling-ContextAware-Configuration-Classes: io.sensible.studio.wcm.impl.AnalyticsConfig
 Import-Package: org.apache.jackrabbit.api.*;version="[2.4,3)", *
                     ]]></bnd>
                 </configuration>

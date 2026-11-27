@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useScreenTitle, useTab } from '../shell/ShellContext';
 import { ToolBar } from '../shell/ToolCrumbs';
 import '../sites/sites.scss';
+import type { ReplicationClient } from '../replication/api';
 import type { ConfigDetail, ConfigList, ConfigProperty, Scalar, SiteConfigClient, Value, Values } from './api';
 import './siteconfig.scss';
 import { StudioConfirmDialog } from '../shell/StudioDialog';
@@ -16,7 +17,8 @@ import { StudioConfirmDialog } from '../shell/StudioDialog';
  * per site, inherited from the sites above and from the global configuration, with the developers'
  * defaults. Left: where (a content path; the site it belongs to is named) and the configurations the
  * instance's bundles define; right: the form of one — a field left empty is not set here and shows what
- * applies instead (inherited or the default).
+ * applies instead (inherited or the default). What a site sets is content under /conf: the live site reads its
+ * own copy, so a configuration is published (and unpublished) from here.
  */
 export const SITECONFIG_URL = '/studio/siteconfig.html';
 
@@ -26,7 +28,11 @@ interface Props {
   path: string;
   /** going to another path; by default a move in the shell */
   onPath?(path: string): void;
+  /** publishing what a site sets; without it the console only saves */
+  replication?: Publishing;
 }
+
+export type Publishing = Pick<ReplicationClient, 'status' | 'activate' | 'deactivate'>;
 
 const show = (v: Value): string => (v === null || v === undefined ? '' : Array.isArray(v) ? v.join(', ') : String(v));
 
@@ -41,7 +47,7 @@ export function valuesOf(properties: ConfigProperty[]): Values {
   return out;
 }
 
-export function SiteConfigConsole({ client, path, onPath: go }: Props) {
+export function SiteConfigConsole({ client, path, onPath: go, replication }: Props) {
   const navigate = useNavigate();
   const tab = useTab();
   const onPath = go ?? ((p: string) => navigate({ kind: 'siteconfig', path: p }));
@@ -142,8 +148,8 @@ export function SiteConfigConsole({ client, path, onPath: go }: Props) {
         </aside>
         <section className="studio-siteconfig__form" aria-label="Configuration">
           {!detail && selected && !error && <ProgressCircle size="S" isIndeterminate aria-label="Loading" />}
-          {detail && !detail.collection && <Singleton key={`${path}|${detail.name}`} client={client} detail={detail} canSave={!!list?.contextPath} onSaved={saved} />}
-          {detail && detail.collection && <Collection key={`${path}|${detail.name}`} client={client} detail={detail} canSave={!!list?.contextPath} onSaved={saved} />}
+          {detail && !detail.collection && <Singleton key={`${path}|${detail.name}`} client={client} detail={detail} canSave={!!list?.contextPath} onSaved={saved} replication={replication} />}
+          {detail && detail.collection && <Collection key={`${path}|${detail.name}`} client={client} detail={detail} canSave={!!list?.contextPath} onSaved={saved} replication={replication} />}
         </section>
       </main>
     </div>
@@ -170,7 +176,64 @@ function Head({ detail }: { detail: ConfigDetail }) {
   );
 }
 
-function Singleton({ client, detail, canSave, onSaved }: { client: SiteConfigClient; detail: ConfigDetail; canSave: boolean; onSaved(d: ConfigDetail, what: string): void }) {
+/**
+ * Whether what this site sets is on the live site, with Publish and Unpublish. The live site reads its own
+ * copy of /conf: a configuration saved here changes nothing there until it is published.
+ */
+function Live({ replication, detail, dirty }: { replication?: Publishing; detail: ConfigDetail; dirty?: boolean }) {
+  const own = detail.resourcePath && !detail.inherited ? detail.resourcePath : null;
+  const [state, setState] = useState<{ published: boolean; activated: boolean; pending: boolean } | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    setState(null);
+    if (!replication || !own) return;
+    let live = true;
+    replication.status([own]).then(
+      (s) => live && setState({ published: !!s[0]?.published, activated: !!s[0]?.activated, pending: !!s[0]?.pending }),
+      () => live && setState(null),
+    );
+    return () => {
+      live = false;
+    };
+  }, [replication, own, detail]);
+  if (!replication || !own) return null;
+  const run = (work: Promise<Array<{ published: boolean; activated?: boolean; pending: boolean }>>, what: string) => {
+    setBusy(true);
+    work.then(
+      (s) => {
+        setBusy(false);
+        setState({ published: !!s[0]?.published, activated: !!s[0]?.activated, pending: !!s[0]?.pending });
+        ToastQueue.positive(what, { timeout: 3000 });
+      },
+      (e: unknown) => {
+        setBusy(false);
+        ToastQueue.negative(e instanceof Error ? e.message : String(e), { timeout: 6000 });
+      },
+    );
+  };
+  const words = !state
+    ? 'Checking the live site…'
+    : state.pending
+      ? 'On its way to the live site.'
+      : state.published
+        ? 'On the live site as it is here.'
+        : state.activated
+          ? 'Changed since it was published: the live site still has the earlier values.'
+          : 'Not published from this author. Publish for the live site to read these values.';
+  return (
+    <div className="studio-siteconfig__live" role="group" aria-label="Live site">
+      <span className={`studio-siteconfig__livestate${state?.published ? ' is-live' : ''}`}>{words}</span>
+      <Button variant="secondary" isDisabled={busy || !!dirty || !state || (state.published && !state.pending)} onPress={() => run(replication.activate([own]), `${detail.label} published`)}>
+        Publish
+      </Button>
+      <Button variant="secondary" isDisabled={busy || !state || !state.activated} onPress={() => run(replication.deactivate([own]), `${detail.label} unpublished`)}>
+        Unpublish
+      </Button>
+    </div>
+  );
+}
+
+function Singleton({ client, detail, canSave, onSaved, replication }: { client: SiteConfigClient; detail: ConfigDetail; canSave: boolean; onSaved(d: ConfigDetail, what: string): void; replication?: Publishing }) {
   const [values, setValues] = useState<Values>(() => valuesOf(detail.properties));
   const [busy, setBusy] = useState(false);
   const dirty = useMemo(() => JSON.stringify(values) !== JSON.stringify(valuesOf(detail.properties)), [values, detail]);
@@ -200,16 +263,24 @@ function Singleton({ client, detail, canSave, onSaved }: { client: SiteConfigCli
           <Button variant="secondary" isDisabled={!canSave || busy || !detail.resourcePath || !!detail.inherited}>
             Remove what this site sets
           </Button>
-          <StudioConfirmDialog title={`Remove ${detail.label} from this site?`} variant="destructive" primaryActionLabel="Remove" cancelLabel="Cancel" onPrimaryAction={() => run(client.remove(detail.path, detail.name), `${detail.label}: this site's values removed`)}>
-            The values set for {detail.contextPath} are removed; what the sites above set, or the defaults, apply again.
+          <StudioConfirmDialog title={`Remove ${detail.label} from this site?`} variant="destructive" primaryActionLabel="Remove" cancelLabel="Cancel" onPrimaryAction={() => run(unpublished(replication, detail.resourcePath).then(() => client.remove(detail.path, detail.name)), `${detail.label}: this site's values removed`)}>
+            The values set for {detail.contextPath} are removed, on the live site too if they were published; what the sites above set, or the defaults, apply again.
           </StudioConfirmDialog>
         </DialogTrigger>
       </div>
+      <Live replication={replication} detail={detail} dirty={dirty} />
     </>
   );
 }
 
-function Collection({ client, detail, canSave, onSaved }: { client: SiteConfigClient; detail: ConfigDetail; canSave: boolean; onSaved(d: ConfigDetail, what: string): void }) {
+/** Takes a published configuration off the live site before it is removed here; nothing to do when it was never published. */
+async function unpublished(replication: Publishing | undefined, resourcePath: string | null | undefined): Promise<void> {
+  if (!replication || !resourcePath) return;
+  const s = await replication.status([resourcePath]);
+  if (s[0]?.activated) await replication.deactivate([resourcePath]);
+}
+
+function Collection({ client, detail, canSave, onSaved, replication }: { client: SiteConfigClient; detail: ConfigDetail; canSave: boolean; onSaved(d: ConfigDetail, what: string): void; replication?: Publishing }) {
   const initial = () => (detail.items ?? []).map((i) => ({ name: i.name, values: valuesOf(i.properties), properties: i.properties }));
   const [items, setItems] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -254,6 +325,7 @@ function Collection({ client, detail, canSave, onSaved }: { client: SiteConfigCl
           Save
         </Button>
       </div>
+      <Live replication={replication} detail={detail} />
     </>
   );
 }

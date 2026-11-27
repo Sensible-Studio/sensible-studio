@@ -149,6 +149,27 @@
     margin-top: 20px;
   }
 
+  // whether what the site sets is on the live site, with Publish / Unpublish
+  &__live {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--studio-neutral-200);
+  }
+
+  &__livestate {
+    flex: 1 1 16rem;
+    color: var(--studio-neutral-700);
+    font-size: 13px;
+
+    &.is-live {
+      color: var(--studio-neutral-900);
+    }
+  }
+
   &__item {
     margin: 0 0 12px;
     padding: 12px;
