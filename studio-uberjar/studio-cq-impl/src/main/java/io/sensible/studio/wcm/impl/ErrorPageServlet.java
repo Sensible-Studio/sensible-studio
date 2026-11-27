@@ -39,7 +39,10 @@ import com.day.cq.wcm.api.WCMMode;
         service = Servlet.class,
         property = {
                 "sling.servlet.paths=/libs/sling/servlet/errorhandler/404",
-                "sling.servlet.paths=/libs/sling/servlet/errorhandler/default"
+                "sling.servlet.paths=/libs/sling/servlet/errorhandler/default",
+                // Sling's own handler sits at the same "default" address: without a ranking above it, ours answered
+                // 404 only and every other failure still showed the request progress
+                "service.ranking:Integer=1000"
         })
 public class ErrorPageServlet extends GenericServlet {
 
@@ -67,7 +70,7 @@ public class ErrorPageServlet extends GenericServlet {
         }
         SlingHttpServletRequest request = req instanceof SlingHttpServletRequest ? (SlingHttpServletRequest) req : null;
         String extension = request == null ? null : request.getRequestPathInfo().getExtension();
-        String path = request == null ? "" : request.getResource().getPath();
+        String path = request == null || request.getResource().getPath() == null ? "" : request.getResource().getPath();
 
         response.reset();
         response.setStatus(status);

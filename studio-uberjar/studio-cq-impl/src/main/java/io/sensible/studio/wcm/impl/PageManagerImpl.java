@@ -53,6 +53,11 @@ final class PageManagerImpl implements PageManager {
 
     @Override
     public Page getContainingPage(Resource resource) {
+        // a request for "/" by someone who may not read it arrives as a resource without a path: asking it for its
+        // parent throws (the author answered 500 to every visit of its root without a session, sign-out included)
+        if (resource == null || resource.getPath() == null) {
+            return null;
+        }
         for (Resource r = resource; r != null; r = r.getParent()) {
             if (Pages.isPage(r)) {
                 return new PageImpl(r, this);
