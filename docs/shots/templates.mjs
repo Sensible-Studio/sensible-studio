@@ -37,4 +37,20 @@ export default [
     { click: label('Page menu') }, { wait: 500 }, { shot: 'templates-page-menu', keepPointer: true }, { key: 'Escape' },
     { click: label('Content Tree') }, { wait: 900 }, { shot: 'templates-layers' },
   ] },
+  { name: 'create-details', steps: [
+    { goto: TPL }, { wait: 2500 }, { click: { text: 'Create template', closest: 'button' } }, { wait: 1800 },
+    { click: { text: 'Weekender Site Empty Page' } }, { wait: 500 }, button('Next'), { wait: 1500 }, { shot: 'templates-create-details' },
+  ] },
+  { name: 'layout', steps: [
+    ...editor, { click: label('Select another mode') }, { wait: 500 }, { click: { text: 'Layout', last: true } }, { wait: 2500 }, { shot: 'templates-layout' },
+  ] },
+  { name: 'component-configuration', steps: [
+    ...editor, { click: label('Configuration of Title in this container') }, { wait: 2000 }, { shot: 'templates-component-configuration' },
+  ] },
+  { name: 'initial-properties', steps: [
+    ...editor, { click: label('Page menu') }, { wait: 500 }, { click: { text: 'Initial Page Properties', last: true } }, { wait: 2200 }, { shot: 'templates-initial-properties' },
+  ] },
+  { name: 'page-configuration', steps: [
+    ...editor, { click: label('Page menu') }, { wait: 500 }, { click: { text: 'Page Configuration', last: true } }, { wait: 2200 }, { shot: 'templates-page-configuration' },
+  ] },
 ];

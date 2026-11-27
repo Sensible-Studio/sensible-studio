@@ -1,4 +1,4 @@
-import { ActionButton, ProgressCircle, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ActionButton, Button, ProgressCircle, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import Add from '@spectrum-icons/workflow/Add';
 import Duplicate from '@spectrum-icons/workflow/Duplicate';
 import { useEffect, useMemo, useState } from 'react';
@@ -12,6 +12,7 @@ import {
   type GraniteRegistry,
   type PostEntry,
 } from '../../granite';
+import { ScreenFrame } from '../../shell/ScreenFrame';
 import type { StudioClient } from '../api/StudioClient';
 import type { PolicyInfo, PolicyTarget, TemplateClient } from './api';
 
@@ -139,19 +140,30 @@ export function PolicyDialog({ client, templates, target, registry, env: hostEnv
 
   return (
     <div className="studio-policy" role="dialog" aria-modal="true" aria-labelledby="studio-policy-title">
-      <header className="studio-policy__header">
-        <h2 id="studio-policy-title" className="studio-policy__title">
-          {target.title}
-        </h2>
-        <div className="studio-policy__actions">
-          <button type="button" className="studio-pp-like-btn studio-pp-like-btn--secondary" onClick={onClose} disabled={saving}>
-            Cancel
-          </button>
-          <button type="button" className="studio-pp-like-btn studio-pp-like-btn--primary" onClick={() => void save()} disabled={saving || !info || !selection}>
-            {saving ? 'Saving…' : 'Done'}
-          </button>
-        </div>
-      </header>
+      {/* the frame every form of Studio has: what it is, Cancel, the primary action, Close */}
+      <ScreenFrame
+        identity={
+          <div className="studio-form-page__identity">
+            <span>Configuration</span>
+            <h1 id="studio-policy-title">{target.title}</h1>
+          </div>
+        }
+        actions={
+          <>
+            {saving && <ProgressCircle size="S" isIndeterminate aria-label="Saving" />}
+            <Button variant="secondary" style="outline" onPress={onClose} isDisabled={saving}>
+              Cancel
+            </Button>
+          </>
+        }
+        primary={
+          <Button variant="accent" onPress={() => void save()} isDisabled={saving || !info || !selection}>
+            Done
+          </Button>
+        }
+        onClose={onClose}
+        closeLabel="Close configuration"
+      />
       {failure && (
         <div className="studio-policy__failure" role="alert">
           {failure}

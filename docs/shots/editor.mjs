@@ -46,4 +46,16 @@ export default [
   mode('personalize', 'Personalize'),
   { name: 'preview', steps: [...open, { click: { text: 'Preview', closest: 'button' } }, { wait: 1800 }, { shot: 'editor-preview' },
     { click: { text: 'Visitor', closest: 'button' } }, { wait: 1200 }, { shot: 'editor-visitor' }] },
+  // --- what a few components add ---
+  { name: 'styles', steps: [
+    ...open, { click: label('Content Tree') }, { wait: 900 }, { click: { text: 'Title: By Jacob Wester' } }, { wait: 1200 },
+    { click: label('Styles') }, { wait: 900 }, { shot: 'editor-styles', keepPointer: true },
+  ] },
+  { name: 'image-editor', steps: [...open, { clickAt: IMAGE }, { wait: 900 }, { click: label('Edit') }, { wait: 2500 }, { shot: 'editor-image-editor' }] },
+  { name: 'layout-selected', steps: [
+    ...open, { click: label('Select another mode') }, { wait: 400 }, { click: { text: 'Layout', last: true } }, { wait: 1800 },
+    { click: label('Content Tree') }, { wait: 900 }, { click: { text: 'Title: By Jacob Wester' } }, { wait: 1200 },
+    { shot: 'editor-layout', keepPointer: true },
+  ] },
+  { name: 'publish', steps: [...open, { click: { text: 'Publish', closest: 'button' } }, { wait: 1800 }, { shot: 'editor-publish' }] },
 ];

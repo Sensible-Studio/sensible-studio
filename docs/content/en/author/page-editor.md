@@ -80,6 +80,12 @@ Move the pointer over the page: the component under it is outlined, and its name
 
 Double-click a component to edit it in place. If it cannot be edited in place, its dialog opens.
 
+### Styles
+
+![The styles of a Title](../images/editor-styles.webp)
+
+**Styles** opens the looks the template allows for this component, in the groups its configuration defines. Click one to switch it on, click it again to switch it off; one of each group can be on. The `×` closes the list. A component without styles has no such button.
+
 ### Edit in place
 
 ![A title being edited in place](../images/editor-inline.webp)
@@ -88,7 +94,19 @@ A title becomes a field you type in, with two buttons below it: the cross discar
 
 A text shows a small toolbar with the formats the site allows: bold, italic, lists, links, paragraph styles. Click the tick in that toolbar, or simply click somewhere else on the page, to save.
 
-Editing an image in place opens the image tools: **Crop**, freely or to one of the aspect ratios the site offers; **Rotate**; **Flip**; and the image map, where you draw rectangles, circles or polygons and give each a link. The original file is never changed: the crop is applied when the image is served.
+Editing an image in place opens the image tools:
+
+![The image tools](../images/editor-image-editor.webp)
+
+| Tool | What it does |
+|---|---|
+| **Crop** | Draws the frame of what is kept; drag its corners. Sites can offer fixed aspect ratios. The numbers below the picture are the frame's position and size |
+| **Remove crop** | Shows the whole picture again |
+| **Rotate** | Turns the picture a quarter |
+| **Rectangle**, **Circle**, **Polygon** | Draw an area of an image map on the picture and give it a link: a visitor who clicks there follows it |
+| **Undo** | Takes back the last step |
+
+**Done** saves, **Cancel** discards. The original file is never changed: the crop is applied when the image is served.
 
 ### The dialog
 
@@ -155,7 +173,7 @@ The arrow beside **Edit** changes what the editor is for.
 
 ![Layout mode](../images/editor-layout.webp)
 
-In **Layout** mode a selected component shows handles at its sides. Drag them to make it narrower or wider, or to push it to the right; it snaps to the columns of the grid. The toolbar adds **Float to new line**, **Hide component**, **Show hidden components** and **Revert breakpoint layout**.
+In **Layout** mode the toolbar of a selected component holds only what concerns its place. A component that sits in a container with a grid shows handles at its sides: drag them to make it narrower or wider, or to push it to the right; it snaps to the columns of the grid. The toolbar adds **Float to new line**, **Hide component**, **Show hidden components** and **Revert breakpoint layout**.
 
 A layout belongs to one screen size. Choose a width in the viewport ruler first: what you then change applies to that size only.
 
@@ -209,7 +227,7 @@ The simulator lets you look at the page as a particular visitor. Personalized co
 |---|---|
 | **Open Properties** | The [page properties](page-properties.md) |
 | **Lock Page**, **Unlock Page** | Keeps the page to yourself while you work |
-| **Publish Page** | Publishes now or at a time you choose. The line below says when it was last published |
+| **Publish Page** | Opens the Publish dialog, below. The line under the entry says when the page was last published |
 | **Unpublish Page** | Takes it off the live site |
 | **Edit Template** | Opens the page's template in the template editor |
 | **View as Published** | The page without the editor |
@@ -218,6 +236,20 @@ The simulator lets you look at the page as a particular visitor. Personalized co
 | **Create Release** | Adds the page to a [release](releases.md) |
 | **Source: Sync changes and Linked copies** | On a page that others follow: sends its changes to them, and lists them. A linked copy has **Linked copy Status** and **Synchronize Page** instead. See [Several sites](sync.md) |
 | **Show in Pages** | Opens the Pages console at this page |
+
+## Publish
+
+![Publish Page](../images/editor-publish.webp)
+
+**Publish** in the bar, and **Publish Page** in the page menu, open the same dialog.
+
+| Part | What it does |
+|---|---|
+| **What the page uses** | The template, the files, the experience and content fragments the page uses that are not on the live site yet, each with its kind and path. They are ticked: published with the page. Untick one, and the page shows a gap there on the live site |
+| **Also the pages below it** | Publishes the whole section |
+| **Now**, **Later** | At once, or at a date and time you set |
+
+See [Publishing](publishing.md).
 
 ## Annotations
 

@@ -57,6 +57,9 @@ Tick a template to see it at the right: its preview, title, name, template type,
 1. In the Templates console, go into the configuration and click **Create template**.
 2. **Pick a Template Type.** A template type is a starting point provided by the site's developers: an empty page, a page that starts with the site's header and footer, an experience fragment.
 3. **Template Details.** Give the template a title and a description, then create it.
+
+![Step 2: the title and description](../images/templates-create-details.webp)
+
 4. Open it to edit its structure.
 5. When it is ready, **Enable** it. Only enabled templates are offered when someone creates a page.
 6. **Publish** it. A page on the live site needs its template there too; publishing a template publishes the component configurations it uses with it.
@@ -84,8 +87,8 @@ Tick a template to see it at the right: its preview, title, name, template type,
 
 | Item | What it does |
 |---|---|
-| **Initial Page Properties** | The properties new pages start with |
-| **Page Configuration** | The site's CSS and JavaScript (client libraries) and the options of the page itself |
+| **Initial Page Properties** | The properties new pages start with. The form is the one of [page properties](page-properties.md) |
+| **Page Configuration** | The site's CSS and JavaScript (client libraries) and the options of the page itself, as a configuration form like the one of a container |
 | **Enable Template**, **Disable Template** | The same as in the console |
 | **Reload Page** | Loads the template again |
 
@@ -111,6 +114,10 @@ A container that authors may fill shows **Allowed Components**: the components t
 | **Layout** | Switches to Layout mode for this component |
 
 The wrench on a chip opens the configuration of *that* component in this container: the heading sizes a Title may use, the formats a Text offers, its styles.
+
+![The configuration of the Title component](../images/templates-component-configuration.webp)
+
+For a Title that is which heading sizes authors may choose (**H1** to **H6**), the size a new title starts with, whether its link is switched off, and on the second tab its **Styles**.
 
 > **Note:** A change to the structure shows on existing pages at once, on the author instance. It shows on the live site when you publish the template.
 
@@ -153,6 +160,20 @@ A component's configuration can define **Styles**: named looks, such as "Dark" o
 In **Initial Content** mode you edit a page as it will be when it is new: the fixed parts are there, and in the unlocked containers you add the components a new page should start with, ready to be filled in. The picture shows an article that starts with a title, a byline, a content fragment and the sharing buttons.
 
 Initial content is copied into each new page once; changing it later does not change existing pages.
+
+![Initial Page Properties](../images/templates-initial-properties.webp)
+
+**Page › Initial Page Properties** does the same for the properties: what you fill in here is what a new page starts with.
+
+### Layout
+
+![Layout mode of the template editor](../images/templates-layout.webp)
+
+**Layout** mode sets how wide the parts of the structure are and where they sit, for each screen size of the viewport ruler. Pages take this layout until someone changes it on the page.
+
+### Page Configuration
+
+![Page Configuration](../images/templates-page-configuration.webp)
 
 ## Which templates are offered where
 
