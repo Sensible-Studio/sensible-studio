@@ -277,6 +277,10 @@ public class ContentFragmentServlet extends SlingAllMethodsServlet {
             send(response, 400, error(e.getMessage()));
         } catch (PersistenceException e) {
             request.getResourceResolver().revert();
+            if (denied(e) || String.valueOf(e.getMessage()).startsWith("Unable to create node")) {
+                send(response, 403, error("You are not allowed to do that here"));
+                return;
+            }
             send(response, 500, error("Could not save: " + e.getMessage()));
         } catch (UnsupportedOperationException e) {
             send(response, 501, error(e.getMessage()));
@@ -351,5 +355,15 @@ public class ContentFragmentServlet extends SlingAllMethodsServlet {
     private static List<Object> objects(Map<String, Object> m, String key) {
         Object v = m.get(key);
         return v instanceof Collection ? new ArrayList<>((Collection<?>) v) : null;
+    }
+    /** The repository refused for lack of rights (also when wrapped): a 403 with words, not a 500 with Oak's. */
+    static boolean denied(Throwable e) {
+        for (Throwable t = e; t != null && t != t.getCause(); t = t.getCause()) {
+            String m = String.valueOf(t.getMessage());
+            if (t instanceof javax.jcr.AccessDeniedException || m.contains("OakAccess0000") || m.startsWith("Access denied")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

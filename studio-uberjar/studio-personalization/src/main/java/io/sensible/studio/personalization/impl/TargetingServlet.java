@@ -256,6 +256,10 @@ public class TargetingServlet extends SlingAllMethodsServlet {
             error(response, 400, e.getMessage());
         } catch (RepositoryException | RuntimeException e) {
             refresh(session);
+            if (denied(e)) {
+                error(response, 403, "You are not allowed to do that here");
+                return;
+            }
             LOG.warn("targeting {} failed", op, e);
             error(response, 500, e.getMessage());
         }
@@ -354,5 +358,15 @@ public class TargetingServlet extends SlingAllMethodsServlet {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("error", message == null ? "failed" : message);
         write(response, status == 0 ? HttpServletResponse.SC_INTERNAL_SERVER_ERROR : status, m);
+    }
+    /** The repository refused for lack of rights (also when wrapped): a 403 with words, not a 500 with Oak's. */
+    static boolean denied(Throwable e) {
+        for (Throwable t = e; t != null && t != t.getCause(); t = t.getCause()) {
+            String m = String.valueOf(t.getMessage());
+            if (t instanceof javax.jcr.AccessDeniedException || m.contains("OakAccess0000") || m.startsWith("Access denied")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

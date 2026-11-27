@@ -137,6 +137,10 @@ public class SiteRailServlet extends SlingAllMethodsServlet {
             send(response, 403, error(e.getMessage()));
         } catch (WCMException | PersistenceException | RepositoryException | RuntimeException e) {
             revert(r, service);
+            if (denied(e)) {
+                send(response, 403, error("You are not allowed to do that here"));
+                return;
+            }
             LOG.warn("Site rail op {} failed", op, e);
             send(response, 500, error(e.getMessage()));
         }
@@ -372,5 +376,15 @@ public class SiteRailServlet extends SlingAllMethodsServlet {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Cache-Control", "no-store");
         response.getWriter().write(Json.write(body));
+    }
+    /** The repository refused for lack of rights (also when wrapped): a 403 with words, not a 500 with Oak's. */
+    static boolean denied(Throwable e) {
+        for (Throwable t = e; t != null && t != t.getCause(); t = t.getCause()) {
+            String m = String.valueOf(t.getMessage());
+            if (t instanceof javax.jcr.AccessDeniedException || m.contains("OakAccess0000") || m.startsWith("Access denied")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
