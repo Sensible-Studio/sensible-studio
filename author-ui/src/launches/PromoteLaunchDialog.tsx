@@ -56,32 +56,32 @@ export function PromoteLaunchDialog({ client, launch, page, onDone }: Props) {
       <Heading>Go live: {launch.title}</Heading>
       <Divider />
       <Content>
-        <Text>Promotion copies the launch's pages over their source pages (each source keeps a version from before).</Text>
+        <Text>Going live copies the release's pages over their source pages (each source keeps a version from before).</Text>
         {page && (
           <RadioGroup label="Go live" value={scope} onChange={(v) => setScope(v as typeof scope)} marginTop="size-150" isDisabled={busy}>
             <Radio value="all">The whole release</Radio>
             <Radio value="page">This page only</Radio>
-            <Radio value="pageAndSubpages">This page and its subpages</Radio>
+            <Radio value="pageAndSubpages">This page and the pages below it</Radio>
           </RadioGroup>
         )}
         <Checkbox isSelected={modifiedOnly} onChange={setModifiedOnly} marginTop="size-100" isDisabled={busy}>
-          Go live modified pages only
+          Only the pages changed in the release
         </Checkbox>
         <Checkbox isSelected={publish} onChange={setPublish} isDisabled={busy}>
-          Publish the pages after promotion
+          Publish the pages afterwards
         </Checkbox>
         <Checkbox isSelected={remove} onChange={setRemove} isDisabled={busy}>
-          Delete the release after promotion
+          Delete the release afterwards
         </Checkbox>
         <div className="studio-launch__pages">
           {pages === null ? (
             <ProgressCircle size="S" isIndeterminate aria-label="Loading pages" />
           ) : affected.length === 0 ? (
-            <Text UNSAFE_className="studio-publish__hint">Nothing to promote with these options.</Text>
+            <Text UNSAFE_className="studio-publish__hint">Nothing goes live with these options: no page was changed in the release.</Text>
           ) : (
             <>
               <Text UNSAFE_className="studio-publish__hint">
-                {affected.length} page{affected.length === 1 ? '' : 's'} will be promoted:
+                {affected.length} page{affected.length === 1 ? ' goes' : 's go'} live:
               </Text>
               <ul>
                 {affected.map((p) => (

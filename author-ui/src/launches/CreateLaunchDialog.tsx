@@ -76,7 +76,7 @@ export function CreateLaunchDialog({ client, msm, source, sourceTitle, more = []
       <Divider />
       <Content>
         <Text>
-          A release is a copy of <strong>{more.length ? `${more.length + 1} pages` : sourceTitle}</strong> you work on apart from the live site and promote back when it is ready.
+          A release is a copy of <strong>{more.length ? `${more.length + 1} pages` : sourceTitle}</strong> you work on apart from the live site and put live when it is ready.
         </Text>
         <Form
           marginTop="size-150"
@@ -92,10 +92,10 @@ export function CreateLaunchDialog({ client, msm, source, sourceTitle, more = []
             Production ready: go live and publish by itself at the live date
           </Checkbox>
           <Checkbox isSelected={deep} onChange={setDeep}>
-            Include subpages
+            Include the pages below
           </Checkbox>
           <Checkbox isSelected={inherit} onChange={setInherit}>
-            Inherit source page live data
+            Keep following the source pages
           </Checkbox>
           <Text UNSAFE_className="studio-publish__hint">
             {inherit ? 'The release pages are a linked copy of the source: changes made on the site reach the release until a page is edited there.' : 'The release pages are a plain copy: changes made on the site afterwards do not reach the release.'}

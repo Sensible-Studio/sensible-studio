@@ -1,7 +1,7 @@
 {
   "name": "studio-author-ui",
   "private": true,
-  "version": "3.14.123.1795739385",
+  "version": "3.14.124.1795739900",
   "type": "module",
   "scripts": {
     "dev": "vite",

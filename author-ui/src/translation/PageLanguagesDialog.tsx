@@ -298,7 +298,7 @@ function LanguagesDialog({
                   Include the pages below
                 </Checkbox>
                 <Checkbox isSelected={references} onChange={setReferences}>
-                  Also translate the experience fragments, content fragments and assets (titles, descriptions) they use
+                  Also translate the experience fragments, content fragments and files (titles, descriptions) they use
                 </Checkbox>
               </>
             )}
