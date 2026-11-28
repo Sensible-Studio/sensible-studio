@@ -10,13 +10,16 @@ import com.day.cq.workflow.metadata.MetaDataMap;
 import com.day.cq.workflow.model.WorkflowModel;
 
 /** A running (or finished) workflow instance. */
-public interface Workflow {
+public interface Workflow extends com.day.cq.workflow.HasMetaData {
 
     /** @return the instance path, e.g. {@code /var/workflow/instances/server0/2026-10-17/my_model_1} */
     String getId();
 
     /** @return the active work items */
     List<WorkItem> getWorkItems();
+
+    /** The waiting steps of this workflow that the filter lets through. */
+    List<WorkItem> getWorkItems(com.day.cq.workflow.exec.filter.WorkItemFilter filter);
 
     WorkflowModel getWorkflowModel();
 

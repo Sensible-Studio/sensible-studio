@@ -178,6 +178,29 @@ final class Objects {
         }
 
         @Override
+        public void setDueTime(Date dueTime) {
+            ModifiableValueMap vm = item.adaptTo(ModifiableValueMap.class);
+            if (vm == null) {
+                throw new IllegalStateException("The step cannot be changed here");
+            }
+            if (dueTime == null) {
+                vm.remove("dueTime");
+            } else {
+                Calendar c = Calendar.getInstance();
+                c.setTime(dueTime);
+                vm.put("dueTime", c);
+                if (vm.get("timeoutHandler") == null) {
+                    vm.put("timeoutHandler", Engine.AUTO_ADVANCER); // due means: goes on by itself then
+                }
+            }
+        }
+
+        @Override
+        public String getContentPath() {
+            return "JCR_PATH".equals(data.getPayloadType()) && data.getPayload() != null ? String.valueOf(data.getPayload()) : null;
+        }
+
+        @Override
         public MetaDataMap getMetaDataMap() {
             return metaData;
         }
@@ -205,6 +228,17 @@ final class Objects {
             for (Resource i : Engine.items(instance)) {
                 if (Engine.ITEM_ACTIVE.equals(i.getValueMap().get("status", ""))) {
                     out.add(new ItemImpl(resolver, (RuntimeModel) getWorkflowModel(), i));
+                }
+            }
+            return out;
+        }
+
+        @Override
+        public List<WorkItem> getWorkItems(com.adobe.granite.workflow.exec.filter.WorkItemFilter filter) {
+            List<WorkItem> out = new ArrayList<>();
+            for (WorkItem i : getWorkItems()) {
+                if (filter == null || filter.doInclude(i)) {
+                    out.add(i);
                 }
             }
             return out;
@@ -693,7 +727,12 @@ final class Objects {
         @Override
         public void deleteModel(String id) throws WorkflowException {
             try {
-                new ModelStore(resolver).delete(ModelStore.CUSTOM + "/" + id.substring(id.lastIndexOf('/') + 1));
+                String design = ModelStore.CUSTOM + "/" + id.substring(id.lastIndexOf('/') + 1);
+                if (resolver.getResource(design) == null) {
+                    new ModelStore(resolver).deleteRuntime(id); // built in code: there is no design
+                    return;
+                }
+                new ModelStore(resolver).delete(design);
             } catch (PersistenceException | RuntimeException e) {
                 throw new WorkflowException("Cannot remove the model " + id + ": " + e.getMessage(), e);
             }
@@ -704,12 +743,60 @@ final class Objects {
             String name = model.getId().substring(model.getId().lastIndexOf('/') + 1);
             try {
                 ModelStore store = new ModelStore(resolver);
+                if (model instanceof RuntimeModel && changed((RuntimeModel) model)) {
+                    store.deploy((RuntimeModel) model);
+                    return;
+                }
                 String design = resolver.getResource(ModelStore.CUSTOM + "/" + name) != null ? ModelStore.CUSTOM + "/" + name
                         : ModelStore.DEFAULT + "/" + name;
                 store.sync(design);
+            } catch (com.adobe.granite.workflow.model.ValidationException e) {
+                throw e;
             } catch (PersistenceException | RuntimeException e) {
                 throw new WorkflowException("Cannot deploy the model " + model.getId() + ": " + e.getMessage(), e);
             }
+        }
+
+        /** Whether the model in hand is no longer the one that is stored: it was built on in code. */
+        private boolean changed(RuntimeModel model) {
+            Resource stored = resolver.getResource(model.id);
+            if (stored == null || stored.getChild("nodes") == null) {
+                return true;
+            }
+            Map<String, Object> a = new java.util.LinkedHashMap<>(model.toJson());
+            Map<String, Object> b = new java.util.LinkedHashMap<>(RuntimeModel.read(stored).toJson());
+            a.remove("version");
+            b.remove("version");
+            return !String.valueOf(a).equals(String.valueOf(b));
+        }
+
+        @Override
+        public com.adobe.granite.workflow.collection.util.ResultSet<WorkItem> getActiveWorkItems(long start, long limit,
+                com.adobe.granite.workflow.exec.filter.WorkItemFilter filter) {
+            List<WorkItem> kept = new ArrayList<>();
+            for (WorkItem i : getActiveWorkItems()) {
+                if (filter == null || filter.doInclude(i)) {
+                    kept.add(i);
+                }
+            }
+            return page(kept.toArray(new WorkItem[0]), start, limit);
+        }
+
+        @Override
+        public WorkflowModel[] getModels(com.adobe.granite.workflow.model.WorkflowModelFilter filter) {
+            List<WorkflowModel> kept = new ArrayList<>();
+            for (WorkflowModel m : getModels()) {
+                if (filter == null || filter.doInclude(m)) {
+                    kept.add(m);
+                }
+            }
+            return kept.toArray(new WorkflowModel[0]);
+        }
+
+        @Override
+        public com.adobe.granite.workflow.collection.util.ResultSet<WorkflowModel> getModels(long start, long limit,
+                com.adobe.granite.workflow.model.WorkflowModelFilter filter) {
+            return page(getModels(filter), start, limit);
         }
 
         @Override

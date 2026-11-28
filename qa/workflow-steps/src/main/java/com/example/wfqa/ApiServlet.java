@@ -51,6 +51,52 @@ public class ApiServlet extends SlingAllMethodsServlet {
                     }
                     break;
                 }
+                case "build": {
+                    // a model made in code, as AEM projects do it at install time
+                    WorkflowModel model = session.createNewModel(request.getParameter("title"), id);
+                    com.adobe.granite.workflow.model.WorkflowNode stamp = model.createNode("Stamp", com.adobe.granite.workflow.model.WorkflowNode.TYPE_PROCESS, "by code");
+                    stamp.getMetaDataMap().put("PROCESS", "QA Stamp");
+                    stamp.getMetaDataMap().put("PROCESS_ARGS", "built");
+                    stamp.getMetaDataMap().put("PROCESS_AUTO_ADVANCE", "true");
+                    com.adobe.granite.workflow.model.WorkflowNode look = model.createNode();
+                    look.setTitle("Look");
+                    look.setType(com.adobe.granite.workflow.model.WorkflowNode.TYPE_PARTICIPANT);
+                    look.getMetaDataMap().put("PARTICIPANT", "administrators");
+                    try {
+                        model.validate();
+                        out.append("loose=valid\n");
+                    } catch (com.adobe.granite.workflow.model.ValidationException e) {
+                        out.append("loose=").append(e.getMessage()).append('\n');
+                    }
+                    model.createTransition(model.getRootNode(), stamp, null);
+                    com.adobe.granite.workflow.model.WorkflowTransition t = model.createTransition();
+                    t.setFrom(stamp);
+                    t.setTo(look);
+                    model.createTransition(look, model.getEndNode(), null);
+                    model.setDescription("Built in code");
+                    model.validate();
+                    session.deployModel(model);
+                    WorkflowModel stored = session.getModel(model.getId());
+                    out.append("id=").append(stored.getId()).append("\nnodes=").append(stored.getNodes().size()).append("\ntransitions=")
+                            .append(stored.getTransitions().size()).append("\ndescription=").append(stored.getDescription());
+                    break;
+                }
+                case "filters": {
+                    String title = request.getParameter("title");
+                    ResultSet<WorkItem> some = session.getActiveWorkItems(0, 10, item -> item.getNode() != null && title.equals(item.getNode().getTitle()));
+                    WorkflowModel[] models = session.getModels(model -> model.getId().contains("/zz-"));
+                    ResultSet<WorkflowModel> one = session.getModels(0, 1, model -> model.getId().contains("/zz-"));
+                    out.append("some=").append(some.getTotalSize());
+                    out.append("\nmodels=").append(models.length > 0 && models.length < session.getModels().length);
+                    out.append("\none=").append(one.getItems().length).append('/').append(one.getTotalSize() == models.length);
+                    if (some.getItems().length > 0) {
+                        WorkItem item = some.getItems()[0];
+                        out.append("\npath=").append(item.getContentPath());
+                        out.append("\nfiltered=").append(item.getWorkflow().getWorkItems(i -> false).size()).append('/')
+                                .append(item.getWorkflow().getWorkItems(i -> true).size());
+                    }
+                    break;
+                }
                 case "deleteModel":
                     session.deleteModel(id);
                     out.append("deleted=").append(id);

@@ -76,8 +76,8 @@ public interface WorkflowSession extends Adaptable {
     void restartWorkflow(Workflow workflow) throws WorkflowException;
 
     /**
-     * A new, empty flow model (start, end) with this title, synced and ready to be started. Its steps are
-     * added in the flow editor: a model object here is read, not built.
+     * A new, empty flow model (start, end) with this title, ready to be started. Give it steps in the flow
+     * editor, or in code: {@code createNode}, {@code createTransition}, then {@link #deployModel}.
      */
     WorkflowModel createNewModel(String title) throws WorkflowException;
 
@@ -87,7 +87,11 @@ public interface WorkflowSession extends Adaptable {
     /** Removes a model made here, design and runtime. Models that came with the product stay. */
     void deleteModel(String id) throws WorkflowException;
 
-    /** Writes the runtime model anew from its design: what Sync does in the flow editor. */
+    /**
+     * Makes the model what flows run on. A model changed in code is written as it is, and is from then on a
+     * model without a design: listed and started like the others, not opened in the flow editor. An unchanged
+     * one is written anew from its design, which is what Sync does in the editor.
+     */
     void deployModel(WorkflowModel model) throws WorkflowException;
 
     /** The model, when {@code version} is its current version; older versions are not kept apart. */
@@ -106,6 +110,14 @@ public interface WorkflowSession extends Adaptable {
     com.adobe.granite.workflow.collection.util.ResultSet<Workflow> getWorkflows(String[] states, long start, long limit) throws WorkflowException;
 
     com.adobe.granite.workflow.collection.util.ResultSet<WorkflowModel> getModels(long start, long limit) throws WorkflowException;
+
+    com.adobe.granite.workflow.collection.util.ResultSet<WorkItem> getActiveWorkItems(long start, long limit,
+            com.adobe.granite.workflow.exec.filter.WorkItemFilter filter) throws WorkflowException;
+
+    WorkflowModel[] getModels(com.adobe.granite.workflow.model.WorkflowModelFilter filter) throws WorkflowException;
+
+    com.adobe.granite.workflow.collection.util.ResultSet<WorkflowModel> getModels(long start, long limit,
+            com.adobe.granite.workflow.model.WorkflowModelFilter filter) throws WorkflowException;
 
     /** Whether the session's user is an administrator of workflows. */
     boolean isSuperuser();

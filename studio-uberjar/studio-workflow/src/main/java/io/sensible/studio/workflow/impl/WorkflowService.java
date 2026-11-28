@@ -3,6 +3,7 @@
  */
 package io.sensible.studio.workflow.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.adobe.granite.workflow.WorkflowException;
 import com.adobe.granite.workflow.exec.ParticipantStepChooser;
+import com.adobe.granite.workflow.exec.WorkItem;
 import com.adobe.granite.workflow.exec.WorkflowProcess;
 
 /**
@@ -72,6 +74,116 @@ public class WorkflowService implements JobConsumer {
             this.label = label;
             this.className = className;
         }
+    }
+
+    // ---- steps that start something outside and wait for it
+
+    private final List<Registered<com.adobe.granite.workflow.exec.WorkflowExternalProcess>> externals = new CopyOnWriteArrayList<>();
+
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    void bindExternal(com.adobe.granite.workflow.exec.WorkflowExternalProcess process, Map<String, Object> props) {
+        externals.add(new Registered<>(process, label(props, "process.label", process)));
+    }
+
+    void unbindExternal(com.adobe.granite.workflow.exec.WorkflowExternalProcess process) {
+        externals.removeIf(r -> r.service == process);
+    }
+
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    void bindOldExternal(com.day.cq.workflow.exec.WorkflowExternalProcess process, Map<String, Object> props) {
+        com.adobe.granite.workflow.exec.WorkflowExternalProcess as = new com.adobe.granite.workflow.exec.WorkflowExternalProcess() {
+            private com.day.cq.workflow.exec.WorkItem item(WorkItem i) {
+                return Legacy.old(i, com.day.cq.workflow.exec.WorkItem.class);
+            }
+
+            private com.day.cq.workflow.metadata.MetaDataMap args(com.adobe.granite.workflow.metadata.MetaDataMap a) {
+                return Legacy.old(a, com.day.cq.workflow.metadata.MetaDataMap.class);
+            }
+
+            @Override
+            public java.io.Serializable execute(WorkItem i, com.adobe.granite.workflow.WorkflowSession s,
+                    com.adobe.granite.workflow.metadata.MetaDataMap a) throws WorkflowException {
+                try {
+                    return process.execute(item(i), LegacyWorkflowService.session(s, null), args(a));
+                } catch (com.day.cq.workflow.WorkflowException e) {
+                    throw new WorkflowException(e.getMessage(), e);
+                }
+            }
+
+            @Override
+            public boolean hasFinished(java.io.Serializable id, WorkItem i, com.adobe.granite.workflow.WorkflowSession s,
+                    com.adobe.granite.workflow.metadata.MetaDataMap a) {
+                return process.hasFinished(id, item(i), LegacyWorkflowService.session(s, null), args(a));
+            }
+
+            @Override
+            public void handleResult(java.io.Serializable id, WorkItem i, com.adobe.granite.workflow.WorkflowSession s,
+                    com.adobe.granite.workflow.metadata.MetaDataMap a) throws WorkflowException {
+                try {
+                    process.handleResult(id, item(i), LegacyWorkflowService.session(s, null), args(a));
+                } catch (com.day.cq.workflow.WorkflowException e) {
+                    throw new WorkflowException(e.getMessage(), e);
+                }
+            }
+        };
+        stoodFor.put(process, as);
+        externals.add(new Registered<>(as, label(props, "process.label", process), process.getClass().getName()));
+    }
+
+    void unbindOldExternal(com.day.cq.workflow.exec.WorkflowExternalProcess process) {
+        Object as = stoodFor.remove(process);
+        externals.removeIf(r -> r.service == as);
+    }
+
+    /** Asks every waiting outside step whether its work is done (see {@link ExternalPoller}). */
+    void pollExternals() {
+        List<String[]> waiting = new ArrayList<>();
+        try (ResourceResolver resolver = engineResolver()) {
+            for (Resource instance : Instances.all(resolver)) {
+                if (!Engine.STATUS_RUNNING.equals(instance.getValueMap().get("status", ""))) {
+                    continue;
+                }
+                for (Resource item : Engine.items(instance)) {
+                    ValueMap iv = item.getValueMap();
+                    if (Engine.ITEM_ACTIVE.equals(iv.get("status", "")) && iv.get("externalProcess") != null) {
+                        waiting.add(new String[] {instance.getPath(), item.getName()});
+                    }
+                }
+            }
+        } catch (LoginException | RuntimeException e) {
+            LOG.warn("Could not look for waiting outside steps", e);
+            return;
+        }
+        for (String[] w : waiting) {
+            try {
+                withEngine(w[0], e -> e.pollExternal(w[0], w[1]));
+            } catch (WorkflowException | RuntimeException e) {
+                LOG.warn("Could not ask about the outside step {}/workItems/{}", w[0], w[1], e);
+            }
+        }
+    }
+
+    /** The oldest chooser: the step's Arguments as an array. */
+    @SuppressWarnings("deprecation")
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    void bindOldestChooser(com.day.cq.workflow.exec.ParticipantChooser chooser, Map<String, Object> props) {
+        ParticipantStepChooser as = (item, session, args) -> {
+            String given = args.get("PROCESS_ARGS", "");
+            try {
+                return chooser.getParticipant(Legacy.old(item, com.day.cq.workflow.exec.WorkItem.class), LegacyWorkflowService.session(session, null),
+                        given.trim().isEmpty() ? new String[0] : given.split("\\s*,\\s*"));
+            } catch (com.day.cq.workflow.WorkflowException e) {
+                throw new com.adobe.granite.workflow.WorkflowException(e.getMessage(), e);
+            }
+        };
+        stoodFor.put(chooser, as);
+        choosers.add(new Registered<>(as, label(props, "chooser.label", chooser), chooser.getClass().getName()));
+    }
+
+    @SuppressWarnings("deprecation")
+    void unbindOldestChooser(com.day.cq.workflow.exec.ParticipantChooser chooser) {
+        Object as = stoodFor.remove(chooser);
+        choosers.removeIf(r -> r.service == as);
     }
 
     // ---- steps written for the older API (com.day.cq.workflow): taken in under the Granite one
@@ -194,6 +306,16 @@ public class WorkflowService implements JobConsumer {
         }
 
         @Override
+        public com.adobe.granite.workflow.exec.WorkflowExternalProcess external(String name) {
+            for (Registered<com.adobe.granite.workflow.exec.WorkflowExternalProcess> r : externals) {
+                if (name.equals(r.label) || name.equals(r.className)) {
+                    return r.service;
+                }
+            }
+            return null;
+        }
+
+        @Override
         public ParticipantStepChooser chooser(String name) {
             for (Registered<ParticipantStepChooser> r : choosers) {
                 if (name.equals(r.label) || name.equals(r.className)) {
@@ -208,6 +330,9 @@ public class WorkflowService implements JobConsumer {
     Map<String, String> processLabels() {
         Map<String, String> out = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         for (Registered<WorkflowProcess> r : processes) {
+            out.put(r.label, r.className);
+        }
+        for (Registered<com.adobe.granite.workflow.exec.WorkflowExternalProcess> r : externals) {
             out.put(r.label, r.className);
         }
         return out;

@@ -25,6 +25,8 @@ import com.adobe.granite.workflow.model.WorkflowTransition;
 final class RuntimeModel implements WorkflowModel {
 
     final String id;
+    /** Changed through the API since it was read: {@code deployModel} writes it as it is. */
+    boolean built;
     String title;
     String description;
     String version = "1.0";
@@ -138,6 +140,125 @@ final class RuntimeModel implements WorkflowModel {
     }
 
     @Override
+    public void setTitle(String title) {
+        this.title = title;
+        built = true;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+        built = true;
+    }
+
+    @Override
+    public WorkflowNode createNode() {
+        return createNode(null, WorkflowNode.TYPE_PROCESS, null);
+    }
+
+    @Override
+    public WorkflowNode createNode(String title, String type, String description) {
+        begin();
+        int n = nodes.size();
+        while (nodes.containsKey("node" + n)) {
+            n++;
+        }
+        Node node = new Node("node" + n, type == null ? WorkflowNode.TYPE_PROCESS : type, title, description, new Meta());
+        nodes.put(node.id, node);
+        return node;
+    }
+
+    @Override
+    public WorkflowTransition createTransition() {
+        begin();
+        Transition t = new Transition(null, null, "", new Meta());
+        transitions.add(t);
+        return t;
+    }
+
+    @Override
+    public WorkflowTransition createTransition(WorkflowNode from, WorkflowNode to, String rule) {
+        begin();
+        return connect(own(from), own(to), rule, null);
+    }
+
+    @Override
+    public void setRootNode(WorkflowNode node) {
+        retype(node, WorkflowNode.TYPE_START);
+    }
+
+    @Override
+    public void setEndNode(WorkflowNode node) {
+        retype(node, WorkflowNode.TYPE_END);
+    }
+
+    private void retype(WorkflowNode node, String type) {
+        built = true;
+        for (Node n : nodes.values()) {
+            if (type.equals(n.type) && n != node) {
+                n.type = WorkflowNode.TYPE_PROCESS;
+            }
+        }
+        own(node).type = type;
+    }
+
+    private Node own(WorkflowNode node) {
+        Node n = node == null ? null : nodes.get(node.getId());
+        if (n == null) {
+            throw new IllegalArgumentException("Not a step of this model: " + (node == null ? null : node.getId()));
+        }
+        return n;
+    }
+
+    /**
+     * A new model is start and end with one line between them, so that it can run as it is. The first
+     * step or line put in by code takes that line away: the code draws its own.
+     */
+    private void begin() {
+        if (!built && nodes.size() == 2 && transitions.size() == 1) {
+            Transition only = transitions.get(0);
+            if (WorkflowNode.TYPE_START.equals(only.from.type) && WorkflowNode.TYPE_END.equals(only.to.type)) {
+                transitions.clear();
+                only.from.out.clear();
+                only.to.in.clear();
+            }
+        }
+        built = true;
+    }
+
+    @Override
+    public void validate() throws com.adobe.granite.workflow.model.ValidationException {
+        Node start = (Node) getRootNode();
+        Node end = (Node) getEndNode();
+        if (start == null || end == null) {
+            throw new com.adobe.granite.workflow.model.ValidationException("The model needs a start and an end");
+        }
+        for (Transition t : transitions) {
+            if (t.from == null || t.to == null) {
+                throw new com.adobe.granite.workflow.model.ValidationException("A transition leads from nowhere or to nowhere");
+            }
+        }
+        for (Node n : nodes.values()) {
+            String name = n.title == null || n.title.isEmpty() ? n.id : n.title;
+            if (n != end && n.out.isEmpty()) {
+                throw new com.adobe.granite.workflow.model.ValidationException("Nothing follows the step " + name);
+            }
+            if (n != start && n.in.isEmpty()) {
+                throw new com.adobe.granite.workflow.model.ValidationException("Nothing leads to the step " + name);
+            }
+            if (WorkflowNode.TYPE_PROCESS.equals(n.type) && n.metaData.get("PROCESS") == null) {
+                throw new com.adobe.granite.workflow.model.ValidationException("The step " + name + " names no process (PROCESS)");
+            }
+            if (WorkflowNode.TYPE_PARTICIPANT.equals(n.type) && n.metaData.get("PARTICIPANT") == null) {
+                throw new com.adobe.granite.workflow.model.ValidationException("The step " + name + " is for nobody (PARTICIPANT)");
+            }
+            if (WorkflowNode.TYPE_DYNAMIC_PARTICIPANT.equals(n.type) && n.metaData.get("DYNAMIC_PARTICIPANT") == null) {
+                throw new com.adobe.granite.workflow.model.ValidationException("The step " + name + " names no chooser (DYNAMIC_PARTICIPANT)");
+            }
+        }
+    }
+
+    @Override
     public List<WorkflowNode> getNodes() {
         return new ArrayList<>(nodes.values());
     }
@@ -179,9 +300,9 @@ final class RuntimeModel implements WorkflowModel {
 
     static final class Node implements WorkflowNode {
         final String id;
-        final String type;
-        final String title;
-        final String description;
+        String type;
+        String title;
+        String description;
         final Meta metaData;
         final List<Transition> out = new ArrayList<>();
         final List<Transition> in = new ArrayList<>();
@@ -215,6 +336,21 @@ final class RuntimeModel implements WorkflowModel {
         }
 
         @Override
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        @Override
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        @Override
         public MetaDataMap getMetaDataMap() {
             return metaData;
         }
@@ -231,9 +367,9 @@ final class RuntimeModel implements WorkflowModel {
     }
 
     static final class Transition implements WorkflowTransition {
-        final Node from;
-        final Node to;
-        final String rule;
+        Node from;
+        Node to;
+        String rule;
         final Meta metaData;
 
         Transition(Node from, Node to, String rule, Meta metaData) {
@@ -260,6 +396,33 @@ final class RuntimeModel implements WorkflowModel {
         @Override
         public String getRule() {
             return rule;
+        }
+
+        @Override
+        public void setFrom(WorkflowNode node) {
+            if (from != null) {
+                from.out.remove(this);
+            }
+            from = (Node) node;
+            if (from != null) {
+                from.out.add(this);
+            }
+        }
+
+        @Override
+        public void setTo(WorkflowNode node) {
+            if (to != null) {
+                to.in.remove(this);
+            }
+            to = (Node) node;
+            if (to != null) {
+                to.in.add(this);
+            }
+        }
+
+        @Override
+        public void setRule(String rule) {
+            this.rule = rule == null ? "" : rule;
         }
 
         @Override

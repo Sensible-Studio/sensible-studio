@@ -63,6 +63,11 @@ final class Engine {
         WorkflowProcess process(String nameOrLabel);
 
         ParticipantStepChooser chooser(String nameOrLabel);
+
+        /** A step that starts something outside and waits for it; none by default. */
+        default com.adobe.granite.workflow.exec.WorkflowExternalProcess external(String nameOrLabel) {
+            return null;
+        }
     }
 
     private final ResourceResolver resolver;
@@ -301,6 +306,11 @@ final class Engine {
             return successors(model, node, null, instance);
         }
         WorkflowProcess process = name == null || name.isEmpty() ? null : processes.process(name);
+        com.adobe.granite.workflow.exec.WorkflowExternalProcess outside = process == null && name != null && !name.isEmpty()
+                ? processes.external(name) : null;
+        if (outside != null) {
+            return external(model, instance, node, item, outside, name);
+        }
         if (process == null) {
             fail(item, name == null || name.isEmpty() ? "The step has no process" : "No process step " + name + " is registered");
             return Collections.emptyList();
@@ -365,6 +375,129 @@ final class Engine {
         }
         also.addAll(successors(model, node, null, resolver.getResource(instance.getPath())));
         return also;
+    }
+
+    // ---------------------------------------------------------------------------------------------- outside work
+
+    /** Starts the outside work of a step and leaves the step waiting for it; without an id the flow goes on. */
+    private List<RuntimeModel.Node> external(RuntimeModel model, Resource instance, RuntimeModel.Node node, Resource item,
+            com.adobe.granite.workflow.exec.WorkflowExternalProcess outside, String name) {
+        Objects.ItemImpl workItem = new Objects.ItemImpl(resolver, model, item);
+        runningItem = item.getPath();
+        runningInstance = instance.getPath();
+        completedItself = false;
+        endedItsFlow = false;
+        try {
+            java.io.Serializable id = outside.execute(workItem, session(), new Meta(node.metaData));
+            workItem.save();
+            Resource now = resolver.getResource(item.getPath());
+            if (id == null) {
+                finish(now, ITEM_COMPLETED, PROCESS_USER, null, null);
+                return successors(model, node, null, resolver.getResource(instance.getPath()));
+            }
+            ModifiableValueMap vm = now.adaptTo(ModifiableValueMap.class);
+            vm.put("externalProcess", name);
+            vm.put("externalId", keep(id));
+            timeout(now, node);
+            return Collections.emptyList();
+        } catch (WorkflowException | RuntimeException e) {
+            LOG.warn("External step {} of {} failed to start", name, instance.getPath(), e);
+            resolver.revert();
+            Resource again = resolver.getResource(item.getPath());
+            if (again == null) {
+                again = newItem(resolver.getResource(instance.getPath()), node, null);
+            }
+            fail(again, message(e));
+            return Collections.emptyList();
+        }
+    }
+
+    /** Asks whether the outside work of a waiting step is done, and when it is, takes its result and goes on. */
+    void pollExternal(String instancePath, String itemName) throws PersistenceException {
+        Resource instance = resolver.getResource(instancePath);
+        Resource item = instance == null ? null : instance.getChild("workItems/" + itemName);
+        if (item == null || !STATUS_RUNNING.equals(instance.getValueMap().get("status", ""))
+                || !ITEM_ACTIVE.equals(item.getValueMap().get("status", ""))) {
+            return;
+        }
+        String name = item.getValueMap().get("externalProcess", String.class);
+        com.adobe.granite.workflow.exec.WorkflowExternalProcess outside = name == null ? null : processes.external(name);
+        if (outside == null) {
+            return; // its bundle is away: the step waits, or its timeout moves it
+        }
+        RuntimeModel model = model(instance);
+        RuntimeModel.Node node = model.nodes.get(item.getValueMap().get("nodeId", ""));
+        Objects.ItemImpl workItem = new Objects.ItemImpl(resolver, model, item);
+        Meta args = new Meta(node == null ? new HashMap<>() : node.metaData);
+        runningItem = item.getPath();
+        runningInstance = instancePath;
+        try {
+            java.io.Serializable id = kept(item.getValueMap().get("externalId", ""), outside.getClass().getClassLoader());
+            if (!outside.hasFinished(id, workItem, session(), args)) {
+                resolver.revert();
+                return;
+            }
+            outside.handleResult(id, workItem, session(), args);
+            workItem.save();
+            finish(resolver.getResource(item.getPath()), ITEM_COMPLETED, PROCESS_USER, null, null);
+            resolver.commit();
+            if (node != null) {
+                Deque<RuntimeModel.Node> queue = new ArrayDeque<>(successors(model, node, null, resolver.getResource(instancePath)));
+                drain(model, instancePath, queue);
+            }
+            resolver.commit();
+        } catch (WorkflowException | RuntimeException e) {
+            LOG.warn("External step {} of {} failed", name, instancePath, e);
+            resolver.revert();
+            Resource again = resolver.getResource(item.getPath());
+            if (again != null) {
+                fail(again, message(e));
+                resolver.commit();
+            }
+        }
+    }
+
+    /** An id as text: what it is, then itself. Anything but text and numbers is kept serialized. */
+    static String keep(java.io.Serializable id) {
+        if (id instanceof String) {
+            return "s:" + id;
+        }
+        if (id instanceof Long || id instanceof Integer) {
+            return "l:" + id;
+        }
+        try (java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+                java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(bytes)) {
+            out.writeObject(id);
+            out.flush();
+            return "o:" + java.util.Base64.getEncoder().encodeToString(bytes.toByteArray());
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException("The id of the outside work cannot be kept: " + e.getMessage(), e);
+        }
+    }
+
+    /** The id again; its class is looked for where the step's own classes are. */
+    static java.io.Serializable kept(String text, ClassLoader loader) {
+        if (text.startsWith("s:")) {
+            return text.substring(2);
+        }
+        if (text.startsWith("l:")) {
+            return Long.valueOf(text.substring(2));
+        }
+        try (java.io.ObjectInputStream in = new java.io.ObjectInputStream(
+                new java.io.ByteArrayInputStream(java.util.Base64.getDecoder().decode(text.substring(2)))) {
+            @Override
+            protected Class<?> resolveClass(java.io.ObjectStreamClass desc) throws java.io.IOException, ClassNotFoundException {
+                try {
+                    return Class.forName(desc.getName(), false, loader);
+                } catch (ClassNotFoundException e) {
+                    return super.resolveClass(desc);
+                }
+            }
+        }) {
+            return (java.io.Serializable) in.readObject();
+        } catch (java.io.IOException | ClassNotFoundException e) {
+            throw new IllegalStateException("The id of the outside work cannot be read: " + e.getMessage(), e);
+        }
     }
 
     /**

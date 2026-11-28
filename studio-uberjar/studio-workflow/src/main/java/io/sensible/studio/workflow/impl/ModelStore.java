@@ -632,6 +632,43 @@ final class ModelStore {
         }
     }
 
+    /**
+     * Writes a model built in code as what flows run on. It has no design from then on (a design it was made
+     * with is removed): the flow editor draws designs, and this one was not drawn there.
+     */
+    RuntimeModel deploy(RuntimeModel model) throws PersistenceException, com.adobe.granite.workflow.model.ValidationException {
+        model.validate();
+        if (!model.id.startsWith(RUNTIME + "/")) {
+            throw new IllegalArgumentException("Not a model id: " + model.id);
+        }
+        Resource existing = resolver.getResource(model.id);
+        if (existing != null) {
+            model.version = next(existing.getValueMap().get("version", "1.0"));
+            resolver.delete(existing);
+        }
+        Resource design = resolver.getResource(CUSTOM + "/" + model.id.substring(RUNTIME.length() + 1));
+        if (design != null) {
+            resolver.delete(design);
+        }
+        write(model, null);
+        resolver.commit();
+        model.built = false;
+        return model;
+    }
+
+    /** Removes a model that has no design (one built in code). */
+    void deleteRuntime(String id) throws PersistenceException {
+        Resource runtime = id.startsWith(RUNTIME + "/") ? resolver.getResource(id) : null;
+        if (runtime == null || runtime.getChild("nodes") == null) {
+            throw new IllegalArgumentException("No workflow model " + id);
+        }
+        if (resolver.getResource(DEFAULT + "/" + runtime.getName()) != null) {
+            throw new IllegalArgumentException("Default models cannot be deleted");
+        }
+        resolver.delete(runtime);
+        resolver.commit();
+    }
+
     private void write(RuntimeModel model, String designPath) throws PersistenceException {
         Resource parent = folders(model.id.substring(0, model.id.lastIndexOf('/')));
         Map<String, Object> props = new HashMap<>();
@@ -641,7 +678,9 @@ final class ModelStore {
             props.put("description", model.description);
         }
         props.put("version", model.version);
-        props.put("designPath", designPath);
+        if (designPath != null) {
+            props.put("designPath", designPath);
+        }
         props.put("jcr:lastModified", Calendar.getInstance());
         props.put("jcr:lastModifiedBy", resolver.getUserID());
         Resource r = resolver.create(parent, model.id.substring(model.id.lastIndexOf('/') + 1), props);

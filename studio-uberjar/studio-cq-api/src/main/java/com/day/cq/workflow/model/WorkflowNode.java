@@ -8,7 +8,7 @@ import java.util.List;
 import com.day.cq.workflow.metadata.MetaDataMap;
 
 /** A node of a runtime workflow model. */
-public interface WorkflowNode {
+public interface WorkflowNode extends com.day.cq.workflow.HasMetaData {
 
     String TYPE_START = "START";
     String TYPE_END = "END";
@@ -19,6 +19,8 @@ public interface WorkflowNode {
     String TYPE_OR_JOIN = "OR_JOIN";
     String TYPE_AND_SPLIT = "AND_SPLIT";
     String TYPE_AND_JOIN = "AND_JOIN";
+    String TYPE_CONTAINER = "CONTAINER";
+    String TYPE_EXTERNAL_PROCESS = "EXTERNAL_PROCESS";
 
     String getId();
 
@@ -27,6 +29,12 @@ public interface WorkflowNode {
     String getDescription();
 
     String getType();
+
+    void setTitle(String title);
+
+    void setDescription(String description);
+
+    void setType(String type);
 
     MetaDataMap getMetaDataMap();
 

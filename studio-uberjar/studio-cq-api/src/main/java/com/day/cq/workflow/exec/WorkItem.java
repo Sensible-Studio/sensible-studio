@@ -9,7 +9,7 @@ import com.day.cq.workflow.metadata.MetaDataMap;
 import com.day.cq.workflow.model.WorkflowNode;
 
 /** One step of a running workflow: a process being executed or a task waiting for a participant. */
-public interface WorkItem {
+public interface WorkItem extends com.day.cq.workflow.HasMetaData {
 
     String getId();
 
@@ -36,4 +36,10 @@ public interface WorkItem {
 
     /** When the step is due, when it has a timeout. */
     Date getDueTime();
+
+    /** Sets or moves when the step is due. Kept when the step returns (in a process step) or at once. */
+    void setDueTime(Date dueTime);
+
+    /** The payload's path, when the payload is one. */
+    String getContentPath();
 }
