@@ -64,10 +64,10 @@ public interface WorkflowSession extends Adaptable {
     List<com.day.cq.workflow.exec.HistoryItem> getHistory(Workflow workflow) throws WorkflowException;
 
     /** Gives a waiting step to somebody else. Whoever has the step may, and an administrator. */
-    void delegateWorkItem(WorkItem item, com.day.cq.workflow.exec.Participant participant) throws WorkflowException;
+    void delegateWorkItem(WorkItem item, org.apache.jackrabbit.api.security.user.Authorizable participant) throws WorkflowException;
 
     /** The users and groups a step can be given to. */
-    java.util.Iterator<com.day.cq.workflow.exec.Participant> getDelegates(WorkItem item) throws WorkflowException;
+    List<org.apache.jackrabbit.api.security.user.Authorizable> getDelegatees(WorkItem item) throws WorkflowException;
 
     /** Every waiting step the session's user may see: all of them for an administrator. */
     WorkItem[] getAllWorkItems() throws WorkflowException;
@@ -78,11 +78,59 @@ public interface WorkflowSession extends Adaptable {
     /** Runs the failed steps of a workflow again. Administrators only. */
     void restartWorkflow(Workflow workflow) throws WorkflowException;
 
+    /**
+     * A new, empty flow model (start, end) with this title, synced and ready to be started. Its steps are
+     * added in the flow editor: a model object here is read, not built.
+     */
+    WorkflowModel createNewModel(String title) throws WorkflowException;
+
+    /** The same, named: {@code id} is the model's name or its full id under {@code /var/workflow/models}. */
+    WorkflowModel createNewModel(String title, String id) throws WorkflowException;
+
+    /** Removes a model made here, design and runtime. Models that came with the product stay. */
+    void deleteModel(String id) throws WorkflowException;
+
+    /** Writes the runtime model anew from its design: what Sync does in the flow editor. */
+    void deployModel(WorkflowModel model) throws WorkflowException;
+
+    /** The model, when {@code version} is its current version; older versions are not kept apart. */
+    WorkflowModel getModel(String id, String version) throws WorkflowException;
+
+    /**
+     * The earlier steps of a flow a waiting step can be sent back to: the participant steps already
+     * completed, the latest first. Completing the item along one of them makes that step wait again.
+     */
+    List<Route> getBackRoutes(WorkItem item, boolean expand) throws WorkflowException;
+
+    com.day.cq.workflow.collection.util.ResultSet<WorkItem> getActiveWorkItems(long start, long limit) throws WorkflowException;
+
+    com.day.cq.workflow.collection.util.ResultSet<WorkItem> getAllWorkItems(long start, long limit) throws WorkflowException;
+
+    com.day.cq.workflow.collection.util.ResultSet<Workflow> getWorkflows(String[] states, long start, long limit) throws WorkflowException;
+
+    com.day.cq.workflow.collection.util.ResultSet<WorkflowModel> getModels(long start, long limit) throws WorkflowException;
+
     /** Whether the session's user is an administrator of workflows. */
     boolean isSuperuser();
 
     /** Nothing to release here: the session ends with the resolver it was adapted from. */
     void logout();
+
+    /** The ways a work item can be completed, an OR split after it not resolved. */
+    List<Route> getRoutes(WorkItem item) throws WorkflowException;
+
+    /** The earlier steps a waiting step can be sent back to. */
+    List<Route> getBackRoutes(WorkItem item) throws WorkflowException;
+
+    /** Whether a rule (see the OR split) holds for this data. */
+    boolean evaluate(WorkflowData data, String rule);
+
+    /** @deprecated the metadata as a map: {@link #startWorkflow(WorkflowModel, WorkflowData, Map)} */
+    @Deprecated
+    Workflow startWorkflow(WorkflowModel model, WorkflowData data, java.util.Dictionary<String, String> metaData) throws WorkflowException;
+
+    /** The user this session acts as. */
+    org.apache.jackrabbit.api.security.user.Authorizable getUser();
 
     /** The JCR session this workflow session works with. */
     javax.jcr.Session getSession();

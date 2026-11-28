@@ -22,6 +22,13 @@
             <artifactId>org.apache.sling.api</artifactId>
         </dependency>
         <dependency>
+            <!-- com.day.cq.workflow.WorkflowSession names users and groups as Authorizable -->
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>oak-jackrabbit-api</artifactId>
+            <version>1.44.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.annotation</artifactId>
         </dependency>
@@ -63,6 +70,7 @@
                     <bnd><![CDATA[
 Bundle-SymbolicName: io.sensible.studio.cq.api
 Sling-Nodetypes: SLING-INF/nodetypes/studio-cq.cnd
+Import-Package: org.apache.jackrabbit.api.*;version="[2.4,3)", *
                     ]]></bnd>
                 </configuration>
             </plugin>

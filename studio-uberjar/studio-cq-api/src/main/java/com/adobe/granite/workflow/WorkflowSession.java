@@ -75,6 +75,38 @@ public interface WorkflowSession extends Adaptable {
     /** Runs the failed steps of a workflow again. Administrators only. */
     void restartWorkflow(Workflow workflow) throws WorkflowException;
 
+    /**
+     * A new, empty flow model (start, end) with this title, synced and ready to be started. Its steps are
+     * added in the flow editor: a model object here is read, not built.
+     */
+    WorkflowModel createNewModel(String title) throws WorkflowException;
+
+    /** The same, named: {@code id} is the model's name or its full id under {@code /var/workflow/models}. */
+    WorkflowModel createNewModel(String title, String id) throws WorkflowException;
+
+    /** Removes a model made here, design and runtime. Models that came with the product stay. */
+    void deleteModel(String id) throws WorkflowException;
+
+    /** Writes the runtime model anew from its design: what Sync does in the flow editor. */
+    void deployModel(WorkflowModel model) throws WorkflowException;
+
+    /** The model, when {@code version} is its current version; older versions are not kept apart. */
+    WorkflowModel getModel(String id, String version) throws WorkflowException;
+
+    /**
+     * The earlier steps of a flow a waiting step can be sent back to: the participant steps already
+     * completed, the latest first. Completing the item along one of them makes that step wait again.
+     */
+    List<Route> getBackRoutes(WorkItem item, boolean expand) throws WorkflowException;
+
+    com.adobe.granite.workflow.collection.util.ResultSet<WorkItem> getActiveWorkItems(long start, long limit) throws WorkflowException;
+
+    com.adobe.granite.workflow.collection.util.ResultSet<WorkItem> getAllWorkItems(long start, long limit) throws WorkflowException;
+
+    com.adobe.granite.workflow.collection.util.ResultSet<Workflow> getWorkflows(String[] states, long start, long limit) throws WorkflowException;
+
+    com.adobe.granite.workflow.collection.util.ResultSet<WorkflowModel> getModels(long start, long limit) throws WorkflowException;
+
     /** Whether the session's user is an administrator of workflows. */
     boolean isSuperuser();
 

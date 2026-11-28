@@ -151,7 +151,7 @@ final class Engine {
                 RuntimeModel.Node node = model.nodes.get(item.getValueMap().get("nodeId", ""));
                 finish(item, ITEM_COMPLETED, user, comment, null);
                 if (node != null) {
-                    queue.addAll(successors(model, node, routeTo, instance));
+                    queue.addAll(onward(model, node, routeTo, instance));
                 }
                 break;
             }
@@ -341,7 +341,7 @@ final class Engine {
             if (own != null && ITEM_ACTIVE.equals(own.getValueMap().get("status", ""))) {
                 finish(own, ITEM_COMPLETED, PROCESS_USER, null, null);
             }
-            also.addAll(successors(model, node, chosenRoute, resolver.getResource(instance.getPath())));
+            also.addAll(onward(model, node, chosenRoute, resolver.getResource(instance.getPath())));
             return also;
         }
         if ("false".equals(node.metaData.get("PROCESS_AUTO_ADVANCE", String.class))) {
@@ -365,6 +365,30 @@ final class Engine {
         }
         also.addAll(successors(model, node, null, resolver.getResource(instance.getPath())));
         return also;
+    }
+
+    /**
+     * Where the flow goes when a step is completed along {@code routeTo}: forward, or back to an earlier step
+     * of this flow when the route names one that is not ahead (see {@code WorkflowSession.getBackRoutes}).
+     */
+    List<RuntimeModel.Node> onward(RuntimeModel model, RuntimeModel.Node node, String routeTo, Resource instance) {
+        if (routeTo != null && model.nodes.containsKey(routeTo)) {
+            boolean ahead = false;
+            for (com.adobe.granite.workflow.exec.Route r : Objects.routes(node, true)) {
+                ahead |= routeTo.equals(r.getId());
+            }
+            for (RuntimeModel.Transition t : node.out) {
+                ahead |= routeTo.equals(t.to.id);
+            }
+            if (!ahead) {
+                for (Resource earlier : items(instance)) {
+                    if (routeTo.equals(earlier.getValueMap().get("nodeId", "")) && ITEM_COMPLETED.equals(earlier.getValueMap().get("status", ""))) {
+                        return Collections.singletonList(model.nodes.get(routeTo));
+                    }
+                }
+            }
+        }
+        return successors(model, node, routeTo, instance);
     }
 
     /**

@@ -673,6 +673,118 @@ final class Objects {
         }
 
         @Override
+        public WorkflowModel createNewModel(String title) throws WorkflowException {
+            return createNewModel(title, null);
+        }
+
+        @Override
+        public WorkflowModel createNewModel(String title, String id) throws WorkflowException {
+            try {
+                ModelStore store = new ModelStore(resolver);
+                String name = id == null ? null : id.substring(id.lastIndexOf('/') + 1);
+                Map<String, Object> made = store.create(title, name, null);
+                resolver.refresh();
+                return getModel(String.valueOf(made.get("id"))); // made and synced by the store
+            } catch (PersistenceException | WorkflowException | RuntimeException e) {
+                throw new WorkflowException("Cannot make the model " + title + ": " + e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public void deleteModel(String id) throws WorkflowException {
+            try {
+                new ModelStore(resolver).delete(ModelStore.CUSTOM + "/" + id.substring(id.lastIndexOf('/') + 1));
+            } catch (PersistenceException | RuntimeException e) {
+                throw new WorkflowException("Cannot remove the model " + id + ": " + e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public void deployModel(WorkflowModel model) throws WorkflowException {
+            String name = model.getId().substring(model.getId().lastIndexOf('/') + 1);
+            try {
+                ModelStore store = new ModelStore(resolver);
+                String design = resolver.getResource(ModelStore.CUSTOM + "/" + name) != null ? ModelStore.CUSTOM + "/" + name
+                        : ModelStore.DEFAULT + "/" + name;
+                store.sync(design);
+            } catch (PersistenceException | RuntimeException e) {
+                throw new WorkflowException("Cannot deploy the model " + model.getId() + ": " + e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public WorkflowModel getModel(String id, String version) throws WorkflowException {
+            WorkflowModel model = getModel(id);
+            if (version != null && !version.equals(model.getVersion())) {
+                throw new WorkflowException("Version " + version + " of " + id + " is not kept; it is at " + model.getVersion());
+            }
+            return model;
+        }
+
+        @Override
+        public List<Route> getBackRoutes(WorkItem item, boolean expand) throws WorkflowException {
+            ResourceResolver rr = reader();
+            Resource i = rr.getResource(item.getId());
+            if (i == null) {
+                throw new WorkflowException("No work item " + item.getId());
+            }
+            Resource instance = i.getParent().getParent();
+            String own = i.getValueMap().get("nodeId", "");
+            List<Resource> items = new ArrayList<>(Engine.items(instance));
+            Collections.reverse(items);
+            List<Route> out = new ArrayList<>();
+            List<String> seen = new ArrayList<>();
+            for (Resource earlier : items) {
+                ValueMap ev = earlier.getValueMap();
+                String node = ev.get("nodeId", "");
+                String type = ev.get("type", "");
+                if (Engine.ITEM_COMPLETED.equals(ev.get("status", "")) && !node.equals(own) && !seen.contains(node)
+                        && (WorkflowNode.TYPE_PARTICIPANT.equals(type) || WorkflowNode.TYPE_DYNAMIC_PARTICIPANT.equals(type))) {
+                    seen.add(node);
+                    out.add(new RouteImpl(node, ev.get("nodeTitle", node), false, Collections.emptyList()));
+                }
+            }
+            return out;
+        }
+
+        @Override
+        public com.adobe.granite.workflow.collection.util.ResultSet<WorkItem> getActiveWorkItems(long start, long limit) {
+            return page(getActiveWorkItems(), start, limit);
+        }
+
+        @Override
+        public com.adobe.granite.workflow.collection.util.ResultSet<WorkItem> getAllWorkItems(long start, long limit) {
+            return page(getAllWorkItems(), start, limit);
+        }
+
+        @Override
+        public com.adobe.granite.workflow.collection.util.ResultSet<Workflow> getWorkflows(String[] states, long start, long limit) {
+            return page(getWorkflows(states), start, limit);
+        }
+
+        @Override
+        public com.adobe.granite.workflow.collection.util.ResultSet<WorkflowModel> getModels(long start, long limit) {
+            return page(getModels(), start, limit);
+        }
+
+        private static <T> com.adobe.granite.workflow.collection.util.ResultSet<T> page(T[] all, long start, long limit) {
+            int from = (int) Math.max(0, Math.min(start, all.length));
+            int to = limit < 0 ? all.length : (int) Math.min(all.length, from + limit);
+            T[] items = java.util.Arrays.copyOfRange(all, from, to);
+            return new com.adobe.granite.workflow.collection.util.ResultSet<T>() {
+                @Override
+                public T[] getItems() {
+                    return items;
+                }
+
+                @Override
+                public long getTotalSize() {
+                    return all.length;
+                }
+            };
+        }
+
+        @Override
         public boolean isSuperuser() {
             return service == null || Instances.isAdmin(resolver);
         }

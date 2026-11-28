@@ -295,6 +295,51 @@ c, refused = curl(ub, "POST", "/bin/qa/wf", dict(model=h.id, payload="/content/z
 check("starting on what is not there is refused with a reason", c == 500 and "does not exist" in str(refused), (c, str(refused)[:200]))
 wf("terminate", id=started)
 
+# ---- the rest of the two APIs, as the signed-in user
+def api(user, **kw):
+    c, body = curl(user, "POST", "/bin/qa/wfapi", kw)
+    return c, dict(l.split("=", 1) for l in str(body).splitlines() if "=" in l) if c == 200 else str(body)
+
+
+c, r = api(ADMIN, do="model", title="ZZ by api", id="zz-api")
+check("createNewModel makes a model that can be started; deployModel syncs it; getModel knows its version", c == 200 and r.get("id") == "/var/workflow/models/zz-api" and r.get("nodes") == "2" and r.get("deployed") != r.get("version") and r.get("same") == r.get("id") and r.get("old") == "refused", r)
+i = start("/var/workflow/models/zz-api", page("zz-w12"))
+check("an empty model runs from start to end", status(i) == "COMPLETED", steps(i))
+check("an author may not make a model", api(ua, do="model", title="ZZ no", id="zz-no")[0] == 500 and "zz-no" not in [x["name"] for x in get(f"{WF}?op=models")])
+c, r = api(ADMIN, do="deleteModel", id="/var/workflow/models/zz-api")
+check("deleteModel removes it", c == 200 and "zz-api" not in [x["name"] for x in get(f"{WF}?op=models")], r)
+
+bk = Model("zz-back", "ZZ back")
+bk.step("participant", "Write", PARTICIPANT="content-authors")
+bk.step("participant", "Check", PARTICIPANT="administrators", timeoutMillis="3600", timeoutHandler="com.adobe.granite.workflow.console.timeout.autoadvance.AutoAdvancer")
+bk.step("process", "Bad", **auto(PROCESS="QA Fail Until Fixed"))
+bk.sync()
+p = page("zz-w12")
+i = start(bk.id, p, ua)
+c, r = api(ua, do="back", id=item(i, "Write"))
+check("the first step has nowhere to go back to", c == 200 and r.get("back") == "", r)
+complete(item(i, "Write"), ua)
+c, r = api(ADMIN, do="item", id=item(i, "Check"))
+check("a work item tells its kind and when it is due; the delegates are offered", c == 200 and r.get("type") == "PARTICIPANT" and r.get("due") == "true" and r.get("delegates") == "true" and r.get("groupOffered") == "true", r)
+c, r = api(ADMIN, do="back", id=item(i, "Check"), go="true")
+time.sleep(1.5)
+check("a step is sent back to an earlier one, which waits again", c == 200 and r.get("back") == "Write|" and [h["title"] for h in active(i)] == ["Write"], (r, steps(i)))
+c, r = api(ADMIN, do="pages")
+check("paged lists: a page and the size of the whole", c == 200 and r.get("two", "").startswith("2/") and r.get("second") == "true" and r.get("items", "").startswith("1/") and r.get("models", "").startswith("2/") and r.get("all", "").split("/")[0] == r.get("all", "/").split("/")[1] == r.get("allWorkflows"), r)
+# as an administrator: whom a session may hand a step to is whom its user may see, and an author sees few
+c, r = api(ADMIN, do="old", id=item(i, "Write"), to="qa-wb")
+time.sleep(1.5)
+check("older API: getUser, getRoutes(item), evaluate, getDelegatees, delegateWorkItem(Authorizable), startWorkflow(Dictionary)", c == 200 and r.get("user") == "admin" and r.get("routes") == "1" and r.get("yes") == "true" and r.get("no") == "false" and r.get("delegatees") == "true" and r.get("given") == "qa-wb" and r.get("title") == "by dictionary" and r.get("session") == "true" and [x["assignee"] for x in active(i)] == ["qa-wb"], (r, active(i)))
+wf("terminate", id=r.get("started", "")) if isinstance(r, dict) else None
+complete(item(i, "Write"), ub)
+complete(item(i, "Check"))
+check("the flow, sent on again, reaches the failing step", [t for t, s in steps(i) if s == "FAILED"] == ["Bad"], steps(i))
+prop(p + "/jcr:content", qaFixed="true", **{"qaFixed@TypeHint": "Boolean"})
+check("restartWorkflow is for administrators", api(ua, do="restart", id=i)[0] == 500)
+c, r = api(ADMIN, do="restart", id=i)
+time.sleep(2)
+check("restartWorkflow runs the failed steps again", c == 200 and status(i) == "COMPLETED", (r, steps(i)))
+
 # ---- the timeout, last: it needs a minute
 time.sleep(max(0, 85 - (time.time() - began)))
 check("a step with a timeout and Auto Advancer goes on by itself", status(timed) == "COMPLETED" and qa(timed_page).get("qaStamp") == "timed", steps(timed))
