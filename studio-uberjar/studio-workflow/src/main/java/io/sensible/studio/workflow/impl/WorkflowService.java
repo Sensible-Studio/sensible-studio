@@ -316,6 +316,9 @@ public class WorkflowService implements JobConsumer {
 
     void retry(ResourceResolver user, String itemId) throws WorkflowException {
         requireAdmin(user);
+        if (!itemId.contains("/workItems/")) {
+            throw new IllegalArgumentException("Not a step of a flow: " + itemId);
+        }
         String instance = itemId.substring(0, itemId.indexOf("/workItems/"));
         enqueue(instance, Engine.EVENT_RETRY, itemId.substring(itemId.lastIndexOf('/') + 1), null, user.getUserID(), null);
     }
@@ -360,7 +363,9 @@ public class WorkflowService implements JobConsumer {
     private void withEngine(String instancePath, EngineWork work) throws WorkflowException {
         synchronized (locks.computeIfAbsent(instancePath, k -> new Object())) {
             try (ResourceResolver engineResolver = engineResolver()) {
-                work.run(new Engine(engineResolver, registry));
+                Engine engine = new Engine(engineResolver, registry);
+                engine.starter = (path, user) -> enqueue(path, Engine.EVENT_START, null, null, user, null);
+                work.run(engine);
             } catch (PersistenceException | LoginException e) {
                 throw new WorkflowException(e);
             }

@@ -182,6 +182,33 @@ class WorkflowServiceTest {
     }
 
     @Test
+    void aFailingStepDoesNotTakeBackTheStepBeforeIt() throws Exception {
+        context.registerService(com.adobe.granite.workflow.exec.WorkflowProcess.class, (item, session, args) -> {
+            throw new com.adobe.granite.workflow.WorkflowException("no");
+        }, "process.label", "Explode");
+        ModelStore store = new ModelStore(context.resourceResolver());
+        store.create("Fails", "fails", null);
+        String flow = ModelStore.CUSTOM + "/fails/jcr:content/flow";
+        String participant = String.valueOf(store.addStep(flow, ModelStore.STEP_PARTICIPANT, "Hold", null).get("path"));
+        context.resourceResolver().getResource(participant + "/metaData").adaptTo(org.apache.sling.api.resource.ModifiableValueMap.class)
+                .put("PARTICIPANT", "editors");
+        String process = String.valueOf(store.addStep(flow, ModelStore.STEP_PROCESS, "Explode", null).get("path"));
+        context.resourceResolver().getResource(process + "/metaData").adaptTo(org.apache.sling.api.resource.ModifiableValueMap.class)
+                .put("PROCESS", "Explode");
+        context.resourceResolver().commit();
+        String failing = store.sync(ModelStore.CUSTOM + "/fails").id;
+
+        ResourceResolver admin = as("admin");
+        String id = service.start(admin, failing, null, PAGE, Collections.emptyMap());
+        service.complete(admin, activeItem(id).getPath(), null, "go");
+        context.resourceResolver().refresh();
+        assertEquals(null, activeItem(id)); // Hold is done, and stays done
+        long failed = Engine.items(context.resourceResolver().getResource(id)).stream()
+                .filter(i -> Engine.ITEM_FAILED.equals(i.getValueMap().get("status", ""))).count();
+        assertEquals(1, failed);
+    }
+
+    @Test
     void aFlowUnderWayKeepsTheModelItStartedOn() throws Exception {
         ResourceResolver admin = as("admin");
         String id = service.start(admin, model, null, PAGE, Collections.emptyMap());

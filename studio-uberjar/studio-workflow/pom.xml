@@ -43,6 +43,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- the rule scripts of OR splits and Goto steps; the Sling Starter carries Rhino as a bundle -->
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>1.7.13</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.core</artifactId>
         </dependency>
@@ -99,7 +106,7 @@
                     <bnd><![CDATA[
 Bundle-SymbolicName: io.sensible.studio.workflow
 -privatepackage: io.sensible.studio.workflow.impl.*
-Import-Package: org.apache.jackrabbit.api.*;version="[2.4,3)", *
+Import-Package: org.apache.jackrabbit.api.*;version="[2.4,3)", org.mozilla.javascript.*;resolution:=optional;version="[1.7,2)", *
                     ]]></bnd>
                 </configuration>
             </plugin>

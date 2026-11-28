@@ -310,9 +310,17 @@ final class Objects {
         private final ResourceResolver resolver;
         private final WorkflowService service;
 
+        /** Inside a process step: the engine that runs it. */
+        private final Engine.Inside inside;
+
         SessionImpl(ResourceResolver resolver, WorkflowService service) {
+            this(resolver, service, null);
+        }
+
+        SessionImpl(ResourceResolver resolver, WorkflowService service, Engine.Inside inside) {
             this.resolver = resolver;
             this.service = service;
+            this.inside = inside;
         }
 
         private WorkflowService service() throws WorkflowException {
@@ -350,8 +358,10 @@ final class Objects {
 
         @Override
         public Workflow startWorkflow(WorkflowModel model, WorkflowData data, Map<String, Object> metaData) throws WorkflowException {
-            String path = service().start(resolver, model.getId(), data.getPayloadType(), String.valueOf(data.getPayload()),
-                    metaData == null ? data.getMetaDataMap() : metaData);
+            Map<String, Object> meta = metaData == null ? data.getMetaDataMap() : metaData;
+            String path = service == null && inside != null
+                    ? inside.start(model.getId(), data.getPayloadType(), String.valueOf(data.getPayload()), meta)
+                    : service().start(resolver, model.getId(), data.getPayloadType(), String.valueOf(data.getPayload()), meta);
             return getWorkflow(path);
         }
 
@@ -385,6 +395,10 @@ final class Objects {
 
         @Override
         public void terminateWorkflow(Workflow workflow) throws WorkflowException {
+            if (service == null && inside != null) {
+                inside.terminate(workflow.getId());
+                return;
+            }
             service().terminate(resolver, workflow.getId());
         }
 
@@ -464,6 +478,10 @@ final class Objects {
 
         @Override
         public void complete(WorkItem item, Route route) throws WorkflowException {
+            if (service == null && inside != null) {
+                inside.complete(item.getId(), route == null ? null : route.getId());
+                return;
+            }
             service().complete(resolver, item.getId(), route == null ? null : route.getId(), null);
         }
 

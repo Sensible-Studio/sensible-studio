@@ -456,7 +456,20 @@ export function ModelEditor({ client, studio, path }: Props) {
             </ul>
           </aside>
         )}
-        <main className="studio-wfe__canvas" onClick={() => setSelected(null)}>
+        <main
+          className="studio-wfe__canvas"
+          onClick={() => setSelected(null)}
+          ref={(el) => {
+            // a flow with branches is wider than a narrow window, and it is drawn around its middle:
+            // opened at the left edge, its start was out of sight
+            if (el && !el.dataset.centred) {
+              el.dataset.centred = '1';
+              requestAnimationFrame(() => {
+                el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
+              });
+            }
+          }}
+        >
           {!editable && (
             <p className="studio-wfe__readonly">
               {model.type === 'default'

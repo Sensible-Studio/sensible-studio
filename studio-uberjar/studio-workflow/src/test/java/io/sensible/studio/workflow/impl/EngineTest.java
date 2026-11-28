@@ -258,6 +258,13 @@ class EngineTest {
         assertTrue(Engine.holds("function check() {\n\treturn true;\n}"));
         assertFalse(Engine.holds("false"));
         assertFalse(Engine.holds("function check() { return payload.length > 3; }"));
+        // with the instance at hand a script is run
+        java.util.function.Supplier<java.util.Map<String, Object>> vars = () -> java.util.Collections.singletonMap("payload", "/content/site");
+        assertTrue(Engine.holds("function check() { return payload.length > 3; }", vars));
+        assertFalse(Engine.holds("function check() { return payload.indexOf('/conf') == 0; }", vars));
+        assertTrue(Engine.holds("function check() { return String(payload).indexOf('/content/') == 0 && payload.startsWith('/content'); }", vars));
+        assertFalse(Engine.holds("var x = 1;", vars)); // no check(): no
+        assertFalse(Engine.holds("function check() { return nothing.here; }", vars)); // it fails: no
         assertEquals(WorkflowNode.TYPE_START, "START");
         assertEquals("a=1", "a=" + BuiltInProcesses.SetProperties.pairs("a = 1, b=").get("a"));
     }

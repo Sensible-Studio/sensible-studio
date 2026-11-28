@@ -170,6 +170,10 @@ final class Engine {
             default:
                 throw new IllegalArgumentException("Unknown workflow event " + event);
         }
+        // what was decided is kept before anything runs: a process step that fails takes back what it
+        // wrote itself, and took the completion of the step before it back with it, so that step
+        // waited again beside the failed one (28.11.2026)
+        resolver.commit();
         drain(model, instance.getPath(), queue);
         resolver.commit();
     }
@@ -218,6 +222,9 @@ final class Engine {
                 break;
             }
             Resource instance = resolver.getResource(instancePath);
+            if (instance == null || !STATUS_RUNNING.equals(instance.getValueMap().get("status", ""))) {
+                break; // a step ended the flow: nothing of it goes on
+            }
             RuntimeModel.Node node = queue.poll();
             switch (node.type) {
                 case WorkflowNode.TYPE_END:
@@ -239,9 +246,15 @@ final class Engine {
                     }
                     break;
                 }
-                case WorkflowNode.TYPE_PARTICIPANT:
-                    timeout(newItem(instance, node, assignee(node.metaData.get("PARTICIPANT", String.class))), node);
+                case WorkflowNode.TYPE_PARTICIPANT: {
+                    String who = assignee(node.metaData.get("PARTICIPANT", String.class));
+                    Resource item = newItem(instance, node, who);
+                    timeout(item, node);
+                    if (!known(who)) {
+                        fail(item, NOBODY.replace("{}", who));
+                    }
                     break;
+                }
                 case WorkflowNode.TYPE_DYNAMIC_PARTICIPANT: {
                     Resource item = newItem(instance, node, null);
                     timeout(item, node);
@@ -252,8 +265,11 @@ final class Engine {
                         break;
                     }
                     try {
-                        String who = chooser.getParticipant(new Objects.ItemImpl(resolver, model, item), session(), node.metaData);
-                        item.adaptTo(ModifiableValueMap.class).put("assignee", assignee(who));
+                        String who = assignee(chooser.getParticipant(new Objects.ItemImpl(resolver, model, item), session(), node.metaData));
+                        item.adaptTo(ModifiableValueMap.class).put("assignee", who);
+                        if (!known(who)) {
+                            fail(item, NOBODY.replace("{}", who));
+                        }
                     } catch (WorkflowException | RuntimeException e) {
                         fail(item, message(e));
                     }
@@ -273,13 +289,13 @@ final class Engine {
         Resource item = newItem(instance, node, null);
         String name = node.metaData.get("PROCESS", String.class);
         if (ModelStore.GOTO_PROCESS.equals(name)) {
-            finish(item, ITEM_COMPLETED, "workflow-process-service", null, null);
+            finish(item, ITEM_COMPLETED, PROCESS_USER, null, null);
             RuntimeModel.Node target = model.nodes.get(String.valueOf(node.metaData.get("TARGET_NODE_ID")));
             String rule = node.metaData.get("rule", String.class);
             if (rule == null) {
                 rule = node.metaData.get("script", String.class);
             }
-            if (target != null && holds(rule)) {
+            if (target != null && holds(rule, seenBy(instance, item))) {
                 return Collections.singletonList(target);
             }
             return successors(model, node, null, instance);
@@ -290,11 +306,17 @@ final class Engine {
             return Collections.emptyList();
         }
         Objects.ItemImpl workItem = new Objects.ItemImpl(resolver, model, item);
+        runningItem = item.getPath();
+        runningInstance = instance.getPath();
+        completedItself = false;
+        chosenRoute = null;
+        endedItsFlow = false;
         try {
             process.execute(workItem, session(), new Meta(node.metaData));
             workItem.save();
         } catch (WorkflowException | RuntimeException e) {
             LOG.warn("Process step {} of {} failed", name, instance.getPath(), e);
+            aside.clear();
             resolver.revert();
             Resource again = resolver.getResource(item.getPath());
             if (again == null) {
@@ -303,7 +325,34 @@ final class Engine {
             fail(again, message(e));
             return Collections.emptyList();
         }
+        if (endedItsFlow) {
+            aside.clear();
+            try {
+                terminate(instance.getPath(), PROCESS_USER);
+            } catch (PersistenceException e) {
+                throw new IllegalStateException("Cannot end " + instance.getPath(), e);
+            }
+            return Collections.emptyList();
+        }
+        List<RuntimeModel.Node> also = new ArrayList<>(aside);
+        aside.clear();
+        if (completedItself) {
+            Resource own = resolver.getResource(item.getPath());
+            if (own != null && ITEM_ACTIVE.equals(own.getValueMap().get("status", ""))) {
+                finish(own, ITEM_COMPLETED, PROCESS_USER, null, null);
+            }
+            also.addAll(successors(model, node, chosenRoute, resolver.getResource(instance.getPath())));
+            return also;
+        }
         if ("false".equals(node.metaData.get("PROCESS_AUTO_ADVANCE", String.class))) {
+            if (!also.isEmpty()) {
+                // it waits itself, but it sent another step of its flow on
+                Resource waiting = resolver.getResource(item.getPath());
+                if (waiting != null && ITEM_ACTIVE.equals(waiting.getValueMap().get("status", ""))) {
+                    timeout(waiting, node);
+                }
+                return also;
+            }
             Resource waiting = resolver.getResource(item.getPath());
             if (waiting != null && ITEM_ACTIVE.equals(waiting.getValueMap().get("status", ""))) {
                 timeout(waiting, node); // the process completes the item itself, later, unless it times out
@@ -312,9 +361,10 @@ final class Engine {
         }
         Resource done = resolver.getResource(item.getPath());
         if (done != null && ITEM_ACTIVE.equals(done.getValueMap().get("status", ""))) {
-            finish(done, ITEM_COMPLETED, "workflow-process-service", null, null);
+            finish(done, ITEM_COMPLETED, PROCESS_USER, null, null);
         }
-        return successors(model, node, null, resolver.getResource(instance.getPath()));
+        also.addAll(successors(model, node, null, resolver.getResource(instance.getPath())));
+        return also;
     }
 
     /**
@@ -324,7 +374,7 @@ final class Engine {
     List<RuntimeModel.Node> successors(RuntimeModel model, RuntimeModel.Node node, String routeTo, Resource instance) {
         List<RuntimeModel.Node> out = new ArrayList<>();
         if (WorkflowNode.TYPE_OR_SPLIT.equals(node.type)) {
-            RuntimeModel.Transition t = choose(node.out, routeTo);
+            RuntimeModel.Transition t = choose(node.out, routeTo, instance);
             if (t != null) {
                 out.add(t.to);
             }
@@ -342,7 +392,7 @@ final class Engine {
         return out;
     }
 
-    private static RuntimeModel.Transition choose(List<RuntimeModel.Transition> options, String routeTo) {
+    private RuntimeModel.Transition choose(List<RuntimeModel.Transition> options, String routeTo, Resource instance) {
         if (routeTo != null) {
             for (RuntimeModel.Transition t : options) {
                 if (t.to.id.equals(routeTo)) {
@@ -351,7 +401,7 @@ final class Engine {
             }
         }
         for (RuntimeModel.Transition t : options) {
-            if (t.rule != null && !t.rule.trim().isEmpty() && holds(t.rule)) {
+            if (t.rule != null && !t.rule.trim().isEmpty() && holds(t.rule, seenBy(instance, null))) {
                 return t;
             }
         }
@@ -368,6 +418,11 @@ final class Engine {
      * that is a script counts as not holding, so the default branch is taken.
      */
     static boolean holds(String rule) {
+        return holds(rule, null);
+    }
+
+    /** With the instance at hand a rule that is a script is run (see {@link Rules}). */
+    static boolean holds(String rule, java.util.function.Supplier<Map<String, Object>> vars) {
         if (rule == null || rule.trim().isEmpty()) {
             return true;
         }
@@ -378,7 +433,46 @@ final class Engine {
         if ("false".equalsIgnoreCase(r)) {
             return false;
         }
-        return r.replaceAll("\\s+", "").matches("functioncheck\\(\\)\\{returntrue;?\\}");
+        if (r.replaceAll("\\s+", "").matches("functioncheck\\(\\)\\{returntrue;?\\}")) {
+            return true;
+        }
+        if (vars == null) {
+            return false;
+        }
+        try {
+            Boolean answer = Rules.check(r, vars.get());
+            if (answer == null) {
+                LOG.warn("A rule without a function check() counts as no: {}", r);
+                return false;
+            }
+            return answer;
+        } catch (LinkageError e) {
+            LOG.warn("Rule scripts cannot be run here (no Rhino): the rule counts as no: {}", r);
+            return false;
+        } catch (RuntimeException e) {
+            LOG.warn("The rule failed and counts as no: {} ({})", r, e.getMessage());
+            return false;
+        }
+    }
+
+    /** What a rule script sees, as in AEM. */
+    private java.util.function.Supplier<Map<String, Object>> seenBy(Resource instance, Resource item) {
+        return () -> {
+            Map<String, Object> vars = new HashMap<>();
+            Resource current = instance == null ? null : resolver.getResource(instance.getPath());
+            if (current != null) {
+                Objects.WorkflowImpl workflow = new Objects.WorkflowImpl(resolver, current, null);
+                vars.put("workflow", workflow);
+                vars.put("workflowData", workflow.getWorkflowData());
+            }
+            if (item != null) {
+                vars.put("workItem", new Objects.ItemImpl(resolver, null, item));
+            }
+            vars.put("workflowSession", session());
+            vars.put("jcrSession", resolver.adaptTo(javax.jcr.Session.class));
+            vars.put("resolver", resolver);
+            return vars;
+        };
     }
 
     /** Counts the arrival of a branch at an AND join; true once all branches arrived (and resets the count). */
@@ -549,6 +643,21 @@ final class Engine {
     }
 
     /** {@code /home/users/a/admin} (as older models store it) -> {@code admin}. */
+    /** A step given to nobody would wait for ever in no one's Inbox: it fails instead, and can be retried. */
+    static final String NOBODY = "The step is for {}, who is not a user or a group here";
+
+    private boolean known(String id) {
+        javax.jcr.Session session = resolver.adaptTo(javax.jcr.Session.class);
+        if (!(session instanceof org.apache.jackrabbit.api.JackrabbitSession)) {
+            return true;
+        }
+        try {
+            return ((org.apache.jackrabbit.api.JackrabbitSession) session).getUserManager().getAuthorizable(id) != null;
+        } catch (javax.jcr.RepositoryException | RuntimeException e) {
+            return true; // not known whether: the step waits, as before
+        }
+    }
+
     String assignee(String participant) {
         if (participant == null || participant.isEmpty()) {
             return "administrators";
@@ -563,8 +672,83 @@ final class Engine {
     }
 
     private WorkflowSession session() {
-        return new Objects.SessionImpl(resolver, null);
+        return new Objects.SessionImpl(resolver, null, new Inside());
     }
+
+    /** Started from inside a step: handed to whoever runs flows, once the new instance is saved. */
+    interface Starter {
+        void started(String instancePath, String user) throws WorkflowException;
+    }
+
+    Starter starter;
+
+    // the step being run, and what it asked for through its session
+    private String runningItem;
+    private String runningInstance;
+    private boolean completedItself;
+    private String chosenRoute;
+    private boolean endedItsFlow;
+    private final Deque<RuntimeModel.Node> aside = new ArrayDeque<>();
+
+    /**
+     * What a process step may do to flows through the session it is given, as in AEM: complete its
+     * own step along a route it chooses (a step with Handler Advance off), complete another waiting
+     * step of its flow, end its flow or another, start a flow. Until 28.11.2026 each of these threw
+     * "Not available inside a process step".
+     */
+    final class Inside {
+        void complete(String itemPath, String routeTo) throws WorkflowException {
+            Resource item = resolver.getResource(itemPath);
+            if (item == null || !ITEM_ACTIVE.equals(item.getValueMap().get("status", ""))) {
+                throw new WorkflowException("No waiting step " + itemPath);
+            }
+            Resource instance = item.getParent().getParent();
+            if (!instance.getPath().equals(runningInstance)) {
+                throw new WorkflowException("A step completes steps of its own flow only: " + itemPath + " belongs to another");
+            }
+            if (itemPath.equals(runningItem)) {
+                completedItself = true;
+                chosenRoute = routeTo;
+                return; // the engine finishes the item when the step returns, and goes where it said
+            }
+            RuntimeModel model = model(instance);
+            RuntimeModel.Node node = model.nodes.get(item.getValueMap().get("nodeId", ""));
+            finish(item, ITEM_COMPLETED, PROCESS_USER, null, null);
+            if (node != null) {
+                aside.addAll(successors(model, node, routeTo, instance));
+            }
+        }
+
+        void terminate(String instancePath) throws WorkflowException {
+            if (instancePath.equals(runningInstance)) {
+                endedItsFlow = true;
+                return;
+            }
+            try {
+                Engine.this.terminate(instancePath, PROCESS_USER);
+            } catch (PersistenceException | RuntimeException e) {
+                throw new WorkflowException("Cannot end " + instancePath, e);
+            }
+        }
+
+        String start(String modelId, String payloadType, String payload, Map<String, Object> metaData) throws WorkflowException {
+            if (starter == null) {
+                throw new WorkflowException("Flows cannot be started from here");
+            }
+            Resource running = runningInstance == null ? null : resolver.getResource(runningInstance);
+            String initiator = running == null ? PROCESS_USER : running.getValueMap().get("initiator", PROCESS_USER);
+            try {
+                String path = create(modelId, payloadType == null ? "JCR_PATH" : payloadType, payload, initiator,
+                        metaData == null ? Collections.emptyMap() : metaData);
+                starter.started(path, initiator);
+                return path;
+            } catch (PersistenceException | RuntimeException e) {
+                throw new WorkflowException("Cannot start " + modelId + ": " + e.getMessage(), e);
+            }
+        }
+    }
+
+    static final String PROCESS_USER = "workflow-process-service";
 
     private static String message(Throwable e) {
         return e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
