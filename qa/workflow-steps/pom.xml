@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <!--
+      Process steps and a participant chooser the way a customer writes them for AEM, in both workflow APIs.
+      Not part of the product: build it (after studio-uberjar), drop the jar into an author's install/ folder,
+      and run run.py against that author. See README.md.
+    -->
+    <parent>
+        <groupId>io.sensible.studio</groupId>
+        <artifactId>studio-uberjar</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <relativePath>../../studio-uberjar/pom.xml</relativePath>
+    </parent>
+    <groupId>com.example</groupId>
+    <artifactId>zz-wfqa</artifactId>
+    <version>1.0.0</version>
+    <name>QA :: a customer's workflow steps</name>
+    <dependencies>
+        <dependency>
+            <groupId>io.sensible.studio</groupId>
+            <artifactId>studio-cq-api</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../../studio-uberjar/studio-cq-api/target/studio-cq-api-0.1.0-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency><groupId>org.apache.sling</groupId><artifactId>org.apache.sling.api</artifactId></dependency>
+        <dependency><groupId>org.osgi</groupId><artifactId>org.osgi.service.component.annotations</artifactId></dependency>
+        <dependency><groupId>org.osgi</groupId><artifactId>osgi.annotation</artifactId></dependency>
+        <dependency><groupId>org.slf4j</groupId><artifactId>slf4j-api</artifactId></dependency>
+        <dependency><groupId>javax.jcr</groupId><artifactId>jcr</artifactId></dependency>
+        <dependency><groupId>javax.servlet</groupId><artifactId>javax.servlet-api</artifactId></dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>biz.aQute.bnd</groupId>
+                <artifactId>bnd-maven-plugin</artifactId>
+                <configuration>
+                    <bnd><![CDATA[
+Bundle-SymbolicName: com.example.zz-wfqa
+-privatepackage: com.example.wfqa.*
+                    ]]></bnd>
+                </configuration>
+            </plugin>
+            <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId></plugin>
+        </plugins>
+    </build>
+</project>

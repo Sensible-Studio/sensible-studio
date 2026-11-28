@@ -56,4 +56,28 @@ public interface WorkflowSession extends Adaptable {
     void complete(WorkItem item, Route route) throws WorkflowException;
 
     void updateWorkflowData(Workflow workflow, WorkflowData data) throws WorkflowException;
+
+    /** What happened in a workflow so far, oldest first. */
+    List<com.adobe.granite.workflow.exec.HistoryItem> getHistory(Workflow workflow) throws WorkflowException;
+
+    /** Gives a waiting step to somebody else. Whoever has the step may, and an administrator. */
+    void delegateWorkItem(WorkItem item, com.adobe.granite.workflow.exec.Participant participant) throws WorkflowException;
+
+    /** The users and groups a step can be given to. */
+    java.util.Iterator<com.adobe.granite.workflow.exec.Participant> getDelegates(WorkItem item) throws WorkflowException;
+
+    /** Every waiting step the session's user may see: all of them for an administrator. */
+    WorkItem[] getAllWorkItems() throws WorkflowException;
+
+    /** Every workflow the session's user may see. */
+    Workflow[] getAllWorkflows() throws WorkflowException;
+
+    /** Runs the failed steps of a workflow again. Administrators only. */
+    void restartWorkflow(Workflow workflow) throws WorkflowException;
+
+    /** Whether the session's user is an administrator of workflows. */
+    boolean isSuperuser();
+
+    /** Nothing to release here: the session ends with the resolver it was adapted from. */
+    void logout();
 }

@@ -5,7 +5,7 @@
  * on Sensible Studio. Align it with the output of studio-compat-scanner (see README).
  */
 @Export
-@Version("1.10.0")
+@Version("1.11.0")
 package com.adobe.granite.workflow;
 
 import org.osgi.annotation.bundle.Export;

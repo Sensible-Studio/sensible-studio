@@ -162,6 +162,22 @@ final class Objects {
         }
 
         @Override
+        public String getItemType() {
+            return item.getValueMap().get("type", String.class);
+        }
+
+        @Override
+        public String getItemSubType() {
+            WorkflowNode node = getNode();
+            return node == null ? null : node.getMetaDataMap().get("subType", String.class);
+        }
+
+        @Override
+        public Date getDueTime() {
+            return date(item.getValueMap(), "dueTime");
+        }
+
+        @Override
         public MetaDataMap getMetaDataMap() {
             return metaData;
         }
@@ -302,6 +318,79 @@ final class Objects {
         return to.title == null || to.title.isEmpty() ? to.id : to.title;
     }
 
+    static final class HistoryImpl implements com.adobe.granite.workflow.exec.HistoryItem {
+        private final ItemImpl item;
+        HistoryImpl previous;
+        HistoryImpl next;
+
+        HistoryImpl(ItemImpl item) {
+            this.item = item;
+        }
+
+        @Override
+        public String getAction() {
+            return item.resource().getValueMap().get("status", "");
+        }
+
+        @Override
+        public String getComment() {
+            ValueMap vm = item.resource().getValueMap();
+            return vm.get("comment", vm.get("failure", String.class));
+        }
+
+        @Override
+        public Date getDate() {
+            Date ended = item.getTimeEnded();
+            return ended != null ? ended : item.getTimeStarted();
+        }
+
+        @Override
+        public String getUserId() {
+            ValueMap vm = item.resource().getValueMap();
+            return vm.get("completedBy", vm.get("assignee", String.class));
+        }
+
+        @Override
+        public WorkItem getWorkItem() {
+            return item;
+        }
+
+        @Override
+        public com.adobe.granite.workflow.exec.HistoryItem getNextHistoryItem() {
+            return next;
+        }
+
+        @Override
+        public com.adobe.granite.workflow.exec.HistoryItem getPreviousHistoryItem() {
+            return previous;
+        }
+    }
+
+    static final class ParticipantImpl implements com.adobe.granite.workflow.exec.Participant {
+        private final String id;
+        private final boolean group;
+
+        ParticipantImpl(String id, boolean group) {
+            this.id = id;
+            this.group = group;
+        }
+
+        @Override
+        public String getID() {
+            return id;
+        }
+
+        @Override
+        public String getName() {
+            return id;
+        }
+
+        @Override
+        public boolean isGroup() {
+            return group;
+        }
+    }
+
     /**
      * A workflow session over a resolver. Reading works everywhere; starting and completing need the service (absent
      * inside a process step, where the step's own item is completed by the engine).
@@ -424,7 +513,7 @@ final class Objects {
                 for (Resource i : Engine.items(r)) {
                     ValueMap iv = i.getValueMap();
                     if (Engine.ITEM_ACTIVE.equals(iv.get("status", "")) && me.contains(iv.get("assignee", ""))) {
-                        out.add(new ItemImpl(rr, null, i));
+                        out.add(new ItemImpl(rr, Engine.modelOf(r), i)); // with its model: getNode() answered null
                     }
                 }
             }
@@ -483,6 +572,114 @@ final class Objects {
                 return;
             }
             service().complete(resolver, item.getId(), route == null ? null : route.getId(), null);
+        }
+
+        @Override
+        public List<com.adobe.granite.workflow.exec.HistoryItem> getHistory(Workflow workflow) throws WorkflowException {
+            ResourceResolver rr = reader();
+            Resource instance = rr.getResource(workflow.getId());
+            if (instance == null || !mine(instance, rr)) {
+                throw new WorkflowException("No workflow " + workflow.getId());
+            }
+            RuntimeModel model = Engine.modelOf(instance);
+            List<Resource> items = new ArrayList<>(Engine.items(instance));
+            items.sort((a, b) -> {
+                Date x = date(a.getValueMap(), "startTime");
+                Date y = date(b.getValueMap(), "startTime");
+                int c = x == null || y == null ? 0 : x.compareTo(y);
+                return c != 0 ? c : Integer.compare(a.getName().length(), b.getName().length()) != 0
+                        ? Integer.compare(a.getName().length(), b.getName().length()) : a.getName().compareTo(b.getName());
+            });
+            List<HistoryImpl> out = new ArrayList<>();
+            for (Resource i : items) {
+                HistoryImpl h = new HistoryImpl(new ItemImpl(rr, model, i));
+                if (!out.isEmpty()) {
+                    h.previous = out.get(out.size() - 1);
+                    h.previous.next = h;
+                }
+                out.add(h);
+            }
+            return new ArrayList<>(out);
+        }
+
+        @Override
+        public void delegateWorkItem(WorkItem item, com.adobe.granite.workflow.exec.Participant participant) throws WorkflowException {
+            if (participant == null || participant.getID() == null || participant.getID().trim().isEmpty()) {
+                throw new WorkflowException("Say whom the step is for");
+            }
+            if (service == null && inside != null) {
+                inside.delegate(item.getId(), participant.getID().trim());
+                return;
+            }
+            service().delegate(resolver, item.getId(), participant.getID());
+        }
+
+        @Override
+        public java.util.Iterator<com.adobe.granite.workflow.exec.Participant> getDelegates(WorkItem item) {
+            List<com.adobe.granite.workflow.exec.Participant> out = new ArrayList<>();
+            javax.jcr.Session session = reader().adaptTo(javax.jcr.Session.class);
+            if (session instanceof org.apache.jackrabbit.api.JackrabbitSession) {
+                try {
+                    java.util.Iterator<org.apache.jackrabbit.api.security.user.Authorizable> all = ((org.apache.jackrabbit.api.JackrabbitSession) session)
+                            .getUserManager().findAuthorizables("jcr:primaryType", null);
+                    while (all.hasNext() && out.size() < 500) {
+                        org.apache.jackrabbit.api.security.user.Authorizable a = all.next();
+                        if (a instanceof org.apache.jackrabbit.api.security.user.User && ((org.apache.jackrabbit.api.security.user.User) a).isSystemUser()) {
+                            continue;
+                        }
+                        out.add(new ParticipantImpl(a.getID(), a.isGroup()));
+                    }
+                } catch (javax.jcr.RepositoryException | RuntimeException e) {
+                    // nobody to offer
+                }
+            }
+            return out.iterator();
+        }
+
+        @Override
+        public WorkItem[] getAllWorkItems() {
+            List<WorkItem> out = new ArrayList<>();
+            ResourceResolver rr = reader();
+            for (Resource r : Instances.all(rr)) {
+                if (!mine(r, rr)) {
+                    continue;
+                }
+                for (Resource i : Engine.items(r)) {
+                    if (Engine.ITEM_ACTIVE.equals(i.getValueMap().get("status", ""))) {
+                        out.add(new ItemImpl(rr, Engine.modelOf(r), i));
+                    }
+                }
+            }
+            return out.toArray(new WorkItem[0]);
+        }
+
+        @Override
+        public Workflow[] getAllWorkflows() {
+            return getWorkflows(null);
+        }
+
+        @Override
+        public void restartWorkflow(Workflow workflow) throws WorkflowException {
+            ResourceResolver rr = reader();
+            Resource instance = rr.getResource(workflow.getId());
+            if (instance == null) {
+                throw new WorkflowException("No workflow " + workflow.getId());
+            }
+            for (Resource i : Engine.items(instance)) {
+                if (Engine.ITEM_FAILED.equals(i.getValueMap().get("status", ""))) {
+                    service().retry(resolver, i.getPath());
+                }
+            }
+        }
+
+        @Override
+        public boolean isSuperuser() {
+            return service == null || Instances.isAdmin(resolver);
+        }
+
+        @Override
+        public void logout() {
+            // the session ends with its resolver
         }
 
         @Override

@@ -27,4 +27,13 @@ public interface WorkItem {
     String getCurrentAssignee();
 
     MetaDataMap getMetaDataMap();
+
+    /** The kind of step: {@code PROCESS}, {@code PARTICIPANT} or {@code DYNAMIC_PARTICIPANT}. */
+    String getItemType();
+
+    /** A finer kind a step may name in its {@code subType}; mostly none. */
+    String getItemSubType();
+
+    /** When the step is due, when it has a timeout. */
+    Date getDueTime();
 }

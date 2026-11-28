@@ -64,10 +64,99 @@ public class WorkflowService implements JobConsumer {
         final String className;
 
         Registered(T service, String label) {
+            this(service, label, service.getClass().getName());
+        }
+
+        Registered(T service, String label, String className) {
             this.service = service;
             this.label = label;
-            this.className = service.getClass().getName();
+            this.className = className;
         }
+    }
+
+    // ---- steps written for the older API (com.day.cq.workflow): taken in under the Granite one
+
+    /** What stands for an older service here, to find it again when it goes. */
+    private final Map<Object, Object> stoodFor = new ConcurrentHashMap<>();
+
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    void bindOldProcess(com.day.cq.workflow.exec.WorkflowProcess process, Map<String, Object> props) {
+        WorkflowProcess as = (item, session, args) -> {
+            try {
+                process.execute(Legacy.old(item, com.day.cq.workflow.exec.WorkItem.class),
+                        LegacyWorkflowService.session(session, null), Legacy.old(args, com.day.cq.workflow.metadata.MetaDataMap.class));
+            } catch (com.day.cq.workflow.WorkflowException e) {
+                throw new com.adobe.granite.workflow.WorkflowException(e.getMessage(), e);
+            }
+        };
+        stoodFor.put(process, as);
+        processes.add(new Registered<>(as, label(props, "process.label", process), process.getClass().getName()));
+    }
+
+    void unbindOldProcess(com.day.cq.workflow.exec.WorkflowProcess process) {
+        Object as = stoodFor.remove(process);
+        processes.removeIf(r -> r.service == as);
+    }
+
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    void bindJavaProcess(com.day.cq.workflow.exec.JavaProcess process, Map<String, Object> props) {
+        WorkflowProcess as = (item, session, args) -> {
+            com.day.cq.workflow.exec.WorkItem oldItem = Legacy.old(item, com.day.cq.workflow.exec.WorkItem.class);
+            com.day.cq.workflow.WorkflowSession oldSession = LegacyWorkflowService.session(session, null);
+            try {
+                if (process instanceof com.day.cq.workflow.exec.JavaProcessExt) {
+                    String given = args.get("PROCESS_ARGS", "");
+                    ((com.day.cq.workflow.exec.JavaProcessExt) process).execute(oldItem, oldSession,
+                            given.trim().isEmpty() ? new String[0] : given.split("\\s*,\\s*"));
+                } else {
+                    process.execute(oldItem, oldSession);
+                }
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new com.adobe.granite.workflow.WorkflowException(e.getMessage(), e);
+            }
+        };
+        if (stoodFor.putIfAbsent(process, as) != null) {
+            return; // registered under both of its types
+        }
+        processes.add(new Registered<>(as, label(props, "process.label", process), process.getClass().getName()));
+    }
+
+    void unbindJavaProcess(com.day.cq.workflow.exec.JavaProcess process) {
+        Object as = stoodFor.remove(process);
+        processes.removeIf(r -> r.service == as);
+    }
+
+    /** A step registered under the wider type only. */
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    void bindJavaProcessExt(com.day.cq.workflow.exec.JavaProcessExt process, Map<String, Object> props) {
+        if (!stoodFor.containsKey(process)) {
+            bindJavaProcess(process, props);
+        }
+    }
+
+    void unbindJavaProcessExt(com.day.cq.workflow.exec.JavaProcessExt process) {
+        unbindJavaProcess(process);
+    }
+
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)
+    void bindOldChooser(com.day.cq.workflow.exec.ParticipantStepChooser chooser, Map<String, Object> props) {
+        ParticipantStepChooser as = (item, session, args) -> {
+            try {
+                return chooser.getParticipant(Legacy.old(item, com.day.cq.workflow.exec.WorkItem.class),
+                        LegacyWorkflowService.session(session, null), Legacy.old(args, com.day.cq.workflow.metadata.MetaDataMap.class));
+            } catch (com.day.cq.workflow.WorkflowException e) {
+                throw new com.adobe.granite.workflow.WorkflowException(e.getMessage(), e);
+            }
+        };
+        stoodFor.put(chooser, as);
+        choosers.add(new Registered<>(as, label(props, "chooser.label", chooser), chooser.getClass().getName()));
+    }
+
+    void unbindOldChooser(com.day.cq.workflow.exec.ParticipantStepChooser chooser) {
+        Object as = stoodFor.remove(chooser);
+        choosers.removeIf(r -> r.service == as);
     }
 
     @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY)

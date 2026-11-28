@@ -466,7 +466,7 @@ final class Engine {
                 vars.put("workflowData", workflow.getWorkflowData());
             }
             if (item != null) {
-                vars.put("workItem", new Objects.ItemImpl(resolver, null, item));
+                vars.put("workItem", new Objects.ItemImpl(resolver, current == null ? null : modelOf(current), item));
             }
             vars.put("workflowSession", session());
             vars.put("jcrSession", resolver.adaptTo(javax.jcr.Session.class));
@@ -717,6 +717,21 @@ final class Engine {
             if (node != null) {
                 aside.addAll(successors(model, node, routeTo, instance));
             }
+        }
+
+        void delegate(String itemPath, String assignee) throws WorkflowException {
+            Resource item = resolver.getResource(itemPath);
+            if (item == null || !ITEM_ACTIVE.equals(item.getValueMap().get("status", ""))) {
+                throw new WorkflowException("No waiting step " + itemPath);
+            }
+            if (!known(assignee)) {
+                throw new WorkflowException(NOBODY.replace("{}", assignee));
+            }
+            ModifiableValueMap vm = item.adaptTo(ModifiableValueMap.class);
+            vm.put("delegatedFrom", vm.get("assignee", ""));
+            vm.put("delegatedBy", PROCESS_USER);
+            vm.put("delegatedTime", Calendar.getInstance());
+            vm.put("assignee", assignee);
         }
 
         void terminate(String instancePath) throws WorkflowException {
